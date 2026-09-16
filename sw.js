@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v18'; // Versione aggiornata per la nuova riga Data/Numero e gestione validità
+const CACHE_NAME = 'prev-app-v19'; // Versione aggiornata per la posizione fissa di Data e Numero
 const ASSETS = [
   './',
   './index.html',
