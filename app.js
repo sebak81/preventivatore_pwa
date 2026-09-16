@@ -198,7 +198,7 @@ function persistSettings() {
 // 3. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
-  type: "PREVENTIVO", // PREVENTIVO | REVISIONE | CONTRATTO
+  type: "PREVENTIVO",
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "30 giorni",
@@ -308,7 +308,6 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
-  // Impostazioni, Logo e Macro-Categorie
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
   safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
@@ -1242,7 +1241,7 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
-//    - Layout Pagina 1 conforme allo schizzo grafico
+//    - Pagina 1: Esatta riproduzione del template grafico approvato
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1265,61 +1264,53 @@ function prepareAndPrint() {
 
   const totalPages = docState.categories.length + 3;
 
-  // PAGINA 1: LAYOUT IDENTICO ALLO SCHEMA GRAFICO
+  // PAGINA 1: LAYOUT DEFINITIVO FEDELE ALL'IMMAGINE
   const page1 = document.createElement('div');
-  page1.className = "sheet";
+  page1.className = "sheet p1-sheet";
   page1.innerHTML = `
-    <div>
-      <!-- Testata Ditta a sinistra e Numero/Data a destra -->
-      <div class="p-header">
-        <div class="p-header-brand">
-          ${companySettings.logo ? `<img src="${companySettings.logo}" class="p-page1-logo" alt="Logo">` : ''}
-          <div class="p-company">
-            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div>${escapeHtml(companySettings.address)}</div>
-            <div>${escapeHtml(companySettings.taxId)}</div>
-            <div>${escapeHtml(companySettings.contacts)}</div>
-          </div>
-        </div>
-        <div class="p-doc-details">
-          <div class="p-doc-meta" style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
-            <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
-          </div>
-          <div class="p-doc-meta"><strong>Data:</strong> ${escapeHtml(docState.date)}</div>
+    <!-- Testata Ditta a sinistra e Numero/Data a destra -->
+    <div class="p-header">
+      <div class="p-header-brand">
+        ${companySettings.logo ? `<img src="${companySettings.logo}" class="p-page1-logo" alt="Logo">` : ''}
+        <div class="p-company">
+          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+          <div>${escapeHtml(companySettings.address)}</div>
+          ${companySettings.taxId ? `<div>${escapeHtml(companySettings.taxId)}</div>` : ''}
+          <div>${escapeHtml(companySettings.contacts)}</div>
         </div>
       </div>
-
-      <!-- Blocco Committente & Cantiere allineato a destra come da schizzo -->
-      <div class="p1-recipient-container">
-        <div class="p1-client-card">
-          <div class="p1-client-title">Sig. ${escapeHtml(docState.client.name) || '____________________'}</div>
-          <div>via ${escapeHtml(docState.client.residence) || '____________________'}</div>
-          ${docState.client.taxId ? `<div style="font-size: 0.85rem; color: #444; margin-top: 2px;">C.F. / P.IVA: ${escapeHtml(docState.client.taxId)}</div>` : ''}
-          <div style="margin-top: 8px;">
-            <div><strong>tel:</strong> ${escapeHtml(docState.client.phone) || '____________________'}</div>
-            <div><strong>e mail:</strong> ${escapeHtml(docState.client.email) || '____________________'}</div>
-          </div>
-        </div>
-
-        <!-- Box Cantiere: compare solo se diverso da sopra -->
-        ${(!docState.sameSite && docState.siteAddress) ? `
-          <div class="p1-site-card">
-            <strong>Cantiere sito in:</strong> ${escapeHtml(docState.siteAddress)}
-          </div>
-        ` : ''}
-      </div>
-
-      <!-- Titolo Centrale Circondato e Validità Offerta come da schizzo -->
-      <div class="p1-title-container">
-        <div class="p1-main-title">${escapeHtml(docState.type)}</div>
-        <div class="p1-validity-text">validità offerta ${escapeHtml(docState.validity || '15 giorni')}</div>
+      <div class="p-doc-details">
+        <div class="p-doc-number"><strong>Numero:</strong> ${escapeHtml(formattedDocNum)}</div>
+        <div class="p-doc-date"><strong>Data:</strong> ${escapeHtml(docState.date)}</div>
       </div>
     </div>
 
-    <!-- Piede di pagina con ditta e numerazione -->
-    <div class="p-footer">
-      <span>${escapeHtml(companySettings.name)}</span>
-      <span>Pagina 1 di ${totalPages}</span>
+    <!-- DATI CONTATTO CLIENTE: CENTRATI A METÀ PAGINA SENZA BORDO -->
+    <div class="p1-client-center">
+      <div class="p1-client-name">Sig. ${escapeHtml(docState.client.name) || '____________________'}</div>
+      <div class="p1-client-address">via ${escapeHtml(docState.client.residence) || '____________________'}</div>
+      ${docState.client.taxId ? `<div class="p1-client-tax">C.F. / P.IVA: ${escapeHtml(docState.client.taxId)}</div>` : ''}
+      ${docState.client.phone ? `<div class="p1-client-line"><strong>tel:</strong> ${escapeHtml(docState.client.phone)}</div>` : ''}
+      ${docState.client.email ? `<div class="p1-client-line"><strong>e mail:</strong> ${escapeHtml(docState.client.email)}</div>` : ''}
+      ${(!docState.sameSite && docState.siteAddress) ? `
+        <div class="p1-site-info"><strong>Cantiere sito in:</strong> ${escapeHtml(docState.siteAddress)}</div>
+      ` : ''}
+    </div>
+
+    <!-- TITOLO E VALIDITÀ: A CIRCA 3/4 DI ALTEZZA -->
+    <div class="p1-title-bottom">
+      <div class="p1-main-title">${escapeHtml(docState.type)}</div>
+      <div class="p1-validity-text">validità offerta ${escapeHtml(docState.validity || '15 giorni')}</div>
+    </div>
+
+    <!-- PIÈ DI PAGINA DI PAGINA 1: RIGA, DATI DITTA A SINISTRA E PAGINA 1 DI X A DESTRA -->
+    <div class="p1-footer">
+      <div class="p1-footer-company">
+        <div class="p1-footer-title">${escapeHtml(companySettings.name)}</div>
+        <div>${escapeHtml(companySettings.address)}</div>
+        <div>${escapeHtml(companySettings.contacts)}</div>
+      </div>
+      <div class="p1-footer-page">Pagina 1 di ${totalPages}</div>
     </div>
   `;
   printRoot.appendChild(page1);
