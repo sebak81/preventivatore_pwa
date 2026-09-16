@@ -1251,8 +1251,8 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
-//    - Pagina 1: Data a sinistra e Numero a destra sotto la riga di divisione
-//    - Validità offerta dinamica (nascosta se Contratto)
+//    - Pagina 1: Layout a blocco unitario con Data a sinistra e Numero a destra
+//    - Validità offerta nascosta in automatico se Tipo Documento = CONTRATTO
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1276,39 +1276,39 @@ function prepareAndPrint() {
 
   const totalPages = docState.categories.length + 3;
 
-  // Calcolo testo validità dinamico dal modulo
   let validityText = (docState.validity || "").trim();
   if (validityText && !validityText.toLowerCase().includes("validit")) {
     validityText = `validità offerta ${validityText}`;
   }
 
-  // PAGINA 1
+  // PAGINA 1: NUOVA TESTATA UNITARIA CON DATA A SINISTRA E NUMERO A DESTRA
   const page1 = document.createElement('div');
   page1.className = "sheet p1-sheet";
   page1.innerHTML = `
-    <!-- 1. SOPRA LA RIGA: Logo a larghezza intera a sinistra (oppure dati ditta se no logo) -->
-    <div class="p1-header-top">
-      ${companySettings.logo ? `
-        <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo Aziendale">
-      ` : `
-        <div class="p-company">
-          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-          <div>${escapeHtml(companySettings.address)}</div>
-          ${companySettings.taxId ? `<div>${escapeHtml(companySettings.taxId)}</div>` : ''}
-          <div>${escapeHtml(companySettings.contacts)}</div>
-        </div>
-      `}
-    </div>
+    <!-- BLOCCO SUPERIORE UNITARIO (In-flow naturale in cima al foglio) -->
+    <div class="p1-top-container">
+      <div class="p1-header-brand">
+        ${companySettings.logo ? `
+          <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo Aziendale">
+        ` : `
+          <div class="p-company">
+            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+            <div>${escapeHtml(companySettings.address)}</div>
+            ${companySettings.taxId ? `<div>${escapeHtml(companySettings.taxId)}</div>` : ''}
+            <div>${escapeHtml(companySettings.contacts)}</div>
+          </div>
+        `}
+      </div>
 
-    <!-- 2. SOTTO LA RIGA: Data a sinistra, Numero con contorno sottile a destra -->
-    <div class="p1-sub-header">
-      <div class="p1-doc-date"><strong>Data:</strong> ${escapeHtml(formattedDate)}</div>
-      <div class="p1-doc-number-box">
-        <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
+      <div class="p1-sub-header">
+        <div class="p1-doc-date"><strong>Data:</strong> ${escapeHtml(formattedDate)}</div>
+        <div class="p1-doc-number-box">
+          <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
+        </div>
       </div>
     </div>
 
-    <!-- 3. DATI CLIENTE: CENTRATI A METÀ PAGINA SENZA BORDO -->
+    <!-- DATI CONTATTO CLIENTE: CENTRATI A METÀ PAGINA SENZA BORDO -->
     <div class="p1-client-center">
       <div class="p1-client-name">Sig. ${escapeHtml(docState.client.name) || '____________________'}</div>
       <div class="p1-client-address">via ${escapeHtml(docState.client.residence) || '____________________'}</div>
@@ -1320,7 +1320,7 @@ function prepareAndPrint() {
       ` : ''}
     </div>
 
-    <!-- 4. TITOLO A CIRCA 3/4 ALTEZZA (La validità appare solo se non è Contratto) -->
+    <!-- TITOLO E VALIDITÀ: A CIRCA 3/4 DI ALTEZZA (Senza validità se Contratto) -->
     <div class="p1-title-bottom">
       <div class="p1-main-title">${escapeHtml(docState.type)}</div>
       ${!isContract && validityText ? `
@@ -1328,7 +1328,7 @@ function prepareAndPrint() {
       ` : ''}
     </div>
 
-    <!-- 5. PIÈ DI PAGINA: DATI DITTA A SINISTRA E PAGINA 1 DI X A DESTRA -->
+    <!-- PIÈ DI PAGINA: DATI DITTA A SINISTRA E PAGINA 1 DI X A DESTRA -->
     <div class="p1-footer">
       <div class="p1-footer-company">
         <div class="p1-footer-title">${escapeHtml(companySettings.name)}</div>
