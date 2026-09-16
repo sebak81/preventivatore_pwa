@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v14'; // Aggiornato con il layout grafico definitivo per Pagina 1
+const CACHE_NAME = 'prev-app-v16'; // Incremento versione per il layout di Pagina 1
 const ASSETS = [
   './',
   './index.html',
