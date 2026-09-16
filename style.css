@@ -24,9 +24,7 @@ body {
   padding-bottom: 80px;
 }
 
-/* ========================================================== */
-/* RIMOZIONE FRECCE SU/GIÙ (SPINNER) DAI CAMPI NUMERICI       */
-/* ========================================================== */
+/* RIMOZIONE FRECCE SU/GIÙ DAI CAMPI NUMERICI */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -476,17 +474,69 @@ textarea {
     text-align: right;
   }
 
-  .p-doc-type {
-    font-size: 1.35rem;
-    font-weight: 900;
-    text-transform: uppercase;
-  }
-
   .p-doc-meta {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     margin-top: 3px;
   }
 
+  /* STILI SCHEMA GRAFICO PAGINA 1 (COMMITTENTE, CANTIERE & TITOLO CENTRALE) */
+  .p1-recipient-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 30px;
+  }
+
+  .p1-client-card {
+    width: 55%;
+    border: 1.5px solid #222;
+    border-radius: 4px;
+    padding: 14px 18px;
+    background: #fff;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .p1-client-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #000;
+    margin-bottom: 4px;
+  }
+
+  .p1-site-card {
+    width: 55%;
+    border: 1.5px solid #222;
+    border-radius: 4px;
+    padding: 10px 18px;
+    margin-top: 10px;
+    background: #fff;
+    font-size: 0.9rem;
+  }
+
+  .p1-title-container {
+    margin-top: 80px;
+    text-align: center;
+  }
+
+  .p1-main-title {
+    font-size: 2.6rem;
+    font-weight: 900;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #000;
+    margin-bottom: 12px;
+  }
+
+  .p1-validity-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: underline;
+    font-style: italic;
+    color: #333;
+  }
+
+  /* Schede Categorie e Tabelle */
   .p-box {
     border: 1px solid #888;
     padding: 10px 12px;
