@@ -24,66 +24,90 @@ let docState = {
   categories: [],
   taxRate: 22,
   taxBonus: "Bonus Casa 50%",
-  paymentTerms: "30% all'ordine, 40% a inizio posa, saldo a fine lavori.",
-  deliveryTerms: "6-8 settimane lavorative da rilievo misure definitive.",
+  paymentTerms: "30% all'ordine come caparra confirmatoria, 40% a inizio posa, 30% a fine lavori collaudati.",
+  deliveryTerms: "Circa 6-8 settimane lavorative dall'avvenuto rilievo misure definitive.",
   finalNotes: ""
 };
 
-// Inizializzazione
-window.addEventListener('DOMContentLoaded', () => {
+// Funzione helper sicura: collega l'evento solo se l'elemento esiste
+function safeOn(id, event, handler) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener(event, handler);
+  } else {
+    console.warn(`Elemento #${id} non trovato nel DOM.`);
+  }
+}
+
+// Inizializzazione sicura
+function initApp() {
   setupEventListeners();
   loadDefaultState();
   renderCategoriesUI();
   updateCalculations();
-});
+  console.log("Preventivatore PWA inizializzato con successo!");
+}
 
-// Setup degli eventi UI
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+// Setup Event Listeners
 function setupEventListeners() {
-  document.getElementById('doc-type').addEventListener('change', (e) => { docState.type = e.target.value; });
-  document.getElementById('doc-number').addEventListener('input', (e) => { docState.number = e.target.value; });
-  document.getElementById('doc-date').addEventListener('change', (e) => { docState.date = e.target.value; });
-  document.getElementById('doc-validity').addEventListener('input', (e) => { docState.validity = e.target.value; });
+  safeOn('doc-type', 'change', (e) => { docState.type = e.target.value; });
+  safeOn('doc-number', 'input', (e) => { docState.number = e.target.value; });
+  safeOn('doc-date', 'change', (e) => { docState.date = e.target.value; });
+  safeOn('doc-validity', 'input', (e) => { docState.validity = e.target.value; });
 
-  document.getElementById('client-name').addEventListener('input', (e) => { docState.client.name = e.target.value; });
-  document.getElementById('client-residence').addEventListener('input', (e) => { docState.client.residence = e.target.value; });
-  document.getElementById('client-taxId' || 'client-taxid').addEventListener('input', (e) => { docState.client.taxId = e.target.value; });
-  document.getElementById('client-phone').addEventListener('input', (e) => { docState.client.phone = e.target.value; });
-  document.getElementById('client-email').addEventListener('input', (e) => { docState.client.email = e.target.value; });
+  safeOn('client-name', 'input', (e) => { docState.client.name = e.target.value; });
+  safeOn('client-residence', 'input', (e) => { docState.client.residence = e.target.value; });
+  safeOn('client-taxid', 'input', (e) => { docState.client.taxId = e.target.value; });
+  safeOn('client-phone', 'input', (e) => { docState.client.phone = e.target.value; });
+  safeOn('client-email', 'input', (e) => { docState.client.email = e.target.value; });
 
-  const sameSiteEl = document.getElementById('same-site');
-  const siteGroupEl = document.getElementById('site-group');
-  sameSiteEl.addEventListener('change', (e) => {
+  safeOn('same-site', 'change', (e) => {
     docState.sameSite = e.target.checked;
-    siteGroupEl.style.display = e.target.checked ? 'none' : 'block';
+    const siteGroupEl = document.getElementById('site-group');
+    if (siteGroupEl) {
+      siteGroupEl.style.display = e.target.checked ? 'none' : 'block';
+    }
   });
-  document.getElementById('site-address').addEventListener('input', (e) => { docState.siteAddress = e.target.value; });
 
-  document.getElementById('tax-rate').addEventListener('change', (e) => {
-    docState.taxRate = parseFloat(e.target.value);
+  safeOn('site-address', 'input', (e) => { docState.siteAddress = e.target.value; });
+
+  safeOn('tax-rate', 'change', (e) => {
+    docState.taxRate = parseFloat(e.target.value) || 0;
     updateCalculations();
   });
-  document.getElementById('tax-bonus').addEventListener('input', (e) => { docState.taxBonus = e.target.value; });
-  document.getElementById('payment-terms').addEventListener('input', (e) => { docState.paymentTerms = e.target.value; });
-  document.getElementById('delivery-terms').addEventListener('input', (e) => { docState.deliveryTerms = e.target.value; });
-  document.getElementById('final-notes').addEventListener('input', (e) => { docState.finalNotes = e.target.value; });
 
-  // Pulsanti Barra Strumenti
-  document.getElementById('btn-add-category').addEventListener('click', addCategoryFromSelector);
-  document.getElementById('btn-print').addEventListener('click', prepareAndPrint);
-  document.getElementById('btn-save').addEventListener('click', saveToFile);
-  document.getElementById('btn-open').addEventListener('click', () => document.getElementById('file-input').click());
-  document.getElementById('file-input').addEventListener('change', openFromFile);
-  document.getElementById('btn-new').addEventListener('click', resetDocument);
+  safeOn('tax-bonus', 'input', (e) => { docState.taxBonus = e.target.value; });
+  safeOn('payment-terms', 'input', (e) => { docState.paymentTerms = e.target.value; });
+  safeOn('delivery-terms', 'input', (e) => { docState.deliveryTerms = e.target.value; });
+  safeOn('final-notes', 'input', (e) => { docState.finalNotes = e.target.value; });
+
+  // Pulsanti Principali
+  safeOn('btn-add-category', 'click', addCategoryFromSelector);
+  safeOn('btn-print', 'click', prepareAndPrint);
+  safeOn('btn-save', 'click', saveToFile);
+  safeOn('btn-open', 'click', () => {
+    const fi = document.getElementById('file-input');
+    if (fi) fi.click();
+  });
+  safeOn('file-input', 'change', openFromFile);
+  safeOn('btn-new', 'click', resetDocument);
 }
 
 function loadDefaultState() {
-  document.getElementById('doc-date').value = docState.date;
+  const dateInput = document.getElementById('doc-date');
+  if (dateInput) dateInput.value = docState.date;
 }
 
 // Aggiunta dinamica di una categoria
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
-  const catName = sel.value;
+  const catName = sel ? sel.value : "Nuova Categoria";
 
   const newCat = {
     id: 'cat_' + Date.now(),
@@ -98,13 +122,18 @@ function addCategoryFromSelector() {
   updateCalculations();
 }
 
-// Render delle schede categoria nel form
+// Render delle schede categoria a schermo
 function renderCategoriesUI() {
   const container = document.getElementById('categories-container');
+  if (!container) return;
+
   container.innerHTML = "";
 
   if (docState.categories.length === 0) {
-    container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Nessuna categoria inserita. Seleziona una voce sopra e premi "Aggiungi".</div>`;
+    container.innerHTML = `
+      <div style="text-align: center; color: var(--text-muted); padding: 24px; border: 2px dashed var(--border); border-radius: 8px;">
+        Nessuna categoria inserita.<br>Scegli una voce dal menu sopra e premi <strong>+ Aggiungi Pagina Categoria</strong>.
+      </div>`;
     return;
   }
 
@@ -113,13 +142,13 @@ function renderCategoriesUI() {
     card.className = "card category-card";
     card.innerHTML = `
       <div class="card-title">
-        <span>Pagina ${index + 2}: ${escapeHtml(cat.name)}</span>
-        <button type="button" class="btn btn-danger" onclick="removeCategory('${cat.id}')">Rimuovi</button>
+        <span><strong>Pagina ${index + 2}:</strong> ${escapeHtml(cat.name)}</span>
+        <button type="button" class="btn btn-danger" onclick="removeCategory('${cat.id}')">Rimuovi Pagina</button>
       </div>
       <div class="form-grid">
         <div class="form-group full">
           <label>Finiture / Specifiche Rapide (Profilo, Colore, Vetro, Rete, ecc.)</label>
-          <input type="text" value="${escapeHtml(cat.options)}" placeholder="es. Serie Alluminio Termico - Colore Bianco 9010 - Vetro selettivo 44.1/16/33.1" oninput="updateCatField('${cat.id}', 'options', this.value)">
+          <input type="text" value="${escapeHtml(cat.options)}" placeholder="es. Alluminio Taglio Termico - Vetrocamera Basso Emissivo 44.1/16/33.1 - Colore Bianco 9010" oninput="updateCatField('${cat.id}', 'options', this.value)">
         </div>
         <div class="form-group full">
           <label>Elenco Posizioni e Descrizione Dettagliata</label>
@@ -127,7 +156,7 @@ function renderCategoriesUI() {
         </div>
         <div class="form-group price-field">
           <label>Prezzo Imponibile Categoria (€)</label>
-          <input type="number" step="0.01" min="0" value="${cat.price || ''}" placeholder="0.00" oninput="updateCatPrice('${cat.id}', this.value)">
+          <input type="number" step="0.01" min="0" value="${cat.price > 0 ? cat.price : ''}" placeholder="0.00" oninput="updateCatPrice('${cat.id}', this.value)">
         </div>
       </div>
     `;
@@ -135,79 +164,92 @@ function renderCategoriesUI() {
   });
 }
 
-function updateCatField(id, field, value) {
+// Funzioni esposte a window per gli attributi inline (onclick / oninput)
+window.updateCatField = function(id, field, value) {
   const cat = docState.categories.find(c => c.id === id);
   if (cat) cat[field] = value;
-}
+};
 
-function updateCatPrice(id, value) {
+window.updateCatPrice = function(id, value) {
   const cat = docState.categories.find(c => c.id === id);
   if (cat) {
     cat.price = parseFloat(value) || 0;
     updateCalculations();
   }
-}
+};
 
-function removeCategory(id) {
-  docState.categories = docState.categories.filter(c => c.id !== id);
-  renderCategoriesUI();
-  updateCalculations();
-}
+window.removeCategory = function(id) {
+  if (confirm("Vuoi rimuovere questa categoria e la relativa pagina?")) {
+    docState.categories = docState.categories.filter(c => c.id !== id);
+    renderCategoriesUI();
+    updateCalculations();
+  }
+};
 
-// Calcolo totali e tasse
+// Calcolo totali e imposte
 function updateCalculations() {
   const subtotal = docState.categories.reduce((sum, c) => sum + (c.price || 0), 0);
   const tax = subtotal * (docState.taxRate / 100);
   const total = subtotal + tax;
 
-  document.getElementById('lbl-subtotal').textContent = formatCurrency(subtotal);
-  document.getElementById('lbl-tax').textContent = `${formatCurrency(tax)} (${docState.taxRate}%)`;
-  document.getElementById('lbl-total').textContent = formatCurrency(total);
+  const subEl = document.getElementById('lbl-subtotal');
+  const taxEl = document.getElementById('lbl-tax');
+  const totEl = document.getElementById('lbl-total');
+
+  if (subEl) subEl.textContent = formatCurrency(subtotal);
+  if (taxEl) taxEl.textContent = `${formatCurrency(tax)} (${docState.taxRate}%)`;
+  if (totEl) totEl.textContent = formatCurrency(total);
 }
 
 function formatCurrency(val) {
-  return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(val);
+  return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(val || 0);
 }
 
 function escapeHtml(str) {
   if (!str) return "";
-  return str.replace(/[&<>"']/g, function(m) {
+  return String(str).replace(/[&<>"']/g, function(m) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
   });
 }
 
-// Reset Preventivo
+// Reset Preventivo (Nuovo)
 function resetDocument() {
-  if (confirm("Vuoi iniziare un nuovo preventivo azzerando i campi?")) {
-    docState.number = "";
-    docState.client = { name: "", residence: "", taxId: "", phone: "", email: "" };
-    docState.categories = [];
-    docState.siteAddress = "";
-    docState.sameSite = true;
-    
-    // Aggiorna UI
-    document.getElementById('doc-number').value = "";
-    document.getElementById('client-name').value = "";
-    document.getElementById('client-residence').value = "";
-    document.getElementById('client-taxid').value = "";
-    document.getElementById('client-phone').value = "";
-    document.getElementById('client-email').value = "";
-    document.getElementById('same-site').checked = true;
-    document.getElementById('site-group').style.display = 'none';
-    document.getElementById('site-address').value = "";
+  if (!confirm("Vuoi iniziare un nuovo preventivo azzerando i campi?")) return;
 
-    renderCategoriesUI();
-    updateCalculations();
-  }
+  docState.number = "";
+  docState.client = { name: "", residence: "", taxId: "", phone: "", email: "" };
+  docState.categories = [];
+  docState.siteAddress = "";
+  docState.sameSite = true;
+  docState.finalNotes = "";
+
+  document.getElementById('doc-number').value = "";
+  document.getElementById('client-name').value = "";
+  document.getElementById('client-residence').value = "";
+  document.getElementById('client-taxid').value = "";
+  document.getElementById('client-phone').value = "";
+  document.getElementById('client-email').value = "";
+  
+  const sameSiteEl = document.getElementById('same-site');
+  if (sameSiteEl) sameSiteEl.checked = true;
+  const siteGroupEl = document.getElementById('site-group');
+  if (siteGroupEl) siteGroupEl.style.display = 'none';
+  
+  document.getElementById('site-address').value = "";
+  document.getElementById('final-notes').value = "";
+
+  renderCategoriesUI();
+  updateCalculations();
 }
 
-// SALVATAGGIO / APERTURA JSON (Compatibile con pCloud Drive)
+// SALVATAGGIO JSON (Compatibile pCloud Drive)
 async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
-  const safeName = (docState.client.name.replace(/[^a-zA-Z0-9]/g, '_') || "Documento") + "_" + (docState.number.replace(/[^a-zA-Z0-9]/g, '_') || "Bozza");
-  const fileName = `${safeName}.json`;
+  const clientName = docState.client.name.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || "Cliente";
+  const docNum = docState.number.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || "Bozza";
+  const fileName = `${clientName}_${docNum}.json`;
 
-  // Uso delle API native moderne se disponibili (apre il dialogo di selezione cartella, es. pCloud)
+  // Se supportato dal browser (Chrome / Edge su PC): dialogo nativo di Windows/Linux per scegliere la cartella pCloud
   if ('showSaveFilePicker' in window) {
     try {
       const handle = await window.showSaveFilePicker({
@@ -220,21 +262,27 @@ async function saveToFile() {
       const writable = await handle.createWritable();
       await writable.write(jsonStr);
       await writable.close();
-      alert("Salvato correttamente!");
+      alert("File salvato correttamente!");
       return;
     } catch (err) {
-      if (err.name === 'AbortError') return;
+      if (err.name === 'AbortError') return; // L'utente ha premuto "Annulla"
+      console.warn("showSaveFilePicker non riuscito, uso download classico:", err);
     }
   }
 
-  // Fallback per browser che non supportano showSaveFilePicker (es. Safari/Mobile)
+  // Fallback universale (scarica direttamente il file)
   const blob = new Blob([jsonStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  a.href = url;
   a.download = fileName;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
+// APERTURA JSON
 function openFromFile(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -245,23 +293,25 @@ function openFromFile(e) {
       const data = JSON.parse(event.target.result);
       docState = Object.assign(docState, data);
 
-      // Aggiornamento campi form
-      document.getElementById('doc-type').value = docState.type;
+      // Ripristino Campi Form
+      document.getElementById('doc-type').value = docState.type || "PREVENTIVO";
       document.getElementById('doc-number').value = docState.number || '';
-      document.getElementById('doc-date').value = docState.date;
+      document.getElementById('doc-date').value = docState.date || '';
       document.getElementById('doc-validity').value = docState.validity || '30 giorni';
 
-      document.getElementById('client-name').value = docState.client.name || '';
-      document.getElementById('client-residence').value = docState.client.residence || '';
-      document.getElementById('client-taxid').value = docState.client.taxId || '';
-      document.getElementById('client-phone').value = docState.client.phone || '';
-      document.getElementById('client-email').value = docState.client.email || '';
+      document.getElementById('client-name').value = docState.client?.name || '';
+      document.getElementById('client-residence').value = docState.client?.residence || '';
+      document.getElementById('client-taxid').value = docState.client?.taxId || '';
+      document.getElementById('client-phone').value = docState.client?.phone || '';
+      document.getElementById('client-email').value = docState.client?.email || '';
 
-      document.getElementById('same-site').checked = docState.sameSite;
-      document.getElementById('site-group').style.display = docState.sameSite ? 'none' : 'block';
+      const sameSiteEl = document.getElementById('same-site');
+      if (sameSiteEl) sameSiteEl.checked = docState.sameSite;
+      const siteGroupEl = document.getElementById('site-group');
+      if (siteGroupEl) siteGroupEl.style.display = docState.sameSite ? 'none' : 'block';
+
       document.getElementById('site-address').value = docState.siteAddress || '';
-
-      document.getElementById('tax-rate').value = docState.taxRate;
+      document.getElementById('tax-rate').value = docState.taxRate || 22;
       document.getElementById('tax-bonus').value = docState.taxBonus || '';
       document.getElementById('payment-terms').value = docState.paymentTerms || '';
       document.getElementById('delivery-terms').value = docState.deliveryTerms || '';
@@ -269,18 +319,19 @@ function openFromFile(e) {
 
       renderCategoriesUI();
       updateCalculations();
-      alert("Progetto caricato con successo!");
+      alert("Preventivo caricato con successo!");
     } catch (err) {
-      alert("Errore nella lettura del file JSON: " + err.message);
+      alert("Errore nel caricamento del file JSON: " + err.message);
     }
   };
   reader.readAsText(file);
-  e.target.value = '';
+  e.target.value = ''; // Permette di ricaricare lo stesso file se necessario
 }
 
-// GENERAZIONE FOGLI DI STAMPA A4 E APERTURA DIALOGO PDF
+// GENERAZIONE PAGINE A4 E STAMPA / PDF
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
+  if (!printRoot) return;
   printRoot.innerHTML = "";
 
   const subtotal = docState.categories.reduce((sum, c) => sum + (c.price || 0), 0);
@@ -308,9 +359,9 @@ function prepareAndPrint() {
         </div>
       </div>
 
-      <div class="p-box" style="margin-top: 30px;">
+      <div class="p-box" style="margin-top: 25px;">
         <div class="p-box-title">Dati del Committente</div>
-        <div style="font-size: 1.05rem; font-weight: bold; margin-bottom: 6px;">${escapeHtml(docState.client.name) || '---'}</div>
+        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 6px;">${escapeHtml(docState.client.name) || '---'}</div>
         <div><strong>Residenza:</strong> ${escapeHtml(docState.client.residence) || '---'}</div>
         <div><strong>C.F. / P.IVA:</strong> ${escapeHtml(docState.client.taxId) || '---'}</div>
         <div><strong>Recapiti:</strong> ${escapeHtml(docState.client.phone)} ${docState.client.email ? '| ' + escapeHtml(docState.client.email) : ''}</div>
@@ -321,11 +372,11 @@ function prepareAndPrint() {
         <div>${docState.sameSite ? 'Il cantiere coincide con l\'indirizzo di residenza sopra indicato.' : '<strong>Indirizzo Cantiere:</strong> ' + escapeHtml(docState.siteAddress)}</div>
       </div>
 
-      <div class="p-box" style="margin-top: 25px;">
+      <div class="p-box" style="margin-top: 20px;">
         <div class="p-box-title">Premessa e Oggetto dell'Offerta</div>
         <p style="font-size: 0.9rem; line-height: 1.5;">
           La presente offerta descrive la fornitura e posa in opera dei manufatti specificati analiticamente nelle pagine successive.
-          Ogni tipologia merceologica viene dettagliata nella propria scheda separata per trasparenza tecnica ed economica.
+          Ogni tipologia merceologica viene dettagliata nella propria scheda separata per la massima trasparenza tecnica ed economica.
         </p>
       </div>
     </div>
@@ -336,7 +387,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(page1);
 
-  // PAGINE 2..N: CATEGORIE (Una per ogni foglio A4)
+  // PAGINE 2..N: CATEGORIE (Una distinta per ogni foglio A4)
   docState.categories.forEach((cat, idx) => {
     const pageCat = document.createElement('div');
     pageCat.className = "sheet";
@@ -345,7 +396,7 @@ function prepareAndPrint() {
         <div class="p-header">
           <div class="p-company">
             <div class="p-company-title">${escapeHtml(COMPANY.name)}</div>
-            <div style="font-size: 0.8rem;">Allegato Tecnico - Preventivo N° ${escapeHtml(docState.number || 'BOZZA')}</div>
+            <div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ${escapeHtml(docState.number || 'BOZZA')}</div>
           </div>
           <div class="p-doc-details">
             <div style="font-size: 1.1rem; font-weight: bold;">SCHEDA TECNICA ${idx + 1}</div>
@@ -353,8 +404,8 @@ function prepareAndPrint() {
           </div>
         </div>
 
-        <div style="margin-top: 10px; margin-bottom: 20px;">
-          <h2 style="font-size: 1.4rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 6px;">
+        <div style="margin: 15px 0 20px 0;">
+          <h2 style="font-size: 1.35rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 6px;">
             ${escapeHtml(cat.name)}
           </h2>
         </div>
@@ -371,7 +422,7 @@ function prepareAndPrint() {
           <div style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;">${escapeHtml(cat.description) || 'Nessuna specifica aggiuntiva.'}</div>
         </div>
 
-        <div style="margin-top: 25px; text-align: right; background: #f4f4f4; padding: 12px 16px; border: 1px solid #ccc;">
+        <div style="margin-top: 20px; text-align: right; background: #f4f4f4; padding: 12px 16px; border: 1px solid #ccc;">
           <span style="font-size: 1.1rem; font-weight: bold; margin-right: 15px;">Totale Imponibile Categoria:</span>
           <span style="font-size: 1.3rem; font-weight: 900;">${formatCurrency(cat.price)}</span>
         </div>
@@ -512,13 +563,13 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(pageLegal);
 
-  // Apertura finestra di stampa nativa
+  // Avvia la finestra di stampa / salvataggio PDF nativa del browser
   window.print();
 }
 
-// Registrazione del Service Worker (PWA)
+// Registrazione del Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log('PWA Service Worker Registrato'))
+    .then(() => console.log('Service Worker Registrato'))
     .catch((err) => console.log('Errore SW:', err));
 }
