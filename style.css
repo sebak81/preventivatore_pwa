@@ -423,6 +423,7 @@ textarea {
     margin: 15mm 15mm 15mm 15mm;
   }
 
+  /* Per pagine 2..N: layout flessibile con footer in fondo */
   .sheet {
     width: 100%;
     min-height: calc(297mm - 30mm);
@@ -438,15 +439,15 @@ textarea {
     page-break-after: avoid;
   }
 
-  /* TESTATA COMUNE PER SCHEDE TECNICHE (PAGINE 2..N) */
+  /* TESTATA PER SCHEDE TECNICHE (PAGINE 2..N) */
   .p-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid #000;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
     margin-bottom: 16px;
-    min-height: 75px;
+    min-height: 70px;
   }
 
   .p-company {
@@ -467,36 +468,41 @@ textarea {
   }
 
   /* ========================================================== */
-  /* STILI DEFINITIVI PAGINA 1                                  */
+  /* STILI DI PAGINA 1: LAYOUT A BLOCCO FISSO                   */
   /* ========================================================== */
-  .p1-sheet {
-    position: relative;
-    height: calc(297mm - 30mm);
+  .sheet.p1-sheet {
+    display: block !important;
+    position: relative !important;
+    height: calc(297mm - 30mm) !important;
+    min-height: calc(297mm - 30mm) !important;
   }
 
-  /* Testata Pagina 1: solo logo o dati azienda sopra la linea */
-  .p1-header-top {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+  /* Contenitore superiore: logo + linea + riga data/numero */
+  .p1-top-container {
+    width: 100%;
+  }
+
+  .p1-header-brand {
     border-bottom: 2px solid #000;
-    padding-bottom: 12px;
-    min-height: 75px;
+    padding-bottom: 10px;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
   }
 
   .p-page1-logo-full {
-    max-height: 80px;
+    max-height: 75px;
     max-width: 450px;
     object-fit: contain;
-    object-position: left center;
   }
 
-  /* Sotto la linea divisoria: Data a sinistra e Numero a destra */
+  /* RIGA SUBITO SOTTO LA LINEA NERA: DATA A SINISTRA E NUMERO A DESTRA */
   .p1-sub-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
+    width: 100%;
   }
 
   .p1-doc-date {
@@ -515,10 +521,10 @@ textarea {
     background-color: #fff;
   }
 
-  /* Dati cliente: centrati a metà altezza foglio */
+  /* DATI CLIENTE A METÀ PAGINA */
   .p1-client-center {
     position: absolute;
-    top: 100mm;
+    top: 105mm;
     left: 0;
     right: 0;
     text-align: center;
@@ -555,10 +561,10 @@ textarea {
     color: #0f172a;
   }
 
-  /* Titolo e validità: a circa 3/4 di altezza */
+  /* TITOLO E VALIDITÀ A CIRCA 3/4 DI ALTEZZA */
   .p1-title-bottom {
     position: absolute;
-    top: 178mm;
+    top: 180mm;
     left: 0;
     right: 0;
     text-align: center;
@@ -581,7 +587,7 @@ textarea {
     color: #334155;
   }
 
-  /* Piè di pagina Pagina 1 */
+  /* PIÈ DI PAGINA DI PAGINA 1 */
   .p1-footer {
     position: absolute;
     bottom: 0;
