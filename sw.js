@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v6'; // Aggiornato per la nuova struttura a 3 livelli
+const CACHE_NAME = 'prev-app-v7'; // Aggiornato per il supporto logo
 const ASSETS = [
   './',
   './index.html',
