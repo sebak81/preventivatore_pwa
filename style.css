@@ -438,6 +438,7 @@ textarea {
     page-break-after: avoid;
   }
 
+  /* TESTATA COMUNE PER SCHEDE TECNICHE (PAGINE 2..N) */
   .p-header {
     display: flex;
     justify-content: space-between;
@@ -445,21 +446,7 @@ textarea {
     border-bottom: 2px solid #000;
     padding-bottom: 12px;
     margin-bottom: 16px;
-    min-height: 80px;
-  }
-
-  .p-header-brand {
-    flex: 1;
-    display: flex;
-    align-items: center;
-  }
-
-  /* LOGO A LARGHEZZA INTERA A SINISTRA */
-  .p-page1-logo-full {
-    max-height: 80px;
-    max-width: 380px;
-    object-fit: contain;
-    object-position: left center;
+    min-height: 75px;
   }
 
   .p-company {
@@ -479,26 +466,6 @@ textarea {
     flex-shrink: 0;
   }
 
-  /* CONTORNO SOTTILE INTORNO AL NUMERO DOCUMENTO */
-  .p-doc-number-box {
-    border: 1px solid #1e293b;
-    border-radius: 4px;
-    padding: 5px 12px;
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #0f172a;
-    display: inline-block;
-    margin-bottom: 4px;
-    background-color: #fff;
-  }
-
-  .p-doc-date {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #334155;
-    margin-right: 2px;
-  }
-
   /* ========================================================== */
   /* STILI DEFINITIVI PAGINA 1                                  */
   /* ========================================================== */
@@ -507,24 +474,65 @@ textarea {
     height: calc(297mm - 30mm);
   }
 
+  /* Testata Pagina 1: solo logo o dati azienda sopra la linea */
+  .p1-header-top {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 12px;
+    min-height: 75px;
+  }
+
+  .p-page1-logo-full {
+    max-height: 80px;
+    max-width: 450px;
+    object-fit: contain;
+    object-position: left center;
+  }
+
+  /* Sotto la linea divisoria: Data a sinistra e Numero a destra */
+  .p1-sub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .p1-doc-date {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .p1-doc-number-box {
+    border: 1px solid #1e293b;
+    border-radius: 4px;
+    padding: 5px 14px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    background-color: #fff;
+  }
+
   /* Dati cliente: centrati a metà altezza foglio */
   .p1-client-center {
     position: absolute;
-    top: 98mm;
+    top: 100mm;
     left: 0;
     right: 0;
     text-align: center;
   }
 
   .p1-client-name {
-    font-size: 1.55rem;
+    font-size: 1.6rem;
     font-weight: 800;
     color: #0f172a;
     margin-bottom: 6px;
   }
 
   .p1-client-address {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: #334155;
     margin-bottom: 6px;
   }
@@ -550,7 +558,7 @@ textarea {
   /* Titolo e validità: a circa 3/4 di altezza */
   .p1-title-bottom {
     position: absolute;
-    top: 175mm;
+    top: 178mm;
     left: 0;
     right: 0;
     text-align: center;
