@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v3'; // Versione aggiornata per forzare il refresh
+const CACHE_NAME = 'prev-app-v4'; // Aggiornato per recepire le nuove schede e impostazioni
 const ASSETS = [
   './',
   './index.html',
