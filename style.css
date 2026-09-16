@@ -24,6 +24,20 @@ body {
   padding-bottom: 80px;
 }
 
+/* ========================================================== */
+/* RIMOZIONE FRECCE SU/GIÙ (SPINNER) DAI CAMPI NUMERICI       */
+/* ========================================================== */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* Barra Strumenti Superiore */
 .top-bar {
   position: sticky;
@@ -305,9 +319,7 @@ textarea {
   color: var(--accent);
 }
 
-/* ========================================================== */
-/* STILI GERARCHIA IMPOSTAZIONI (MACROCATEGORIA > FORNITORI)  */
-/* ========================================================== */
+/* Gerarchia Impostazioni */
 .settings-cat-accordion {
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -437,7 +449,6 @@ textarea {
     margin-bottom: 16px;
   }
 
-  /* Blocco Logo & Ditta per la Pagina 1 */
   .p-header-brand {
     display: flex;
     align-items: center;
