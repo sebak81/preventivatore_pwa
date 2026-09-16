@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v16'; // Incremento versione per il layout di Pagina 1
+const CACHE_NAME = 'prev-app-v17'; // Incremento versione per logo esteso e contorno sottile
 const ASSETS = [
   './',
   './index.html',
