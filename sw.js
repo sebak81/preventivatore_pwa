@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v8'; // Versione aggiornata per la gestione dinamica macro-categorie
+const CACHE_NAME = 'prev-app-v9'; // Incremento versione per recepire la numerazione e pulizia stampa
 const ASSETS = [
   './',
   './index.html',
