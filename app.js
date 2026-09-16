@@ -198,7 +198,7 @@ function persistSettings() {
 // 3. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
-  type: "PREVENTIVO",
+  type: "PREVENTIVO", // PREVENTIVO | REVISIONE | CONTRATTO
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "30 giorni",
@@ -212,6 +212,34 @@ let docState = {
   deliveryTerms: "Circa 6-8 settimane lavorative dall'avvenuto rilievo misure definitive.",
   finalNotes: ""
 };
+
+// ==========================================================================
+// FUNZIONE HELPER: NUMERAZIONE DOCUMENTO CON SUFFISSO DINAMICO
+// Preventivo -> _P | Revisione -> _Rev. | Contratto -> _C
+// ==========================================================================
+function getFormattedDocNumber() {
+  const raw = (docState.number || "").trim();
+  if (!raw) return "BOZZA";
+
+  let suffix = "_P";
+  if (docState.type === "REVISIONE" || docState.type.includes("REVISIONE")) {
+    suffix = "_Rev.";
+  } else if (docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO")) {
+    suffix = "_C";
+  }
+
+  // Pulisce l'eventuale suffisso già digitato dall'utente per evitare duplicazioni (_P, _Rev., _C)
+  const clean = raw.replace(/(_P|_Rev\.|_C)$/i, '');
+  return `${clean}${suffix}`;
+}
+
+function updateDocNumberPreview() {
+  const previewEl = document.getElementById('doc-number-preview');
+  if (previewEl) {
+    const formatted = getFormattedDocNumber();
+    previewEl.textContent = (docState.number && docState.number.trim()) ? `(Codice: ${formatted})` : '';
+  }
+}
 
 // ==========================================================================
 // 4. INIZIALIZZAZIONE & EVENTI
@@ -228,6 +256,7 @@ function initApp() {
   populateCategorySelector();
   renderCategoriesUI();
   updateCalculations();
+  updateDocNumberPreview();
 }
 
 if (document.readyState === 'loading') {
@@ -240,8 +269,16 @@ function setupEventListeners() {
   safeOn('tab-editor-btn', 'click', () => switchView('editor'));
   safeOn('tab-settings-btn', 'click', () => switchView('settings'));
 
-  safeOn('doc-type', 'change', (e) => { docState.type = e.target.value; });
-  safeOn('doc-number', 'input', (e) => { docState.number = e.target.value; });
+  safeOn('doc-type', 'change', (e) => { 
+    docState.type = e.target.value; 
+    updateDocNumberPreview();
+  });
+
+  safeOn('doc-number', 'input', (e) => { 
+    docState.number = e.target.value; 
+    updateDocNumberPreview();
+  });
+
   safeOn('doc-date', 'change', (e) => { docState.date = e.target.value; });
   safeOn('doc-validity', 'input', (e) => { docState.validity = e.target.value; });
 
@@ -275,6 +312,7 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
+  // Impostazioni, Logo e Macro-Categorie
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
   safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
@@ -303,6 +341,7 @@ function switchView(view) {
     btnSet.classList.remove('active');
     populateCategorySelector();
     renderCategoriesUI();
+    updateDocNumberPreview();
   } else {
     edView.style.display = 'none';
     setView.style.display = 'flex';
@@ -684,7 +723,7 @@ function importSettingsJSON(e) {
 }
 
 // ==========================================================================
-// 6. GESTIONE SCHEDE PREVENTIVO (EDITOR A CASCATA & FIX INPUT PREZZO)
+// 6. GESTIONE SCHEDE PREVENTIVO (EDITOR A CASCATA)
 // ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
@@ -1083,8 +1122,10 @@ function escapeHtml(str) {
 async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
   const clientName = docState.client.name.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || "Cliente";
-  const docNum = docState.number.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || "Bozza";
-  const fileName = `${clientName}_${docNum}.json`;
+  const formattedNum = getFormattedDocNumber();
+  // Rimuove eventuali punti finali dal codice per estensione pulita (.json)
+  const safeDocNum = formattedNum.replace(/\.+$/, '').replace(/[^a-zA-Z0-9_.-]/g, '_');
+  const fileName = `${clientName}_${safeDocNum}.json`;
 
   if ('showSaveFilePicker' in window) {
     try {
@@ -1123,6 +1164,10 @@ function openFromFile(e) {
       const data = JSON.parse(event.target.result);
       docState = Object.assign(docState, data);
 
+      // Normalizzazione tipo documento da vecchi salvataggi
+      if (docState.type === "CONFERMA D'ORDINE / CONTRATTO") docState.type = "CONTRATTO";
+      if (docState.type === "REVISIONE PREVENTIVO") docState.type = "REVISIONE";
+
       document.getElementById('doc-type').value = docState.type || "PREVENTIVO";
       document.getElementById('doc-number').value = docState.number || '';
       document.getElementById('doc-date').value = docState.date || '';
@@ -1149,6 +1194,7 @@ function openFromFile(e) {
       switchView('editor');
       renderCategoriesUI();
       updateCalculations();
+      updateDocNumberPreview();
       alert("Preventivo caricato con successo!");
     } catch (err) {
       alert("Errore nel file: " + err.message);
@@ -1178,6 +1224,7 @@ function resetDocument() {
 
   renderCategoriesUI();
   updateCalculations();
+  updateDocNumberPreview();
 }
 
 // ==========================================================================
@@ -1199,11 +1246,12 @@ function prepareAndPrint() {
   const subtotal = grandFornitura + grandPosa;
   const tax = subtotal * (docState.taxRate / 100);
   const total = subtotal + tax;
-  const isContract = docState.type.includes("CONTRATTO");
+  const isContract = docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO");
+  const formattedDocNum = getFormattedDocNumber();
 
   const totalPages = docState.categories.length + 3;
 
-  // PAGINA 1: INTESTAZIONE CON LOGO AZIENDALE E DATI COMMITTENTE
+  // PAGINA 1: INTESTAZIONE SENZA SCRITTA "PREVENTIVO", CON NUMERO DOCUMENTO E SUFFISSO
   const page1 = document.createElement('div');
   page1.className = "sheet";
   page1.innerHTML = `
@@ -1219,8 +1267,9 @@ function prepareAndPrint() {
           </div>
         </div>
         <div class="p-doc-details">
-          <div class="p-doc-type">${escapeHtml(docState.type)}</div>
-          <div class="p-doc-meta"><strong>Numero:</strong> ${escapeHtml(docState.number || 'BOZZA')}</div>
+          <div class="p-doc-meta" style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+            <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
+          </div>
           <div class="p-doc-meta"><strong>Data:</strong> ${escapeHtml(docState.date)}</div>
           <div class="p-doc-meta"><strong>Validità:</strong> ${escapeHtml(docState.validity)}</div>
         </div>
@@ -1280,7 +1329,7 @@ function prepareAndPrint() {
         <div class="p-header">
           <div class="p-company">
             <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ${escapeHtml(docState.number || 'BOZZA')}</div>
+            <div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ${escapeHtml(formattedDocNum)}</div>
           </div>
           <div class="p-doc-details">
             <div style="font-size: 1.1rem; font-weight: bold;">SCHEDA TECNICA ${idx + 1}</div>
@@ -1376,7 +1425,7 @@ function prepareAndPrint() {
         </div>
         <div class="p-doc-details">
           <div class="p-doc-type">RIEPILOGO & FIRMA</div>
-          <div class="p-doc-meta">Rif. Doc N°: ${escapeHtml(docState.number || 'BOZZA')}</div>
+          <div class="p-doc-meta">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
         </div>
       </div>
 
