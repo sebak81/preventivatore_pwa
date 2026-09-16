@@ -285,7 +285,6 @@ function setupEventListeners() {
   safeOn('logo-file-input', 'change', handleLogoUpload);
   safeOn('btn-remove-logo', 'click', handleLogoRemove);
 
-  // Aggiunta Nuova Macro-categoria
   safeOn('btn-add-macro-cat', 'click', handleAddMacroCategory);
   safeOn('new-macro-cat-input', 'keypress', (e) => {
     if (e.key === 'Enter') handleAddMacroCategory();
@@ -319,7 +318,6 @@ function loadDefaultState() {
   if (dateInput) dateInput.value = docState.date;
 }
 
-// Popola dinamicamente il menu a tendina delle categorie nel preventivo
 function populateCategorySelector() {
   const sel = document.getElementById('select-category-type');
   if (!sel) return;
@@ -400,7 +398,6 @@ function handleLogoRemove() {
   }
 }
 
-// Creazione di una nuova macro-categoria
 function handleAddMacroCategory() {
   const input = document.getElementById('new-macro-cat-input');
   if (!input) return;
@@ -411,14 +408,12 @@ function handleAddMacroCategory() {
     return;
   }
 
-  // Verifica se esiste già
   const exists = Object.keys(catalogSettings).some(k => k.toLowerCase() === rawName.toLowerCase());
   if (exists) {
     alert(`La macro-categoria "${rawName}" esiste già!`);
     return;
   }
 
-  // Crea la macro-categoria con un fornitore e modello base
   catalogSettings[rawName] = {
     suppliers: [
       {
@@ -439,7 +434,6 @@ function handleAddMacroCategory() {
   alert(`Macro-categoria "${rawName}" aggiunta con successo!`);
 }
 
-// Eliminazione di una macro-categoria
 window.deleteMacroCategory = function(catName) {
   if (confirm(`Vuoi davvero eliminare la macro-categoria "${catName}" e tutti i suoi fornitori e modelli?`)) {
     delete catalogSettings[catName];
@@ -519,7 +513,7 @@ function renderSettingsCategoriesList() {
                 </div>
                 <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
                   <button type="button" class="btn btn-secondary btn-sm" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
-                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina Fornitore</button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina</button>
                 </div>
               </div>
 
@@ -578,7 +572,6 @@ window.toggleSettingsSupplier = function(catName, sIdx) {
   renderSettingsCategoriesList();
 };
 
-// CRUD FORNITORI
 window.addSupplierToCategory = function(catName) {
   if (!catalogSettings[catName]) catalogSettings[catName] = { suppliers: [] };
   const suppName = prompt("Inserisci il nome del nuovo fornitore:");
@@ -612,7 +605,6 @@ window.deleteSupplier = function(catName, sIdx) {
   }
 };
 
-// CRUD MODELLI
 window.addModelToSupplier = function(catName, sIdx) {
   const supp = catalogSettings[catName].suppliers[sIdx];
   if (!supp) return;
@@ -1175,6 +1167,9 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
+//    - Logo SOLO in Pagina 1
+//    - Piede pagina calcolato matematicamente: "Pagina X di Totale"
+//    - Azzeramento temporaneo di document.title per non stampare l'intestazione web
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1193,6 +1188,10 @@ function prepareAndPrint() {
   const tax = subtotal * (docState.taxRate / 100);
   const total = subtotal + tax;
   const isContract = docState.type.includes("CONTRATTO");
+
+  // Calcolo matematico del numero totale delle pagine:
+  // 1 (Intestazione) + N (Pagine Categoria) + 1 (Totali & Firma) + 1 (Normativa & Privacy)
+  const totalPages = docState.categories.length + 3;
 
   // PAGINA 1: INTESTAZIONE CON LOGO AZIENDALE E DATI COMMITTENTE
   const page1 = document.createElement('div');
@@ -1240,7 +1239,7 @@ function prepareAndPrint() {
     </div>
     <div class="p-footer">
       <span>${escapeHtml(companySettings.name)}</span>
-      <span>Pagina 1 di intestazione</span>
+      <span>Pagina 1 di ${totalPages}</span>
     </div>
   `;
   printRoot.appendChild(page1);
@@ -1249,6 +1248,7 @@ function prepareAndPrint() {
   docState.categories.forEach((cat, idx) => {
     const pageCat = document.createElement('div');
     pageCat.className = "sheet";
+    const currentPageNum = idx + 2;
     const catTotals = calculateCategoryTotals(cat);
 
     let posRows = (cat.positions || []).map(p => {
@@ -1333,14 +1333,15 @@ function prepareAndPrint() {
       </div>
 
       <div class="p-footer">
-        <span>Scheda: ${escapeHtml(cat.name)} (${escapeHtml(cat.supplierName)})</span>
-        <span>Pagina Tecnica ${idx + 2}</span>
+        <span>${escapeHtml(companySettings.name)}</span>
+        <span>Pagina ${currentPageNum} di ${totalPages}</span>
       </div>
     `;
     printRoot.appendChild(pageCat);
   });
 
   // PAGINA TOTALI & FIRMA
+  const pageTotalsNum = docState.categories.length + 2;
   const pageTotals = document.createElement('div');
   pageTotals.className = "sheet";
   
@@ -1424,8 +1425,8 @@ function prepareAndPrint() {
     </div>
 
     <div class="p-footer">
-      <span>Riepilogo Fiscale e Firma</span>
-      <span>Pagina Totali</span>
+      <span>${escapeHtml(companySettings.name)}</span>
+      <span>Pagina ${pageTotalsNum} di ${totalPages}</span>
     </div>
   `;
   printRoot.appendChild(pageTotals);
@@ -1470,13 +1471,22 @@ function prepareAndPrint() {
     </div>
 
     <div class="p-footer">
-      <span>Allegato Normativo</span>
-      <span>Condizioni Generali & Privacy</span>
+      <span>${escapeHtml(companySettings.name)}</span>
+      <span>Pagina ${totalPages} di ${totalPages}</span>
     </div>
   `;
   printRoot.appendChild(pageLegal);
 
+  // Azzeramento temporaneo del tag title per evitare che il browser stampi l'intestazione web
+  const originalTitle = document.title;
+  document.title = "";
+  
   window.print();
+
+  // Ripristino del titolo al termine della stampa
+  setTimeout(() => {
+    document.title = originalTitle;
+  }, 1000);
 }
 
 if ('serviceWorker' in navigator) {
