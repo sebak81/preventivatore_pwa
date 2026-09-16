@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v7'; // Aggiornato per il supporto logo
+const CACHE_NAME = 'prev-app-v8'; // Versione aggiornata per la gestione dinamica macro-categorie
 const ASSETS = [
   './',
   './index.html',
