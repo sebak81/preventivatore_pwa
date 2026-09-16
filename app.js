@@ -6,7 +6,8 @@ const DEFAULT_COMPANY = {
   name: "NOME AZIENDA / SERRAMENTI",
   address: "Via delle Industrie, 12 - 00100 Roma (RM)",
   taxId: "P.IVA / C.F.: 01234567890",
-  contacts: "Tel: 06 1234567 | Cell: 340 0000000 | Email: info@azienda.it"
+  contacts: "Tel: 06 1234567 | Cell: 340 0000000 | Email: info@azienda.it",
+  logo: "" // Stringa Base64 del logo aziendale
 };
 
 const DEFAULT_CATALOG = {
@@ -175,9 +176,8 @@ const DEFAULT_CATALOG = {
 let companySettings = loadCompanySettings();
 let catalogSettings = loadCatalogSettings();
 
-// Traccia le macrocategorie e i singoli fornitori aperti nell'accordion
 let openSettingsCategories = { "Serramenti": true };
-let openSettingsSuppliers = {}; // es: { "Serramenti_0": true }
+let openSettingsSuppliers = {};
 
 function loadCompanySettings() {
   const saved = localStorage.getItem('prev_company_settings');
@@ -274,10 +274,15 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
+  // Impostazioni & Logo
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
   safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
   safeOn('settings-file-input', 'change', importSettingsJSON);
+
+  safeOn('btn-upload-logo', 'click', () => document.getElementById('logo-file-input').click());
+  safeOn('logo-file-input', 'change', handleLogoUpload);
+  safeOn('btn-remove-logo', 'click', handleLogoRemove);
 }
 
 function switchView(view) {
@@ -307,7 +312,7 @@ function loadDefaultState() {
 }
 
 // ==========================================================================
-// 5. GESTIONE IMPOSTAZIONI: GERARCHIA MACROCATEGORIA > FORNITORE > MODELLI
+// 5. GESTIONE IMPOSTAZIONI, LOGO E CATALOGO A 3 LIVELLI
 // ==========================================================================
 function initSettingsUI() {
   document.getElementById('set-company-name').value = companySettings.name || '';
@@ -315,7 +320,53 @@ function initSettingsUI() {
   document.getElementById('set-company-taxid').value = companySettings.taxId || '';
   document.getElementById('set-company-contacts').value = companySettings.contacts || '';
 
+  updateLogoPreviewUI();
   renderSettingsCategoriesList();
+}
+
+function updateLogoPreviewUI() {
+  const previewImg = document.getElementById('logo-preview-img');
+  const placeholder = document.getElementById('logo-placeholder-text');
+  const btnRemove = document.getElementById('btn-remove-logo');
+
+  if (companySettings.logo) {
+    previewImg.src = companySettings.logo;
+    previewImg.style.display = 'block';
+    if (placeholder) placeholder.style.display = 'none';
+    if (btnRemove) btnRemove.style.display = 'inline-flex';
+  } else {
+    previewImg.src = '';
+    previewImg.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'block';
+    if (btnRemove) btnRemove.style.display = 'none';
+  }
+}
+
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    alert("Per favore seleziona un file immagine valido (PNG, JPG, SVG, WebP).");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    companySettings.logo = event.target.result; // Salva la stringa base64
+    persistSettings();
+    updateLogoPreviewUI();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function handleLogoRemove() {
+  if (confirm("Vuoi rimuovere il logo aziendale?")) {
+    companySettings.logo = "";
+    persistSettings();
+    updateLogoPreviewUI();
+  }
 }
 
 function renderSettingsCategoriesList() {
@@ -343,7 +394,7 @@ function renderSettingsCategoriesList() {
       } else {
         suppliersHtml = suppliers.map((supp, sIdx) => {
           const suppKey = `${catName}_${sIdx}`;
-          const isSuppOpen = openSettingsSuppliers[suppKey] !== false; // aperto di default
+          const isSuppOpen = openSettingsSuppliers[suppKey] !== false;
           const models = supp.models || [];
 
           let modelsHtml = models.map((mod, mIdx) => {
@@ -443,7 +494,6 @@ window.toggleSettingsSupplier = function(catName, sIdx) {
   renderSettingsCategoriesList();
 };
 
-// CRUD FORNITORI
 window.addSupplierToCategory = function(catName) {
   if (!catalogSettings[catName]) catalogSettings[catName] = { suppliers: [] };
   const suppName = prompt("Inserisci il nome del nuovo fornitore (es. QFORT, Cosmet, Bettio):");
@@ -477,7 +527,6 @@ window.deleteSupplier = function(catName, sIdx) {
   }
 };
 
-// CRUD MODELLI
 window.addModelToSupplier = function(catName, sIdx) {
   const supp = catalogSettings[catName].suppliers[sIdx];
   if (!supp) return;
@@ -517,7 +566,7 @@ function saveSettingsFromUI() {
   companySettings.contacts = document.getElementById('set-company-contacts').value;
 
   persistSettings();
-  alert("Tutte le impostazioni aziendali, fornitori e modelli sono stati salvati correttamente!");
+  alert("Tutte le impostazioni aziendali, logo e cataloghi sono stati salvati correttamente!");
 }
 
 function exportSettingsJSON() {
@@ -547,7 +596,7 @@ function importSettingsJSON(e) {
       persistSettings();
       initSettingsUI();
       renderCategoriesUI();
-      alert("Configurazione aziendale importata con successo!");
+      alert("Configurazione aziendale (incluso il logo) importata con successo!");
     } catch (err) {
       alert("File non valido: " + err.message);
     }
@@ -1038,6 +1087,8 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
+//    - Il LOGO viene apposto SOLO nella Pagina 1
+//    - Le pagine 2..N, Totali e Legale mantengono la sola intestazione testuale
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1057,17 +1108,20 @@ function prepareAndPrint() {
   const total = subtotal + tax;
   const isContract = docState.type.includes("CONTRATTO");
 
-  // PAGINA 1: INTESTAZIONE E COMMITTENTE
+  // PAGINA 1: INTESTAZIONE CON LOGO AZIENDALE E DATI COMMITTENTE
   const page1 = document.createElement('div');
   page1.className = "sheet";
   page1.innerHTML = `
     <div>
       <div class="p-header">
-        <div class="p-company">
-          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-          <div>${escapeHtml(companySettings.address)}</div>
-          <div>${escapeHtml(companySettings.taxId)}</div>
-          <div>${escapeHtml(companySettings.contacts)}</div>
+        <div class="p-header-brand">
+          ${companySettings.logo ? `<img src="${companySettings.logo}" class="p-page1-logo" alt="Logo">` : ''}
+          <div class="p-company">
+            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+            <div>${escapeHtml(companySettings.address)}</div>
+            <div>${escapeHtml(companySettings.taxId)}</div>
+            <div>${escapeHtml(companySettings.contacts)}</div>
+          </div>
         </div>
         <div class="p-doc-details">
           <div class="p-doc-type">${escapeHtml(docState.type)}</div>
@@ -1105,7 +1159,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(page1);
 
-  // PAGINE 2..N: SCHEDE CATEGORIA
+  // PAGINE 2..N: SCHEDE CATEGORIA (Senza logo, solo testata pulita)
   docState.categories.forEach((cat, idx) => {
     const pageCat = document.createElement('div');
     pageCat.className = "sheet";
@@ -1200,7 +1254,7 @@ function prepareAndPrint() {
     printRoot.appendChild(pageCat);
   });
 
-  // PAGINA TOTALI & FIRMA
+  // PAGINA TOTALI & FIRMA (Senza logo)
   const pageTotals = document.createElement('div');
   pageTotals.className = "sheet";
   
@@ -1290,7 +1344,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(pageTotals);
 
-  // ULTIMA PAGINA: CONDIZIONI GENERALI E PRIVACY
+  // ULTIMA PAGINA: NORMATIVA & PRIVACY (Senza logo)
   const pageLegal = document.createElement('div');
   pageLegal.className = "sheet";
   pageLegal.innerHTML = `
