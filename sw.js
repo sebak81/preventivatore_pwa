@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v1';
+const CACHE_NAME = 'prev-app-v2'; // <--- Cambiato da v1 a v2
 const ASSETS = [
   './',
   './index.html',
