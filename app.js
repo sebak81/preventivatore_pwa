@@ -341,7 +341,7 @@ function populateCategorySelector() {
 }
 
 // ==========================================================================
-// 5. GESTIONE IMPOSTAZIONI: LOGO & CATALOGO MACROCATEGORIA > FORNITORE > MODELLO
+// 5. GESTIONE IMPOSTAZIONI: LOGO & CATALOGO
 // ==========================================================================
 function initSettingsUI() {
   document.getElementById('set-company-name').value = companySettings.name || '';
@@ -675,7 +675,7 @@ function importSettingsJSON(e) {
       initSettingsUI();
       populateCategorySelector();
       renderCategoriesUI();
-      alert("Configurazione aziendale (incluso il logo) importata con successo!");
+      alert("Configurazione aziendale importata con successo!");
     } catch (err) {
       alert("File non valido: " + err.message);
     }
@@ -685,7 +685,7 @@ function importSettingsJSON(e) {
 }
 
 // ==========================================================================
-// 6. GESTIONE SCHEDE PREVENTIVO (EDITOR A CASCATA)
+// 6. GESTIONE SCHEDE PREVENTIVO (EDITOR A CASCATA & FIX INPUT PREZZO)
 // ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
@@ -792,15 +792,18 @@ function renderCategoriesUI() {
       <div class="cat-summary-box">
         <div class="cat-summary-row">
           <span>Subtotale Fornitura Manufatti:</span>
-          <strong>${formatCurrency(totalsCat.fornitura)}</strong>
+          <strong id="cat-fornitura-${cat.id}">${formatCurrency(totalsCat.fornitura)}</strong>
         </div>
         <div class="cat-summary-row" style="align-items: center;">
-          <label style="margin: 0; text-transform: none; font-weight: 600;">Posa in Opera ed Assistenza (€ netto):</label>
-          <input type="number" step="0.01" min="0" value="${cat.installationPrice > 0 ? cat.installationPrice : ''}" placeholder="0.00" style="width: 140px; text-align: right; font-weight: bold;" oninput="updateCatInstallation('${cat.id}', this.value)">
+          <label style="margin: 0; text-transform: none; font-weight: 600;">Posa in Opera:</label>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="number" step="0.01" min="0" value="${cat.installationPrice > 0 ? cat.installationPrice : ''}" placeholder="0.00" style="width: 130px; text-align: right; font-weight: bold;" oninput="updateCatInstallation('${cat.id}', this.value)">
+            <span style="font-weight: 700; color: var(--text);">€</span>
+          </div>
         </div>
         <div class="cat-summary-row cat-summary-total">
           <span>Totale Pagina ${pageNum} (${escapeHtml(cat.name)}):</span>
-          <span>${formatCurrency(totalsCat.total)}</span>
+          <span id="cat-total-${cat.id}">${formatCurrency(totalsCat.total)}</span>
         </div>
       </div>
     `;
@@ -931,9 +934,9 @@ function renderPositionsTableHtml(cat) {
           <input type="number" min="1" step="1" value="${pos.quantity || 1}" style="text-align: center;" oninput="updatePosField('${cat.id}', '${pos.id}', 'quantity', this.value)">
         </td>
         <td style="width: 12%;">
-          <input type="number" step="0.01" min="0" value="${pos.unitPrice > 0 ? pos.unitPrice : ''}" placeholder="0.00" style="text-align: right;" oninput="updatePosField('${cat.id}', '${pos.id}', 'unitPrice', this.value)">
+          <input type="number" step="any" min="0" value="${pos.unitPrice > 0 ? pos.unitPrice : ''}" placeholder="0.00" style="text-align: right;" oninput="updatePosField('${cat.id}', '${pos.id}', 'unitPrice', this.value)">
         </td>
-        <td style="width: 10%; text-align: right; font-weight: bold; padding: 8px;">
+        <td id="pos-total-${pos.id}" style="width: 10%; text-align: right; font-weight: bold; padding: 8px;">
           ${formatCurrency(rowTotal)}
         </td>
         <td style="width: 4%; text-align: center;">
@@ -989,6 +992,7 @@ window.removePosition = function(catId, posId) {
   updateCalculations();
 };
 
+// Aggiornamento sul campo senza distruggere il DOM (non fa perdere il focus alle cifre)
 window.updatePosField = function(catId, posId, field, val) {
   const cat = docState.categories.find(c => c.id === catId);
   if (!cat) return;
@@ -996,7 +1000,7 @@ window.updatePosField = function(catId, posId, field, val) {
   if (!pos) return;
 
   if (field === 'quantity') {
-    pos.quantity = parseInt(val) || 1;
+    pos.quantity = parseFloat(val) || 0;
   } else if (field === 'unitPrice') {
     pos.unitPrice = parseFloat(val) || 0;
   } else {
@@ -1004,16 +1008,30 @@ window.updatePosField = function(catId, posId, field, val) {
   }
 
   if (field === 'quantity' || field === 'unitPrice') {
-    renderCategoriesUI();
+    const rowTot = (pos.quantity || 0) * (pos.unitPrice || 0);
+    const rowTotEl = document.getElementById(`pos-total-${pos.id}`);
+    if (rowTotEl) {
+      rowTotEl.textContent = formatCurrency(rowTot);
+    }
+    updateCatSummaryDOM(cat);
     updateCalculations();
   }
 };
+
+// Aggiorna solo i valori a video della riga riassuntiva senza distruggere i campi input
+function updateCatSummaryDOM(cat) {
+  const totalsCat = calculateCategoryTotals(cat);
+  const fornituraEl = document.getElementById(`cat-fornitura-${cat.id}`);
+  const totalEl = document.getElementById(`cat-total-${cat.id}`);
+  if (fornituraEl) fornituraEl.textContent = formatCurrency(totalsCat.fornitura);
+  if (totalEl) totalEl.textContent = formatCurrency(totalsCat.total);
+}
 
 window.updateCatInstallation = function(catId, val) {
   const cat = docState.categories.find(c => c.id === catId);
   if (!cat) return;
   cat.installationPrice = parseFloat(val) || 0;
-  renderCategoriesUI();
+  updateCatSummaryDOM(cat);
   updateCalculations();
 };
 
@@ -1167,9 +1185,6 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
-//    - Logo SOLO in Pagina 1
-//    - Piede pagina calcolato matematicamente: "Pagina X di Totale"
-//    - Azzeramento temporaneo di document.title per non stampare l'intestazione web
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1189,8 +1204,6 @@ function prepareAndPrint() {
   const total = subtotal + tax;
   const isContract = docState.type.includes("CONTRATTO");
 
-  // Calcolo matematico del numero totale delle pagine:
-  // 1 (Intestazione) + N (Pagine Categoria) + 1 (Totali & Firma) + 1 (Normativa & Privacy)
   const totalPages = docState.categories.length + 3;
 
   // PAGINA 1: INTESTAZIONE CON LOGO AZIENDALE E DATI COMMITTENTE
@@ -1322,7 +1335,7 @@ function prepareAndPrint() {
             <strong>${formatCurrency(catTotals.fornitura)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #ccc;">
-            <span>Posa in Opera ed Assistenza al Montaggio:</span>
+            <span>Posa in Opera:</span>
             <strong>${formatCurrency(catTotals.posa)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
@@ -1477,13 +1490,11 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(pageLegal);
 
-  // Azzeramento temporaneo del tag title per evitare che il browser stampi l'intestazione web
   const originalTitle = document.title;
   document.title = "";
   
   window.print();
 
-  // Ripristino del titolo al termine della stampa
   setTimeout(() => {
     document.title = originalTitle;
   }, 1000);
