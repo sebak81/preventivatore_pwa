@@ -237,6 +237,15 @@ function updateDocNumberPreview() {
   }
 }
 
+function formatItalianDate(isoDate) {
+  if (!isoDate) return "";
+  const parts = isoDate.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return isoDate;
+}
+
 // ==========================================================================
 // 4. INIZIALIZZAZIONE & EVENTI
 // ==========================================================================
@@ -1242,6 +1251,8 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
+//    - Pagina 1: Data a sinistra e Numero a destra sotto la riga di divisione
+//    - Validità offerta dinamica (nascosta se Contratto)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1261,36 +1272,43 @@ function prepareAndPrint() {
   const total = subtotal + tax;
   const isContract = docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO");
   const formattedDocNum = getFormattedDocNumber();
+  const formattedDate = formatItalianDate(docState.date);
 
   const totalPages = docState.categories.length + 3;
 
-  // PAGINA 1: LOGO A LARGHEZZA INTERA (O TESTO), BORDO SOTTILE SUL NUMERO
+  // Calcolo testo validità dinamico dal modulo
+  let validityText = (docState.validity || "").trim();
+  if (validityText && !validityText.toLowerCase().includes("validit")) {
+    validityText = `validità offerta ${validityText}`;
+  }
+
+  // PAGINA 1
   const page1 = document.createElement('div');
   page1.className = "sheet p1-sheet";
   page1.innerHTML = `
-    <!-- Testata: se c'è il logo occupa tutto lo spazio a sinistra, altrimenti mostra i dati ditta -->
-    <div class="p-header">
-      <div class="p-header-brand">
-        ${companySettings.logo ? `
-          <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo Aziendale">
-        ` : `
-          <div class="p-company">
-            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div>${escapeHtml(companySettings.address)}</div>
-            ${companySettings.taxId ? `<div>${escapeHtml(companySettings.taxId)}</div>` : ''}
-            <div>${escapeHtml(companySettings.contacts)}</div>
-          </div>
-        `}
-      </div>
-      <div class="p-doc-details">
-        <div class="p-doc-number-box">
-          <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
+    <!-- 1. SOPRA LA RIGA: Logo a larghezza intera a sinistra (oppure dati ditta se no logo) -->
+    <div class="p1-header-top">
+      ${companySettings.logo ? `
+        <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo Aziendale">
+      ` : `
+        <div class="p-company">
+          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+          <div>${escapeHtml(companySettings.address)}</div>
+          ${companySettings.taxId ? `<div>${escapeHtml(companySettings.taxId)}</div>` : ''}
+          <div>${escapeHtml(companySettings.contacts)}</div>
         </div>
-        <div class="p-doc-date"><strong>Data:</strong> ${escapeHtml(docState.date)}</div>
+      `}
+    </div>
+
+    <!-- 2. SOTTO LA RIGA: Data a sinistra, Numero con contorno sottile a destra -->
+    <div class="p1-sub-header">
+      <div class="p1-doc-date"><strong>Data:</strong> ${escapeHtml(formattedDate)}</div>
+      <div class="p1-doc-number-box">
+        <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
       </div>
     </div>
 
-    <!-- DATI CONTATTO CLIENTE: CENTRATI A METÀ PAGINA SENZA BORDO -->
+    <!-- 3. DATI CLIENTE: CENTRATI A METÀ PAGINA SENZA BORDO -->
     <div class="p1-client-center">
       <div class="p1-client-name">Sig. ${escapeHtml(docState.client.name) || '____________________'}</div>
       <div class="p1-client-address">via ${escapeHtml(docState.client.residence) || '____________________'}</div>
@@ -1302,13 +1320,15 @@ function prepareAndPrint() {
       ` : ''}
     </div>
 
-    <!-- TITOLO E VALIDITÀ: A CIRCA 3/4 DI ALTEZZA -->
+    <!-- 4. TITOLO A CIRCA 3/4 ALTEZZA (La validità appare solo se non è Contratto) -->
     <div class="p1-title-bottom">
       <div class="p1-main-title">${escapeHtml(docState.type)}</div>
-      <div class="p1-validity-text">validità offerta ${escapeHtml(docState.validity || '15 giorni')}</div>
+      ${!isContract && validityText ? `
+        <div class="p1-validity-text">${escapeHtml(validityText)}</div>
+      ` : ''}
     </div>
 
-    <!-- PIÈ DI PAGINA: DATI DITTA A SINISTRA E PAGINA 1 DI X A DESTRA -->
+    <!-- 5. PIÈ DI PAGINA: DATI DITTA A SINISTRA E PAGINA 1 DI X A DESTRA -->
     <div class="p1-footer">
       <div class="p1-footer-company">
         <div class="p1-footer-title">${escapeHtml(companySettings.name)}</div>
