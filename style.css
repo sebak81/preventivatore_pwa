@@ -1,1 +1,333 @@
+:root {
+  --primary: #1e293b;
+  --primary-light: #334155;
+  --accent: #0284c7;
+  --bg: #f1f5f9;
+  --card-bg: #ffffff;
+  --border: #cbd5e1;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --danger: #ef4444;
+  --success: #10b981;
+}
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  padding-bottom: 80px;
+}
+
+/* Barra degli Strumenti Fissa in Alto */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--primary);
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar h1 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary { background-color: var(--accent); color: white; }
+.btn-primary:hover { background-color: #0369a1; }
+.btn-secondary { background-color: var(--primary-light); color: white; }
+.btn-secondary:hover { background-color: #475569; }
+.btn-success { background-color: var(--success); color: white; }
+.btn-success:hover { background-color: #059669; }
+.btn-danger { background-color: transparent; border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background-color: var(--danger); color: white; }
+
+/* Contenitore Principale */
+.container {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Moduli e Schede */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--text);
+  background-color: #fff;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin: 8px 0;
+}
+
+.checkbox-group input {
+  width: auto;
+  cursor: pointer;
+}
+
+/* Blocco Aggiungi Categoria */
+.add-category-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background-color: #e2e8f0;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.category-card {
+  border-left: 4px solid var(--accent);
+}
+
+.price-field input {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+/* SCHERMATA DI STAMPA A4 (@media print) */
+#print-root {
+  display: none;
+}
+
+@media print {
+  body {
+    background-color: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: black !important;
+  }
+
+  .top-bar, .container, #file-input {
+    display: none !important;
+  }
+
+  #print-root {
+    display: block !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+
+  .sheet {
+    width: 100%;
+    min-height: calc(297mm - 30mm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .sheet:last-child {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Intestazioni Stampa */
+  .p-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #000;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+
+  .p-company {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .p-company-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .p-doc-details {
+    text-align: right;
+  }
+
+  .p-doc-type {
+    font-size: 1.4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .p-doc-meta {
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  /* Scatole Dati Stampa */
+  .p-box {
+    border: 1px solid #999;
+    padding: 12px 14px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  .p-box-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+  }
+
+  .p-content {
+    flex-grow: 1;
+  }
+
+  .p-footer {
+    border-top: 1px solid #ccc;
+    padding-top: 8px;
+    font-size: 0.75rem;
+    color: #444;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Tabella Totali */
+  .p-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+  }
+
+  .p-table th, .p-table td {
+    border: 1px solid #bbb;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .p-table th {
+    background-color: #f2f2f2;
+    text-align: left;
+  }
+
+  .text-right {
+    text-align: right !important;
+  }
+
+  .p-signature-area {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .p-sign-box {
+    border-top: 1px dashed #000;
+    padding-top: 8px;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+
+  .legal-text {
+    font-size: 0.75rem;
+    line-height: 1.45;
+    text-align: justify;
+    color: #222;
+  }
+}
