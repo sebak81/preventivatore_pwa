@@ -198,7 +198,7 @@ function persistSettings() {
 // 3. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
-  type: "PREVENTIVO",
+  type: "PREVENTIVO", // PREVENTIVO | REVISIONE | CONTRATTO
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "30 giorni",
@@ -953,7 +953,6 @@ function renderPositionsTableHtml(cat) {
 
   const rows = cat.positions.map((pos) => {
     const rowTotal = (pos.quantity || 0) * (pos.unitPrice || 0);
-    // Recupera compatibilità con vecchio campo measures se width/height non sono ancora stati popolati
     let w = pos.width !== undefined ? pos.width : "";
     let h = pos.height !== undefined ? pos.height : "";
     if (pos.measures && !w && !h) {
@@ -1243,9 +1242,7 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
-//    - Formattazione Misure: "L. xxx X H. xxx"
-//    - Articolo Generalizzato: se Vano e Misure sono vuoti, unisce le prime
-//      3 colonne lasciando solo descrizione, quantità e prezzi.
+//    - Layout Pagina 1 conforme allo schizzo grafico
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1268,11 +1265,12 @@ function prepareAndPrint() {
 
   const totalPages = docState.categories.length + 3;
 
-  // PAGINA 1: INTESTAZIONE
+  // PAGINA 1: LAYOUT IDENTICO ALLO SCHEMA GRAFICO
   const page1 = document.createElement('div');
   page1.className = "sheet";
   page1.innerHTML = `
     <div>
+      <!-- Testata Ditta a sinistra e Numero/Data a destra -->
       <div class="p-header">
         <div class="p-header-brand">
           ${companySettings.logo ? `<img src="${companySettings.logo}" class="p-page1-logo" alt="Logo">` : ''}
@@ -1284,35 +1282,41 @@ function prepareAndPrint() {
           </div>
         </div>
         <div class="p-doc-details">
-          <div class="p-doc-meta" style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+          <div class="p-doc-meta" style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
             <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
           </div>
           <div class="p-doc-meta"><strong>Data:</strong> ${escapeHtml(docState.date)}</div>
-          <div class="p-doc-meta"><strong>Validità:</strong> ${escapeHtml(docState.validity)}</div>
         </div>
       </div>
 
-      <div class="p-box" style="margin-top: 25px;">
-        <div class="p-box-title">Dati del Committente</div>
-        <div style="font-size: 1.15rem; font-weight: bold; margin-bottom: 6px;">${escapeHtml(docState.client.name) || '---'}</div>
-        <div><strong>Residenza:</strong> ${escapeHtml(docState.client.residence) || '---'}</div>
-        <div><strong>C.F. / P.IVA:</strong> ${escapeHtml(docState.client.taxId) || '---'}</div>
-        <div><strong>Recapiti:</strong> ${escapeHtml(docState.client.phone)} ${docState.client.email ? '| ' + escapeHtml(docState.client.email) : ''}</div>
+      <!-- Blocco Committente & Cantiere allineato a destra come da schizzo -->
+      <div class="p1-recipient-container">
+        <div class="p1-client-card">
+          <div class="p1-client-title">Sig. ${escapeHtml(docState.client.name) || '____________________'}</div>
+          <div>via ${escapeHtml(docState.client.residence) || '____________________'}</div>
+          ${docState.client.taxId ? `<div style="font-size: 0.85rem; color: #444; margin-top: 2px;">C.F. / P.IVA: ${escapeHtml(docState.client.taxId)}</div>` : ''}
+          <div style="margin-top: 8px;">
+            <div><strong>tel:</strong> ${escapeHtml(docState.client.phone) || '____________________'}</div>
+            <div><strong>e mail:</strong> ${escapeHtml(docState.client.email) || '____________________'}</div>
+          </div>
+        </div>
+
+        <!-- Box Cantiere: compare solo se diverso da sopra -->
+        ${(!docState.sameSite && docState.siteAddress) ? `
+          <div class="p1-site-card">
+            <strong>Cantiere sito in:</strong> ${escapeHtml(docState.siteAddress)}
+          </div>
+        ` : ''}
       </div>
 
-      <div class="p-box">
-        <div class="p-box-title">Luogo di Posa / Cantiere</div>
-        <div>${docState.sameSite ? 'Il cantiere coincide con l\'indirizzo di residenza sopra indicato.' : '<strong>Indirizzo Cantiere:</strong> ' + escapeHtml(docState.siteAddress)}</div>
-      </div>
-
-      <div class="p-box" style="margin-top: 25px;">
-        <div class="p-box-title">Oggetto della Fornitura</div>
-        <p style="font-size: 0.9rem; line-height: 1.5;">
-          La presente proposta descrive la fornitura e posa in opera a regola d'arte dei manufatti dettagliati analiticamente nelle schede tecniche successive.
-          Ogni tipologia merceologica è riportata su scheda autonoma con l'indicazione delle singole posizioni, quote dimensionali e specifici costi di montaggio.
-        </p>
+      <!-- Titolo Centrale Circondato e Validità Offerta come da schizzo -->
+      <div class="p1-title-container">
+        <div class="p1-main-title">${escapeHtml(docState.type)}</div>
+        <div class="p1-validity-text">validità offerta ${escapeHtml(docState.validity || '15 giorni')}</div>
       </div>
     </div>
+
+    <!-- Piede di pagina con ditta e numerazione -->
     <div class="p-footer">
       <span>${escapeHtml(companySettings.name)}</span>
       <span>Pagina 1 di ${totalPages}</span>
@@ -1336,7 +1340,6 @@ function prepareAndPrint() {
       const oldMeasures = (p.measures || "").trim();
       const hasMeasures = wVal.length > 0 || hVal.length > 0 || oldMeasures.length > 0;
 
-      // ARTICOLO GENERALIZZATO: se mancano sia il vano sia le misure, omette le colonne e lascia solo la descrizione
       if (!hasName && !hasMeasures) {
         return `
           <tr>
@@ -1350,7 +1353,6 @@ function prepareAndPrint() {
         `;
       }
 
-      // RIGA STANDARD CON POSIZIONE E/O MISURE
       let measuresFormatted = "-";
       if (wVal && hVal) {
         measuresFormatted = `L. ${escapeHtml(wVal)} X H. ${escapeHtml(hVal)}`;
