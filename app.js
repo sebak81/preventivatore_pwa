@@ -7,7 +7,7 @@ const DEFAULT_COMPANY = {
   address: "Via delle Industrie, 12 - 00100 Roma (RM)",
   taxId: "P.IVA / C.F.: 01234567890",
   contacts: "Tel: 06 1234567 | Cell: 340 0000000 | Email: info@azienda.it",
-  logo: "" // Stringa Base64 del logo aziendale
+  logo: ""
 };
 
 const DEFAULT_CATALOG = {
@@ -225,6 +225,7 @@ function initApp() {
   setupEventListeners();
   loadDefaultState();
   initSettingsUI();
+  populateCategorySelector();
   renderCategoriesUI();
   updateCalculations();
 }
@@ -274,7 +275,7 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
-  // Impostazioni & Logo
+  // Impostazioni, Logo e Macro-Categorie
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
   safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
@@ -283,6 +284,12 @@ function setupEventListeners() {
   safeOn('btn-upload-logo', 'click', () => document.getElementById('logo-file-input').click());
   safeOn('logo-file-input', 'change', handleLogoUpload);
   safeOn('btn-remove-logo', 'click', handleLogoRemove);
+
+  // Aggiunta Nuova Macro-categoria
+  safeOn('btn-add-macro-cat', 'click', handleAddMacroCategory);
+  safeOn('new-macro-cat-input', 'keypress', (e) => {
+    if (e.key === 'Enter') handleAddMacroCategory();
+  });
 }
 
 function switchView(view) {
@@ -296,6 +303,7 @@ function switchView(view) {
     setView.style.display = 'none';
     btnEd.classList.add('active');
     btnSet.classList.remove('active');
+    populateCategorySelector();
     renderCategoriesUI();
   } else {
     edView.style.display = 'none';
@@ -311,8 +319,31 @@ function loadDefaultState() {
   if (dateInput) dateInput.value = docState.date;
 }
 
+// Popola dinamicamente il menu a tendina delle categorie nel preventivo
+function populateCategorySelector() {
+  const sel = document.getElementById('select-category-type');
+  if (!sel) return;
+
+  const currentVal = sel.value;
+  sel.innerHTML = "";
+
+  const keys = Object.keys(catalogSettings);
+  keys.forEach((catName, idx) => {
+    const opt = document.createElement('option');
+    opt.value = catName;
+    opt.textContent = `${idx + 1}. ${catName}`;
+    sel.appendChild(opt);
+  });
+
+  if (keys.includes(currentVal)) {
+    sel.value = currentVal;
+  } else if (keys.length > 0) {
+    sel.value = keys[0];
+  }
+}
+
 // ==========================================================================
-// 5. GESTIONE IMPOSTAZIONI, LOGO E CATALOGO A 3 LIVELLI
+// 5. GESTIONE IMPOSTAZIONI: LOGO & CATALOGO MACROCATEGORIA > FORNITORE > MODELLO
 // ==========================================================================
 function initSettingsUI() {
   document.getElementById('set-company-name').value = companySettings.name || '';
@@ -353,7 +384,7 @@ function handleLogoUpload(e) {
 
   const reader = new FileReader();
   reader.onload = (event) => {
-    companySettings.logo = event.target.result; // Salva la stringa base64
+    companySettings.logo = event.target.result;
     persistSettings();
     updateLogoPreviewUI();
   };
@@ -368,6 +399,56 @@ function handleLogoRemove() {
     updateLogoPreviewUI();
   }
 }
+
+// Creazione di una nuova macro-categoria
+function handleAddMacroCategory() {
+  const input = document.getElementById('new-macro-cat-input');
+  if (!input) return;
+
+  const rawName = input.value.trim();
+  if (!rawName) {
+    alert("Inserisci un nome per la nuova macro-categoria.");
+    return;
+  }
+
+  // Verifica se esiste già
+  const exists = Object.keys(catalogSettings).some(k => k.toLowerCase() === rawName.toLowerCase());
+  if (exists) {
+    alert(`La macro-categoria "${rawName}" esiste già!`);
+    return;
+  }
+
+  // Crea la macro-categoria con un fornitore e modello base
+  catalogSettings[rawName] = {
+    suppliers: [
+      {
+        id: 'supp_' + Date.now(),
+        name: "Fornitore Standard",
+        models: [
+          { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: `Fornitura di ${rawName} realizzata a regola d'arte.` }
+        ]
+      }
+    ]
+  };
+
+  openSettingsCategories[rawName] = true;
+  input.value = "";
+  persistSettings();
+  renderSettingsCategoriesList();
+  populateCategorySelector();
+  alert(`Macro-categoria "${rawName}" aggiunta con successo!`);
+}
+
+// Eliminazione di una macro-categoria
+window.deleteMacroCategory = function(catName) {
+  if (confirm(`Vuoi davvero eliminare la macro-categoria "${catName}" e tutti i suoi fornitori e modelli?`)) {
+    delete catalogSettings[catName];
+    delete openSettingsCategories[catName];
+    persistSettings();
+    renderSettingsCategoriesList();
+    populateCategorySelector();
+  }
+};
 
 function renderSettingsCategoriesList() {
   const container = document.getElementById('settings-categories-list');
@@ -438,7 +519,7 @@ function renderSettingsCategoriesList() {
                 </div>
                 <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
                   <button type="button" class="btn btn-secondary btn-sm" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
-                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina</button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina Fornitore</button>
                 </div>
               </div>
 
@@ -474,7 +555,10 @@ function renderSettingsCategoriesList() {
           <span class="accordion-arrow">${isCatOpen ? '▼' : '▶'}</span>
           <span style="font-weight: 700; font-size: 1rem;">${idx + 1}. ${escapeHtml(catName)}</span>
         </div>
-        <span class="cat-badge">${suppliers.length} fornitore/i</span>
+        <div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation();">
+          <span class="cat-badge">${suppliers.length} fornitore/i</span>
+          <button type="button" class="btn btn-danger btn-sm" onclick="deleteMacroCategory('${escapeHtml(catName)}')">Elimina</button>
+        </div>
       </div>
       ${isCatOpen ? `<div class="settings-cat-body">${suppliersHtml}</div>` : ''}
     `;
@@ -494,16 +578,17 @@ window.toggleSettingsSupplier = function(catName, sIdx) {
   renderSettingsCategoriesList();
 };
 
+// CRUD FORNITORI
 window.addSupplierToCategory = function(catName) {
   if (!catalogSettings[catName]) catalogSettings[catName] = { suppliers: [] };
-  const suppName = prompt("Inserisci il nome del nuovo fornitore (es. QFORT, Cosmet, Bettio):");
+  const suppName = prompt("Inserisci il nome del nuovo fornitore:");
   if (!suppName || !suppName.trim()) return;
 
   const newSupp = {
     id: 'supp_' + Date.now(),
     name: suppName.trim(),
     models: [
-      { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: "Descrizione tecnica del modello..." }
+      { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: `Fornitura di ${catName} secondo specifiche di capitolato.` }
     ]
   };
   catalogSettings[catName].suppliers.push(newSupp);
@@ -527,6 +612,7 @@ window.deleteSupplier = function(catName, sIdx) {
   }
 };
 
+// CRUD MODELLI
 window.addModelToSupplier = function(catName, sIdx) {
   const supp = catalogSettings[catName].suppliers[sIdx];
   if (!supp) return;
@@ -595,6 +681,7 @@ function importSettingsJSON(e) {
       if (data.catalog) catalogSettings = data.catalog;
       persistSettings();
       initSettingsUI();
+      populateCategorySelector();
       renderCategoriesUI();
       alert("Configurazione aziendale (incluso il logo) importata con successo!");
     } catch (err) {
@@ -610,7 +697,8 @@ function importSettingsJSON(e) {
 // ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
-  const catKey = sel ? sel.value : "Serramenti";
+  const catKey = sel ? sel.value : Object.keys(catalogSettings)[0];
+  if (!catKey) return;
 
   const catDef = catalogSettings[catKey] || { suppliers: [{ name: "Standard", models: [{ name: "Standard", specs: "", desc: "" }] }] };
   const firstSupp = (catDef.suppliers && catDef.suppliers.length > 0) ? catDef.suppliers[0] : { name: "Standard", models: [{ name: "Standard", specs: "", desc: "" }] };
@@ -1087,8 +1175,6 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
-//    - Il LOGO viene apposto SOLO nella Pagina 1
-//    - Le pagine 2..N, Totali e Legale mantengono la sola intestazione testuale
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1159,7 +1245,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(page1);
 
-  // PAGINE 2..N: SCHEDE CATEGORIA (Senza logo, solo testata pulita)
+  // PAGINE 2..N: SCHEDE CATEGORIA
   docState.categories.forEach((cat, idx) => {
     const pageCat = document.createElement('div');
     pageCat.className = "sheet";
@@ -1254,7 +1340,7 @@ function prepareAndPrint() {
     printRoot.appendChild(pageCat);
   });
 
-  // PAGINA TOTALI & FIRMA (Senza logo)
+  // PAGINA TOTALI & FIRMA
   const pageTotals = document.createElement('div');
   pageTotals.className = "sheet";
   
@@ -1344,7 +1430,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(pageTotals);
 
-  // ULTIMA PAGINA: NORMATIVA & PRIVACY (Senza logo)
+  // ULTIMA PAGINA: NORMATIVA & PRIVACY
   const pageLegal = document.createElement('div');
   pageLegal.className = "sheet";
   pageLegal.innerHTML = `
