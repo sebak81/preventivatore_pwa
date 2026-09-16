@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v13'; // Versione aggiornata per misure L/H e articoli generalizzati
+const CACHE_NAME = 'prev-app-v14'; // Aggiornato con il layout grafico definitivo per Pagina 1
 const ASSETS = [
   './',
   './index.html',
