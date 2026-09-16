@@ -198,7 +198,7 @@ function persistSettings() {
 // 3. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
-  type: "PREVENTIVO", // PREVENTIVO | REVISIONE | CONTRATTO
+  type: "PREVENTIVO",
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "30 giorni",
@@ -213,10 +213,7 @@ let docState = {
   finalNotes: ""
 };
 
-// ==========================================================================
-// FUNZIONE HELPER: NUMERAZIONE DOCUMENTO CON SUFFISSO DINAMICO
-// Preventivo -> _P | Revisione -> _Rev. | Contratto -> _C
-// ==========================================================================
+// Suffissi Documento: Preventivo -> _P | Revisione -> _Rev. | Contratto -> _C
 function getFormattedDocNumber() {
   const raw = (docState.number || "").trim();
   if (!raw) return "BOZZA";
@@ -228,7 +225,6 @@ function getFormattedDocNumber() {
     suffix = "_C";
   }
 
-  // Pulisce l'eventuale suffisso già digitato dall'utente per evitare duplicazioni (_P, _Rev., _C)
   const clean = raw.replace(/(_P|_Rev\.|_C)$/i, '');
   return `${clean}${suffix}`;
 }
@@ -723,7 +719,7 @@ function importSettingsJSON(e) {
 }
 
 // ==========================================================================
-// 6. GESTIONE SCHEDE PREVENTIVO (EDITOR A CASCATA)
+// 6. GESTIONE SCHEDE PREVENTIVO: MISURE SDOPPIATE (L / H) & ARTICOLI GENERALI
 // ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
@@ -744,7 +740,7 @@ function addCategoryFromSelector() {
     glass: firstModel.glass || "",
     description: firstModel.desc || "",
     positions: [
-      { id: 'pos_' + Date.now(), name: "Pos. 1", measures: "", description: "", quantity: 1, unitPrice: 0 }
+      { id: 'pos_' + Date.now(), name: "Pos. 1", width: "", height: "", description: "", quantity: 1, unitPrice: 0 }
     ],
     installationPrice: 0
   };
@@ -821,8 +817,8 @@ function renderCategoriesUI() {
 
       <div style="margin-top: 15px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <label style="font-size: 0.85rem; font-weight: 700;">ELENCO VANI, POSIZIONI E MISURE</label>
-          <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 5px 10px;" onclick="addPosition('${cat.id}')">+ Aggiungi Vano</button>
+          <label style="font-size: 0.85rem; font-weight: 700;">ELENCO VANI, MISURE E ARTICOLI</label>
+          <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 5px 10px;" onclick="addPosition('${cat.id}')">+ Aggiungi Riga / Vano</button>
         </div>
         ${positionsTable}
       </div>
@@ -952,29 +948,48 @@ window.onCatModelChange = function(catId, modelName) {
 
 function renderPositionsTableHtml(cat) {
   if (cat.positions.length === 0) {
-    return `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 10px;">Nessuna posizione inserita.</div>`;
+    return `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 10px;">Nessuna riga inserita.</div>`;
   }
 
   const rows = cat.positions.map((pos) => {
     const rowTotal = (pos.quantity || 0) * (pos.unitPrice || 0);
+    // Recupera compatibilità con vecchio campo measures se width/height non sono ancora stati popolati
+    let w = pos.width !== undefined ? pos.width : "";
+    let h = pos.height !== undefined ? pos.height : "";
+    if (pos.measures && !w && !h) {
+      const mParts = pos.measures.replace(/mm|cm/gi, '').split(/x/i);
+      if (mParts.length === 2) {
+        w = mParts[0].trim();
+        h = mParts[1].trim();
+        pos.width = w;
+        pos.height = h;
+      }
+    }
+
     return `
       <tr>
-        <td style="width: 20%;">
-          <input type="text" value="${escapeHtml(pos.name)}" placeholder="es. Pos. 1 - Cucina" oninput="updatePosField('${cat.id}', '${pos.id}', 'name', this.value)">
-        </td>
         <td style="width: 18%;">
-          <input type="text" value="${escapeHtml(pos.measures)}" placeholder="es. 1200 x 1400 mm" oninput="updatePosField('${cat.id}', '${pos.id}', 'measures', this.value)">
+          <input type="text" value="${escapeHtml(pos.name)}" placeholder="es. Pos. 1 (vuoto x art. gen.)" oninput="updatePosField('${cat.id}', '${pos.id}', 'name', this.value)">
         </td>
-        <td style="width: 32%;">
-          <input type="text" value="${escapeHtml(pos.description)}" placeholder="es. 1 anta ribalta" oninput="updatePosField('${cat.id}', '${pos.id}', 'description', this.value)">
+        <td style="width: 20%;">
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">L.</span>
+            <input type="text" value="${escapeHtml(w)}" placeholder="mm" style="text-align: center; padding: 5px 4px;" oninput="updatePosField('${cat.id}', '${pos.id}', 'width', this.value)">
+            <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">X</span>
+            <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">H.</span>
+            <input type="text" value="${escapeHtml(h)}" placeholder="mm" style="text-align: center; padding: 5px 4px;" oninput="updatePosField('${cat.id}', '${pos.id}', 'height', this.value)">
+          </div>
         </td>
-        <td style="width: 8%;">
+        <td style="width: 30%;">
+          <input type="text" value="${escapeHtml(pos.description)}" placeholder="Descrizione o articolo libero" oninput="updatePosField('${cat.id}', '${pos.id}', 'description', this.value)">
+        </td>
+        <td style="width: 7%;">
           <input type="number" min="1" step="1" value="${pos.quantity || 1}" style="text-align: center;" oninput="updatePosField('${cat.id}', '${pos.id}', 'quantity', this.value)">
         </td>
         <td style="width: 12%;">
           <input type="number" step="any" min="0" value="${pos.unitPrice > 0 ? pos.unitPrice : ''}" placeholder="0.00" style="text-align: right;" oninput="updatePosField('${cat.id}', '${pos.id}', 'unitPrice', this.value)">
         </td>
-        <td id="pos-total-${pos.id}" style="width: 10%; text-align: right; font-weight: bold; padding: 8px;">
+        <td id="pos-total-${pos.id}" style="width: 9%; text-align: right; font-weight: bold; padding: 8px;">
           ${formatCurrency(rowTotal)}
         </td>
         <td style="width: 4%; text-align: center;">
@@ -990,7 +1005,7 @@ function renderPositionsTableHtml(cat) {
         <thead>
           <tr>
             <th>Posizione / Vano</th>
-            <th>Misure (LxH)</th>
+            <th style="text-align: center;">Misure (L x H)</th>
             <th>Descrizione Specifica</th>
             <th style="text-align: center;">Q.tà</th>
             <th style="text-align: right;">Prezzo Unit. (€)</th>
@@ -1013,7 +1028,8 @@ window.addPosition = function(catId) {
   cat.positions.push({
     id: 'pos_' + Date.now(),
     name: `Pos. ${nextNum}`,
-    measures: "",
+    width: "",
+    height: "",
     description: "",
     quantity: 1,
     unitPrice: 0
@@ -1123,7 +1139,6 @@ async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
   const clientName = docState.client.name.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || "Cliente";
   const formattedNum = getFormattedDocNumber();
-  // Rimuove eventuali punti finali dal codice per estensione pulita (.json)
   const safeDocNum = formattedNum.replace(/\.+$/, '').replace(/[^a-zA-Z0-9_.-]/g, '_');
   const fileName = `${clientName}_${safeDocNum}.json`;
 
@@ -1164,7 +1179,6 @@ function openFromFile(e) {
       const data = JSON.parse(event.target.result);
       docState = Object.assign(docState, data);
 
-      // Normalizzazione tipo documento da vecchi salvataggi
       if (docState.type === "CONFERMA D'ORDINE / CONTRATTO") docState.type = "CONTRATTO";
       if (docState.type === "REVISIONE PREVENTIVO") docState.type = "REVISIONE";
 
@@ -1229,6 +1243,9 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
+//    - Formattazione Misure: "L. xxx X H. xxx"
+//    - Articolo Generalizzato: se Vano e Misure sono vuoti, unisce le prime
+//      3 colonne lasciando solo descrizione, quantità e prezzi.
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1251,7 +1268,7 @@ function prepareAndPrint() {
 
   const totalPages = docState.categories.length + 3;
 
-  // PAGINA 1: INTESTAZIONE SENZA SCRITTA "PREVENTIVO", CON NUMERO DOCUMENTO E SUFFISSO
+  // PAGINA 1: INTESTAZIONE
   const page1 = document.createElement('div');
   page1.className = "sheet";
   page1.innerHTML = `
@@ -1312,10 +1329,43 @@ function prepareAndPrint() {
 
     let posRows = (cat.positions || []).map(p => {
       const rowTot = (p.quantity || 0) * (p.unitPrice || 0);
+
+      const hasName = (p.name || "").trim().length > 0;
+      const wVal = (p.width || "").trim();
+      const hVal = (p.height || "").trim();
+      const oldMeasures = (p.measures || "").trim();
+      const hasMeasures = wVal.length > 0 || hVal.length > 0 || oldMeasures.length > 0;
+
+      // ARTICOLO GENERALIZZATO: se mancano sia il vano sia le misure, omette le colonne e lascia solo la descrizione
+      if (!hasName && !hasMeasures) {
+        return `
+          <tr>
+            <td colspan="3" style="font-size: 0.85rem; font-weight: 500; padding-left: 10px;">
+              ${escapeHtml(p.description) || 'Articolo / Lavorazione specifica'}
+            </td>
+            <td style="text-align: center;">${p.quantity}</td>
+            <td style="text-align: right;">${formatCurrency(p.unitPrice)}</td>
+            <td style="text-align: right; font-weight: bold;">${formatCurrency(rowTot)}</td>
+          </tr>
+        `;
+      }
+
+      // RIGA STANDARD CON POSIZIONE E/O MISURE
+      let measuresFormatted = "-";
+      if (wVal && hVal) {
+        measuresFormatted = `L. ${escapeHtml(wVal)} X H. ${escapeHtml(hVal)}`;
+      } else if (wVal) {
+        measuresFormatted = `L. ${escapeHtml(wVal)}`;
+      } else if (hVal) {
+        measuresFormatted = `H. ${escapeHtml(hVal)}`;
+      } else if (oldMeasures) {
+        measuresFormatted = escapeHtml(oldMeasures);
+      }
+
       return `
         <tr>
-          <td><strong>${escapeHtml(p.name)}</strong></td>
-          <td>${escapeHtml(p.measures) || '-'}</td>
+          <td><strong>${escapeHtml(p.name || '')}</strong></td>
+          <td style="white-space: nowrap; font-size: 0.82rem;">${measuresFormatted}</td>
           <td style="font-size: 0.85rem;">${escapeHtml(p.description)}</td>
           <td style="text-align: center;">${p.quantity}</td>
           <td style="text-align: right;">${formatCurrency(p.unitPrice)}</td>
@@ -1363,8 +1413,8 @@ function prepareAndPrint() {
           <thead>
             <tr>
               <th style="width: 18%;">Vano / Posizione</th>
-              <th style="width: 16%;">Misure (LxH)</th>
-              <th style="width: 38%;">Descrizione Manufatto</th>
+              <th style="width: 18%;">Misure (LxH)</th>
+              <th style="width: 36%;">Descrizione Manufatto</th>
               <th style="width: 6%; text-align: center;">Q.tà</th>
               <th style="width: 11%; text-align: right;">P. Unit.</th>
               <th style="width: 11%; text-align: right;">Totale</th>
