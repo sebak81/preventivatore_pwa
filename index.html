@@ -106,21 +106,9 @@
         <span>Pagine Categoria (Seleziona, ordina e componi le schede)</span>
       </div>
       
-      <!-- Barra di aggiunta con le 11 Macro-Categorie -->
+      <!-- Barra di aggiunta dinamica alimentata dal catalogo -->
       <div class="add-category-bar">
-        <select id="select-category-type" style="flex-grow: 1; font-weight: 600;">
-          <option value="Portoncini">1. Portoncini</option>
-          <option value="Serramenti" selected>2. Serramenti</option>
-          <option value="Zanzariere">3. Zanzariere</option>
-          <option value="Avvolgibili">4. Avvolgibili</option>
-          <option value="Scuri">5. Scuri</option>
-          <option value="Teli filtranti / oscuranti">6. Teli filtranti / oscuranti</option>
-          <option value="Porte interne">7. Porte interne</option>
-          <option value="Portoni Garage">8. Portoni Garage</option>
-          <option value="Monoblocchi Isolanti">9. Monoblocchi Isolanti</option>
-          <option value="Porte a vetro">10. Porte a vetro</option>
-          <option value="Altro">11. Altro (Compilazione libera)</option>
-        </select>
+        <select id="select-category-type" style="flex-grow: 1; font-weight: 600;"></select>
         <button type="button" class="btn btn-primary" id="btn-add-category">+ Aggiungi Pagina Categoria</button>
       </div>
 
@@ -221,14 +209,20 @@
       </div>
     </section>
 
-    <!-- GESTIONE CATALOGO FORNITORI DELLE 11 CATEGORIE -->
+    <!-- GESTIONE CATALOGO: AGGIUNTA E MODIFICA MACRO-CATEGORIE -->
     <section class="card">
       <div class="card-title">
         <span>Gestione Macro-Categorie, Fornitori & Modelli</span>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-        Clicca sulla macro-categoria per visualizzare i relativi fornitori. Clicca sul fornitore per visualizzare e modificare i suoi modelli e descrizioni tecniche.
+        Puoi creare nuove macro-categorie su misura o gestire quelle esistenti. Clicca sulla macro-categoria per visualizzare i relativi fornitori e modelli.
       </p>
+
+      <!-- BARRA CREAZIONE NUOVA MACROCATEGORIA -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px; background: #f8fafc; padding: 12px; border: 1px solid var(--border); border-radius: 6px;">
+        <input type="text" id="new-macro-cat-input" placeholder="Nome nuova macro-categoria (es. Pergole Bioclimatiche, Inferriate, Tende da sole...)" style="flex-grow: 1;">
+        <button type="button" class="btn btn-primary" id="btn-add-macro-cat">+ Aggiungi Macro-categoria</button>
+      </div>
 
       <div id="settings-categories-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
     </section>
@@ -239,7 +233,7 @@
         <span>Condivisione Impostazioni & Logo con i Colleghi (pCloud)</span>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-        Puoi esportare l'intera configurazione (dati azienda, logo incorporato, fornitori e modelli) in un file da salvare nella cartella condivisa di pCloud. Sugli altri PC basterà importarlo una volta sola.
+        Puoi esportare l'intera configurazione (dati azienda, logo incorporato, tutte le macro-categorie, fornitori e modelli) in un file da salvare nella cartella condivisa di pCloud. Sugli altri PC basterà importarlo una volta sola.
       </p>
       <div class="btn-group">
         <button type="button" class="btn btn-primary" id="btn-export-settings">Esporta Impostazioni (.json)</button>
