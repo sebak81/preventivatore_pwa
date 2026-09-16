@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v9'; // Incremento versione per recepire la numerazione e pulizia stampa
+const CACHE_NAME = 'prev-app-v10'; // Aggiornato per recepire le modifiche a campi prezzo e posa
 const ASSETS = [
   './',
   './index.html',
