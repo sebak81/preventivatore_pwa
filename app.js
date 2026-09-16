@@ -1,123 +1,150 @@
-// ==========================================
-// 1. ANAGRAFICA AZIENDALE DI DEFAULT
-// ==========================================
-const COMPANY = {
+// ==========================================================================
+// 1. CONFIGURAZIONE E CATALOGO DI DEFAULT DELLE 11 MACRO-CATEGORIE
+// ==========================================================================
+const DEFAULT_COMPANY = {
   name: "NOME AZIENDA / SERRAMENTI",
   address: "Via delle Industrie, 12 - 00100 Roma (RM)",
   taxId: "P.IVA / C.F.: 01234567890",
   contacts: "Tel: 06 1234567 | Cell: 340 0000000 | Email: info@azienda.it"
 };
 
-// ==========================================
-// 2. CATALOGO BASE FORNITORI E MODELLI
-// ==========================================
+// Catalogo predefinito per le 11 categorie
 const DEFAULT_CATALOG = {
-  suppliers: [
-    {
-      id: "qfort",
-      name: "QFORT",
-      categories: [
-        {
-          id: "pvc",
-          name: "Serramenti in PVC",
-          models: [
-            {
-              id: "4_stars",
-              name: "4 Stars",
-              profileDepth: "70 mm",
-              chambers: "5 camere",
-              gaskets: "2 guarnizioni di battuta",
-              defaultGlass: "Vetrocamera 24 mm B.E. con gas Argon e Warm Edge",
-              defaultDescription: "Profilo in PVC classe A da 70 mm a 5 camere con rinforzi in acciaio zincato. Sistema a 2 guarnizioni di battuta in EPDM. Ideale per ristrutturazioni e interventi di riqualificazione energetica."
-            },
-            {
-              id: "5_stars",
-              name: "5 Stars",
-              profileDepth: "70 mm",
-              chambers: "5 camere",
-              gaskets: "2 guarnizioni di tenuta",
-              defaultGlass: "Vetrocamera 24 mm o 30 mm B.E. con canalina calda",
-              defaultDescription: "Design squadrato ed essenziale. Profilo in PVC da 70 mm a 5 camere, ferramenta perimetrale ad alta sicurezza con riscontri antieffrazione e dispositivo di microventilazione integrato."
-            },
-            {
-              id: "7_stars",
-              name: "7 Stars",
-              profileDepth: "85 mm",
-              chambers: "7 camere",
-              gaskets: "3 guarnizioni (con guarnizione centrale a giunto aperto)",
-              defaultGlass: "Triplo vetro 44 mm selettivo B.E. con gas Argon e canalina termica Warm Edge",
-              defaultDescription: "Top di gamma a taglio termico passivo. Profilo in PVC classe A da 85 mm a 7 camere e sistema a 3 guarnizioni. Massime prestazioni di isolamento termico e acustico per case a basso consumo ed edifici nZEB."
-            },
-            {
-              id: "stars_epiq",
-              name: "Stars Epiq",
-              profileDepth: "82 mm",
-              chambers: "6 camere",
-              gaskets: "3 guarnizioni perimetrali",
-              defaultGlass: "Triplo vetro ad alte prestazioni termiche e acustiche",
-              defaultDescription: "Sistema innovativo con estetica moderna e complanare/semi-complanare. Profili rinforzati per grandi aperture, eccellente stabilità statica e valore termico ai massimi livelli di mercato."
-            }
-          ]
-        },
-        {
-          id: "alluminio",
-          name: "Serramenti in Alluminio",
-          models: [
-            {
-              id: "alluminio_tt",
-              name: "Alluminio a Taglio Termico",
-              profileDepth: "75 mm",
-              chambers: "Barrette tubolari in poliammide",
-              gaskets: "3 guarnizioni di tenuta",
-              defaultGlass: "Vetrocamera 33.1/16/33.1 B.E. con Warm Edge",
-              defaultDescription: "Profili estrusi in lega primaria di alluminio a taglio termico. Massima resistenza meccanica, indeformabilità, resistenza agli agenti atmosferici e linee sobrie ed essenziali."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "generico",
-      name: "Fornitore Personalizzato / Altro",
-      categories: [
-        {
-          id: "libero",
-          name: "Standard",
-          models: [
-            {
-              id: "custom",
-              name: "Su Misura / Standard",
-              profileDepth: "-",
-              chambers: "-",
-              gaskets: "-",
-              defaultGlass: "Secondo capitolato",
-              defaultDescription: "Fornitura realizzata secondo le specifiche tecniche concordate per la singola commessa."
-            }
-          ]
-        }
-      ]
-    }
-  ]
+  "Portoncini": {
+    suppliers: [
+      {
+        id: "qfort_portoncini",
+        name: "QFORT",
+        models: [
+          { id: "baby_stars", name: "Baby Stars", specs: "Alluminio/PVC, serratura automatica 5 punti", desc: "Portoncino d'ingresso ad elevata sicurezza con pannello coibentato ad alto isolamento." }
+        ]
+      },
+      { id: "altro_portoncini", name: "Altro / Blindato", models: [{ id: "custom", name: "Standard", specs: "Classe 3/4 antieffrazione", desc: "Porta blindata d'ingresso con cilindro europeo e defender." }] }
+    ]
+  },
+  "Serramenti": {
+    suppliers: [
+      {
+        id: "qfort",
+        name: "QFORT",
+        models: [
+          { id: "4_stars", name: "4 Stars (70mm - 5 cam - 2 guarn.)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm B.E. Warm Edge", desc: "Profilo in PVC classe A da 70 mm a 5 camere con rinforzi in acciaio zincato. Sistema a 2 guarnizioni di battuta." },
+          { id: "5_stars", name: "5 Stars (70mm - 5 cam - 2 guarn.)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm o 30 mm B.E. Warm Edge", desc: "Design squadrato ed essenziale. Profilo in PVC da 70 mm a 5 camere, ferramenta perimetrale con scontri antieffrazione." },
+          { id: "7_stars", name: "7 Stars (85mm - 7 cam - 3 guarn.)", specs: "85 mm - 7 camere - 3 guarnizioni (giunto aperto)", glass: "Triplo vetro 44 mm selettivo B.E. Warm Edge", desc: "Top di gamma a taglio termico passivo. Profilo da 85 mm a 7 camere e 3 guarnizioni per case a bassissimo consumo." },
+          { id: "stars_epiq", name: "Stars Epiq (82mm - 6 cam)", specs: "82 mm - 6 camere - 3 guarnizioni", glass: "Triplo vetro alte prestazioni", desc: "Sistema con estetica complanare o semi-complanare per grandi aperture." }
+        ]
+      },
+      {
+        id: "alluminio_gen",
+        name: "Alluminio a Taglio Termico",
+        models: [
+          { id: "alluminio_tt", name: "Alluminio TT 75mm", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", desc: "Profili estrusi in lega primaria a taglio termico. Massima resistenza meccanica." }
+        ]
+      }
+    ]
+  },
+  "Zanzariere": {
+    suppliers: [
+      {
+        id: "bettio",
+        name: "Bettio",
+        models: [
+          { id: "scenica", name: "Scenica (Senza guida a terra)", specs: "Rete in fibra di vetro, guida zero barriere", desc: "Zanzariera laterale senza inciampo a terra, fermo in qualsiasi posizione." },
+          { id: "verticale", name: "Verticale a molla/catenella", specs: "Cassonetto 40/50mm con rallentatore", desc: "Zanzariera classica a scorrimento verticale con spazzolini antivento." }
+        ]
+      },
+      { id: "mvline", name: "MV Line", models: [{ id: "standard", name: "Modello Standard", specs: "Alluminio estruso", desc: "Zanzariera con aggancio rapido e rete ad alta trasparenza." }] }
+    ]
+  },
+  "Avvolgibili": {
+    suppliers: [
+      {
+        id: "pinto",
+        name: "Pinto / Pasini",
+        models: [
+          { id: "alluminio_coibentato", name: "Alluminio Coibentato media/alta densità", specs: "Poliuretano espanso ecologico, terminale estruso", desc: "Tapparella in alluminio coibentato ad elevata stabilità e leggerezza." },
+          { id: "acciaio", name: "Acciaio Coibentato Blindato", specs: "Lamiera di acciaio con poliuretano", desc: "Tapparella di sicurezza ad alta resistenza antieffrazione." }
+        ]
+      }
+    ]
+  },
+  "Scuri": {
+    suppliers: [
+      { id: "scuri_gen", name: "Scuri & Persiane", models: [{ id: "scuro_padovana", name: "Alla Padovana / Vicentina", specs: "Alluminio coibentato o dogato", desc: "Oscurante tradizionale a doghe con ferramenta alla piemontese o padovana." }] }
+    ]
+  },
+  "Teli filtranti / oscuranti": {
+    suppliers: [
+      { id: "teli_gen", name: "Tende Tecniche", models: [{ id: "screen", name: "Telo Screen Filtrante", specs: "Fibra di vetro e PVC", desc: "Schermatura solare per la riduzione del carico termico estivo." }] }
+    ]
+  },
+  "Porte interne": {
+    suppliers: [
+      {
+        id: "porte_standard",
+        name: "Porte Interne Design",
+        models: [
+          { id: "battente_cieca", name: "Battente Tamburata Microtek", specs: "Telaio e coprifili con guarnizione acustica, cerniere a scomparsa", desc: "Porta interna moderna ad anta liscia con serratura magnetica." },
+          { id: "scorrevole", name: "Scorrevole a scomparsa / esterno muro", specs: "Kit binario con carrelli ammortizzati", desc: "Porta scorrevole salvaspazio coordinata con le finiture dell'abitazione." }
+        ]
+      }
+    ]
+  },
+  "Portoni Garage": {
+    suppliers: [
+      { id: "sezionale", name: "Portoni Sezionali Coibentati", models: [{ id: "pannello_40", name: "Pannello sandwich 40/42 mm", specs: "Doppia lamiera d'acciaio, motorizzazione a soffitto", desc: "Portone da garage ad apertura verticale a scorrimento sotto il soffitto." }] }
+    ]
+  },
+  "Monoblocchi Isolanti": {
+    suppliers: [
+      { id: "monoblocco_termo", name: "Monoblocco Termico", models: [{ id: "termo_eps", name: "Spalle e cassonetto in EPS", specs: "Taglio termico quarto lato, predisposizione serramento e avvolgibile/frangisole", desc: "Sistema per l'isolamento completo del foro finestra conforme norma UNI 11673." }] }
+    ]
+  },
+  "Porte a vetro": {
+    suppliers: [
+      { id: "vetro_arredo", name: "Porte in Cristallo Temperato", models: [{ id: "vetro_8_10", name: "Cristallo 8/10 mm temperato", specs: "Finitura trasparente, satinata o fumé con maniglione inox", desc: "Porta d'arredo a tutto vetro con cerniere a scatto o binario minimale." }] }
+    ]
+  },
+  "Altro": {
+    suppliers: [
+      { id: "libero", name: "Voce Libera", models: [{ id: "speciale", name: "Lavorazione Speciale", specs: "-", desc: "Fornitura ed opere complementari speciali secondo accordi." }] }
+    ]
+  }
 };
 
-// ==========================================
-// 3. STATO CENTRALE DELL'APPLICAZIONE
-// ==========================================
+// ==========================================================================
+// 2. GESTIONE STORAGE LOCALE DELLE IMPOSTAZIONI
+// ==========================================================================
+let companySettings = loadCompanySettings();
+let catalogSettings = loadCatalogSettings();
+
+function loadCompanySettings() {
+  const saved = localStorage.getItem('prev_company_settings');
+  return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_COMPANY);
+}
+
+function loadCatalogSettings() {
+  const saved = localStorage.getItem('prev_catalog_settings');
+  return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+}
+
+function persistSettings() {
+  localStorage.setItem('prev_company_settings', JSON.stringify(companySettings));
+  localStorage.setItem('prev_catalog_settings', JSON.stringify(catalogSettings));
+}
+
+// ==========================================================================
+// 3. STATO CENTRALE DEL PREVENTIVO
+// ==========================================================================
 let docState = {
   type: "PREVENTIVO",
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "30 giorni",
-  client: {
-    name: "",
-    residence: "",
-    taxId: "",
-    phone: "",
-    email: ""
-  },
+  client: { name: "", residence: "", taxId: "", phone: "", email: "" },
   sameSite: true,
   siteAddress: "",
-  categories: [],
+  categories: [], // Array ordinato delle pagine categoria inserite
   taxRate: 22,
   taxBonus: "Bonus Casa 50%",
   paymentTerms: "30% all'ordine come caparra confirmatoria, 40% a inizio posa, 30% a fine lavori collaudati.",
@@ -125,9 +152,9 @@ let docState = {
   finalNotes: ""
 };
 
-// ==========================================
-// 4. INIZIALIZZAZIONE E GESTIONE EVENTI
-// ==========================================
+// ==========================================================================
+// 4. INIZIALIZZAZIONE & EVENTI
+// ==========================================================================
 function safeOn(id, event, handler) {
   const el = document.getElementById(id);
   if (el) el.addEventListener(event, handler);
@@ -136,6 +163,7 @@ function safeOn(id, event, handler) {
 function initApp() {
   setupEventListeners();
   loadDefaultState();
+  initSettingsUI();
   renderCategoriesUI();
   updateCalculations();
 }
@@ -147,11 +175,17 @@ if (document.readyState === 'loading') {
 }
 
 function setupEventListeners() {
+  // Switch Viste (Preventivo vs Impostazioni)
+  safeOn('tab-editor-btn', 'click', () => switchView('editor'));
+  safeOn('tab-settings-btn', 'click', () => switchView('settings'));
+
+  // Campi Documento
   safeOn('doc-type', 'change', (e) => { docState.type = e.target.value; });
   safeOn('doc-number', 'input', (e) => { docState.number = e.target.value; });
   safeOn('doc-date', 'change', (e) => { docState.date = e.target.value; });
   safeOn('doc-validity', 'input', (e) => { docState.validity = e.target.value; });
 
+  // Dati Cliente
   safeOn('client-name', 'input', (e) => { docState.client.name = e.target.value; });
   safeOn('client-residence', 'input', (e) => { docState.client.residence = e.target.value; });
   safeOn('client-taxid', 'input', (e) => { docState.client.taxId = e.target.value; });
@@ -166,11 +200,11 @@ function setupEventListeners() {
 
   safeOn('site-address', 'input', (e) => { docState.siteAddress = e.target.value; });
 
+  // Totali e Note
   safeOn('tax-rate', 'change', (e) => {
     docState.taxRate = parseFloat(e.target.value) || 0;
     updateCalculations();
   });
-
   safeOn('tax-bonus', 'input', (e) => { docState.taxBonus = e.target.value; });
   safeOn('payment-terms', 'input', (e) => { docState.paymentTerms = e.target.value; });
   safeOn('delivery-terms', 'input', (e) => { docState.deliveryTerms = e.target.value; });
@@ -180,12 +214,34 @@ function setupEventListeners() {
   safeOn('btn-add-category', 'click', addCategoryFromSelector);
   safeOn('btn-print', 'click', prepareAndPrint);
   safeOn('btn-save', 'click', saveToFile);
-  safeOn('btn-open', 'click', () => {
-    const fi = document.getElementById('file-input');
-    if (fi) fi.click();
-  });
+  safeOn('btn-open', 'click', () => document.getElementById('file-input').click());
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
+
+  // Impostazioni
+  safeOn('btn-save-settings', 'click', saveSettingsFromUI);
+  safeOn('btn-export-settings', 'click', exportSettingsJSON);
+  safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
+  safeOn('settings-file-input', 'change', importSettingsJSON);
+}
+
+function switchView(view) {
+  const edView = document.getElementById('view-editor');
+  const setView = document.getElementById('view-settings');
+  const btnEd = document.getElementById('tab-editor-btn');
+  const btnSet = document.getElementById('tab-settings-btn');
+
+  if (view === 'editor') {
+    edView.style.display = 'flex';
+    setView.style.display = 'none';
+    btnEd.classList.add('active');
+    btnSet.classList.remove('active');
+  } else {
+    edView.style.display = 'none';
+    setView.style.display = 'flex';
+    btnEd.classList.remove('active');
+    btnSet.classList.add('active');
+  }
 }
 
 function loadDefaultState() {
@@ -193,51 +249,67 @@ function loadDefaultState() {
   if (dateInput) dateInput.value = docState.date;
 }
 
-// ==========================================
-// 5. GESTIONE CATEGORIE E CATALOGO A CASCATA
-// ==========================================
+// ==========================================================================
+// 5. GESTIONE E ORDINAMENTO DELLE CATEGORIE (SU ▲ / GIÙ ▼)
+// ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
-  const catType = sel ? sel.value : "Serramenti";
+  const catKey = sel ? sel.value : "Serramenti";
 
-  const isSerramenti = catType.toLowerCase().includes("serramenti");
-  const defaultSupp = DEFAULT_CATALOG.suppliers[0];
-  const defaultSubCat = defaultSupp.categories[0];
-  const defaultModel = defaultSubCat.models[2] || defaultSubCat.models[0]; // 7 Stars se presente
+  // Recupera la configurazione di questa categoria dalle impostazioni
+  const catConfig = catalogSettings[catKey] || { suppliers: [{ id: "gen", name: "Standard", models: [{ id: "m1", name: "Standard", specs: "-", desc: "" }] }] };
+  const firstSupp = catConfig.suppliers[0];
+  const firstModel = firstSupp.models[0];
 
   const newCat = {
     id: 'cat_' + Date.now(),
-    name: catType,
-    isSerramenti: isSerramenti,
-    // Dati specifici di catalogo (per Serramenti)
-    supplierId: isSerramenti ? defaultSupp.id : "generico",
-    materialId: isSerramenti ? defaultSubCat.id : "libero",
-    modelId: isSerramenti ? defaultModel.id : "custom",
+    name: catKey,
+    supplierName: firstSupp.name,
+    modelName: firstModel.name,
+    specs: firstModel.specs || "",
     color: "",
-    glass: isSerramenti ? defaultModel.defaultGlass : "",
-    profileSpecs: isSerramenti ? `${defaultModel.profileDepth} - ${defaultModel.chambers} - ${defaultModel.gaskets}` : "",
-    description: isSerramenti ? defaultModel.defaultDescription : "",
-    // Righe Vani / Posizioni
-    positions: [],
-    // Posa in opera specifica della pagina
+    glass: firstModel.glass || "",
+    description: firstModel.desc || "",
+    positions: [
+      { id: 'pos_' + Date.now(), name: "Pos. 1", measures: "", description: "", quantity: 1, unitPrice: 0 }
+    ],
     installationPrice: 0
   };
-
-  // Aggiunge una prima posizione vuota di default
-  newCat.positions.push({
-    id: 'pos_' + Date.now(),
-    name: "Pos. 1",
-    measures: "",
-    description: "",
-    quantity: 1,
-    unitPrice: 0
-  });
 
   docState.categories.push(newCat);
   renderCategoriesUI();
   updateCalculations();
 }
 
+window.moveCategoryUp = function(index) {
+  if (index <= 0) return;
+  const temp = docState.categories[index];
+  docState.categories[index] = docState.categories[index - 1];
+  docState.categories[index - 1] = temp;
+  renderCategoriesUI();
+  updateCalculations();
+};
+
+window.moveCategoryDown = function(index) {
+  if (index >= docState.categories.length - 1) return;
+  const temp = docState.categories[index];
+  docState.categories[index] = docState.categories[index + 1];
+  docState.categories[index + 1] = temp;
+  renderCategoriesUI();
+  updateCalculations();
+};
+
+window.removeCategory = function(id) {
+  if (confirm("Vuoi rimuovere questa categoria e la relativa pagina dal preventivo?")) {
+    docState.categories = docState.categories.filter(c => c.id !== id);
+    renderCategoriesUI();
+    updateCalculations();
+  }
+};
+
+// ==========================================================================
+// 6. RENDER DELL'INTERFACCIA DELLE SCHEDE
+// ==========================================================================
 function renderCategoriesUI() {
   const container = document.getElementById('categories-container');
   if (!container) return;
@@ -255,42 +327,47 @@ function renderCategoriesUI() {
     const card = document.createElement('div');
     card.className = "card category-card";
 
-    let catalogSectionHtml = "";
-    if (cat.isSerramenti) {
-      catalogSectionHtml = renderCatalogSelectorHtml(cat);
-    }
+    const isFirst = index === 0;
+    const isLast = index === docState.categories.length - 1;
+    const pageNum = index + 2; // Pagina 1 è sempre l'intestazione
 
-    const positionsTableHtml = renderPositionsTableHtml(cat);
+    const selectorBlock = renderCategoryOptionsBlock(cat);
+    const positionsTable = renderPositionsTableHtml(cat);
     const totalsCat = calculateCategoryTotals(cat);
 
     card.innerHTML = `
       <div class="card-title">
-        <span><strong>Pagina ${index + 2}:</strong> ${escapeHtml(cat.name)}</span>
-        <button type="button" class="btn btn-danger" onclick="removeCategory('${cat.id}')">Rimuovi Pagina</button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span><strong>Pagina ${pageNum}:</strong> ${escapeHtml(cat.name)}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <button type="button" class="btn-order" onclick="moveCategoryUp(${index})" ${isFirst ? 'disabled' : ''} title="Sposta prima">▲ Sposta Su</button>
+          <button type="button" class="btn-order" onclick="moveCategoryDown(${index})" ${isLast ? 'disabled' : ''} title="Sposta dopo">▼ Sposta Giù</button>
+          <button type="button" class="btn btn-danger" style="margin-left: 8px;" onclick="removeCategory('${cat.id}')">Rimuovi</button>
+        </div>
       </div>
 
-      ${catalogSectionHtml}
+      ${selectorBlock}
 
       <div style="margin-top: 15px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <label style="font-size: 0.85rem; font-weight: 700;">ELENCO VANI, POSIZIONI E MISURE</label>
-          <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 5px 10px;" onclick="addPosition('${cat.id}')">+ Aggiungi Vano / Posizione</button>
+          <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 5px 10px;" onclick="addPosition('${cat.id}')">+ Aggiungi Vano</button>
         </div>
-        ${positionsTableHtml}
+        ${positionsTable}
       </div>
 
-      <!-- RIEPILOGO ECONOMICO DELLA CATEGORIA -->
       <div class="cat-summary-box">
         <div class="cat-summary-row">
           <span>Subtotale Fornitura Manufatti:</span>
           <strong>${formatCurrency(totalsCat.fornitura)}</strong>
         </div>
         <div class="cat-summary-row" style="align-items: center;">
-          <label style="margin: 0; text-transform: none; font-weight: 600;">Posa in Opera e Fissaggio (€ netto):</label>
+          <label style="margin: 0; text-transform: none; font-weight: 600;">Posa in Opera ed Assistenza (€ netto):</label>
           <input type="number" step="0.01" min="0" value="${cat.installationPrice > 0 ? cat.installationPrice : ''}" placeholder="0.00" style="width: 140px; text-align: right; font-weight: bold;" oninput="updateCatInstallation('${cat.id}', this.value)">
         </div>
         <div class="cat-summary-row cat-summary-total">
-          <span>Totale Categoria (Fornitura + Posa):</span>
+          <span>Totale Pagina ${pageNum} (${escapeHtml(cat.name)}):</span>
           <span>${formatCurrency(totalsCat.total)}</span>
         </div>
       </div>
@@ -300,65 +377,101 @@ function renderCategoriesUI() {
   });
 }
 
-// Genera i selettori a cascata per Serramenti
-function renderCatalogSelectorHtml(cat) {
-  const currentSupp = DEFAULT_CATALOG.suppliers.find(s => s.id === cat.supplierId) || DEFAULT_CATALOG.suppliers[0];
-  const currentMaterial = currentSupp.categories.find(m => m.id === cat.materialId) || currentSupp.categories[0];
+function renderCategoryOptionsBlock(cat) {
+  const catDef = catalogSettings[cat.name] || { suppliers: [{ id: "gen", name: "Standard", models: [{ id: "m1", name: "Standard", specs: "-", desc: "" }] }] };
+  const suppliers = catDef.suppliers || [];
 
-  const suppOptions = DEFAULT_CATALOG.suppliers.map(s => 
-    `<option value="${s.id}" ${s.id === cat.supplierId ? 'selected' : ''}>${escapeHtml(s.name)}</option>`
+  const suppOptions = suppliers.map(s => 
+    `<option value="${escapeHtml(s.name)}" ${s.name === cat.supplierName ? 'selected' : ''}>${escapeHtml(s.name)}</option>`
   ).join('');
 
-  const matOptions = currentSupp.categories.map(m => 
-    `<option value="${m.id}" ${m.id === cat.materialId ? 'selected' : ''}>${escapeHtml(m.name)}</option>`
-  ).join('');
+  const currentSupp = suppliers.find(s => s.name === cat.supplierName) || suppliers[0];
+  const models = currentSupp ? (currentSupp.models || []) : [];
 
-  const modelOptions = currentMaterial.models.map(mod => 
-    `<option value="${mod.id}" ${mod.id === cat.modelId ? 'selected' : ''}>${escapeHtml(mod.name)}</option>`
+  const modelOptions = models.map(m => 
+    `<option value="${escapeHtml(m.name)}" ${m.name === cat.modelName ? 'selected' : ''}>${escapeHtml(m.name)}</option>`
   ).join('');
 
   return `
-    <div style="background: #f8fafc; border: 1px solid var(--border); padding: 14px; border-radius: 6px; margin-bottom: 15px;">
-      <label style="color: var(--accent); margin-bottom: 8px; display: block;">Configurazione Fornitore & Modello</label>
+    <div style="background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: 6px;">
       <div class="form-grid">
         <div class="form-group">
           <label>Fornitore</label>
-          <select onchange="onSupplierChange('${cat.id}', this.value)">${suppOptions}</select>
+          <select onchange="onCatSupplierChange('${cat.id}', this.value)">
+            ${suppOptions}
+          </select>
         </div>
         <div class="form-group">
-          <label>Materiale / Categoria</label>
-          <select onchange="onMaterialChange('${cat.id}', this.value)">${matOptions}</select>
+          <label>Modello / Serie</label>
+          <select onchange="onCatModelChange('${cat.id}', this.value)">
+            ${modelOptions}
+          </select>
         </div>
         <div class="form-group">
-          <label>Serie / Modello</label>
-          <select onchange="onModelChange('${cat.id}', this.value)">${modelOptions}</select>
+          <label>Finitura / Colore</label>
+          <input type="text" value="${escapeHtml(cat.color)}" placeholder="es. Bianco 9010 / Noce" oninput="updateCatField('${cat.id}', 'color', this.value)">
         </div>
       </div>
 
       <div class="form-grid" style="margin-top: 10px;">
         <div class="form-group">
-          <label>Dati Tecnici Profilo</label>
-          <input type="text" value="${escapeHtml(cat.profileSpecs)}" placeholder="Spessore, camere, guarnizioni" oninput="updateCatField('${cat.id}', 'profileSpecs', this.value)">
+          <label>Specifiche Tecniche Sistema</label>
+          <input type="text" value="${escapeHtml(cat.specs)}" placeholder="Spessore, guarnizioni, caratteristiche" oninput="updateCatField('${cat.id}', 'specs', this.value)">
         </div>
         <div class="form-group">
-          <label>Finitura / Colore Int. / Est.</label>
-          <input type="text" value="${escapeHtml(cat.color)}" placeholder="es. Bianco Massa / Noce Ext." oninput="updateCatField('${cat.id}', 'color', this.value)">
-        </div>
-        <div class="form-group">
-          <label>Vetraggio di Base</label>
-          <input type="text" value="${escapeHtml(cat.glass)}" placeholder="es. 44.1/16/33.1 B.E. Warm Edge" oninput="updateCatField('${cat.id}', 'glass', this.value)">
+          <label>Vetraggio / Dettaglio Accessori</label>
+          <input type="text" value="${escapeHtml(cat.glass)}" placeholder="Tipologia vetro o rete" oninput="updateCatField('${cat.id}', 'glass', this.value)">
         </div>
       </div>
 
       <div class="form-group full" style="margin-top: 10px;">
-        <label>Descrizione Generale Manufatto (Precompilata, modificabile)</label>
+        <label>Descrizione Generale del Manufatto (Precompilata, modificabile)</label>
         <textarea oninput="updateCatField('${cat.id}', 'description', this.value)">${escapeHtml(cat.description)}</textarea>
       </div>
     </div>
   `;
 }
 
-// Genera la tabella dei singoli vani per la scheda corrente
+window.onCatSupplierChange = function(catId, suppName) {
+  const cat = docState.categories.find(c => c.id === catId);
+  if (!cat) return;
+  cat.supplierName = suppName;
+
+  const catDef = catalogSettings[cat.name];
+  if (catDef) {
+    const supp = catDef.suppliers.find(s => s.name === suppName);
+    if (supp && supp.models.length > 0) {
+      cat.modelName = supp.models[0].name;
+      cat.specs = supp.models[0].specs || "";
+      cat.glass = supp.models[0].glass || "";
+      cat.description = supp.models[0].desc || "";
+    }
+  }
+  renderCategoriesUI();
+  updateCalculations();
+};
+
+window.onCatModelChange = function(catId, modelName) {
+  const cat = docState.categories.find(c => c.id === catId);
+  if (!cat) return;
+  cat.modelName = modelName;
+
+  const catDef = catalogSettings[cat.name];
+  if (catDef) {
+    const supp = catDef.suppliers.find(s => s.name === cat.supplierName);
+    if (supp) {
+      const mod = supp.models.find(m => m.name === modelName);
+      if (mod) {
+        cat.specs = mod.specs || "";
+        cat.glass = mod.glass || "";
+        cat.description = mod.desc || "";
+      }
+    }
+  }
+  renderCategoriesUI();
+  updateCalculations();
+};
+
 function renderPositionsTableHtml(cat) {
   if (cat.positions.length === 0) {
     return `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 10px;">Nessuna posizione inserita.</div>`;
@@ -375,7 +488,7 @@ function renderPositionsTableHtml(cat) {
           <input type="text" value="${escapeHtml(pos.measures)}" placeholder="es. 1200 x 1400 mm" oninput="updatePosField('${cat.id}', '${pos.id}', 'measures', this.value)">
         </td>
         <td style="width: 32%;">
-          <input type="text" value="${escapeHtml(pos.description)}" placeholder="es. Finestra 1 anta con ribalta" oninput="updatePosField('${cat.id}', '${pos.id}', 'description', this.value)">
+          <input type="text" value="${escapeHtml(pos.description)}" placeholder="es. 1 anta ribalta" oninput="updatePosField('${cat.id}', '${pos.id}', 'description', this.value)">
         </td>
         <td style="width: 8%;">
           <input type="number" min="1" step="1" value="${pos.quantity || 1}" style="text-align: center;" oninput="updatePosField('${cat.id}', '${pos.id}', 'quantity', this.value)">
@@ -415,58 +528,6 @@ function renderPositionsTableHtml(cat) {
   `;
 }
 
-// ==========================================
-// 6. EVENTI A CASCATA (Fornitore -> Modello)
-// ==========================================
-window.onSupplierChange = function(catId, suppId) {
-  const cat = docState.categories.find(c => c.id === catId);
-  if (!cat) return;
-  cat.supplierId = suppId;
-  const supp = DEFAULT_CATALOG.suppliers.find(s => s.id === suppId);
-  cat.materialId = supp.categories[0].id;
-  cat.modelId = supp.categories[0].models[0].id;
-  applyModelSpecs(cat);
-  renderCategoriesUI();
-  updateCalculations();
-};
-
-window.onMaterialChange = function(catId, matId) {
-  const cat = docState.categories.find(c => c.id === catId);
-  if (!cat) return;
-  cat.materialId = matId;
-  const supp = DEFAULT_CATALOG.suppliers.find(s => s.id === cat.supplierId);
-  const mat = supp.categories.find(m => m.id === matId);
-  cat.modelId = mat.models[0].id;
-  applyModelSpecs(cat);
-  renderCategoriesUI();
-  updateCalculations();
-};
-
-window.onModelChange = function(catId, modelId) {
-  const cat = docState.categories.find(c => c.id === catId);
-  if (!cat) return;
-  cat.modelId = modelId;
-  applyModelSpecs(cat);
-  renderCategoriesUI();
-  updateCalculations();
-};
-
-function applyModelSpecs(cat) {
-  const supp = DEFAULT_CATALOG.suppliers.find(s => s.id === cat.supplierId);
-  if (!supp) return;
-  const mat = supp.categories.find(m => m.id === cat.materialId);
-  if (!mat) return;
-  const model = mat.models.find(mod => mod.id === cat.modelId);
-  if (!model) return;
-
-  cat.profileSpecs = `${model.profileDepth} - ${model.chambers} - ${model.gaskets}`;
-  cat.glass = model.defaultGlass;
-  cat.description = model.defaultDescription;
-}
-
-// ==========================================
-// 7. GESTIONE POSIZIONI E TOTALI
-// ==========================================
 window.addPosition = function(catId) {
   const cat = docState.categories.find(c => c.id === catId);
   if (!cat) return;
@@ -505,7 +566,6 @@ window.updatePosField = function(catId, posId, field, val) {
     pos[field] = val;
   }
 
-  // Se cambiano prezzi o quantità, aggiorniamo i totali a schermo
   if (field === 'quantity' || field === 'unitPrice') {
     renderCategoriesUI();
     updateCalculations();
@@ -516,12 +576,8 @@ window.updateCatInstallation = function(catId, val) {
   const cat = docState.categories.find(c => c.id === catId);
   if (!cat) return;
   cat.installationPrice = parseFloat(val) || 0;
-  updateCalculations();
-  // Aggiorna la riga totale del blocco senza rifare l'intero render
-  const totals = calculateCategoryTotals(cat);
-  const container = document.getElementById('categories-container');
-  // Refresh mirato
   renderCategoriesUI();
+  updateCalculations();
 };
 
 window.updateCatField = function(catId, field, val) {
@@ -529,22 +585,10 @@ window.updateCatField = function(catId, field, val) {
   if (cat) cat[field] = val;
 };
 
-window.removeCategory = function(id) {
-  if (confirm("Vuoi rimuovere questa categoria e la relativa pagina?")) {
-    docState.categories = docState.categories.filter(c => c.id !== id);
-    renderCategoriesUI();
-    updateCalculations();
-  }
-};
-
 function calculateCategoryTotals(cat) {
   const fornitura = (cat.positions || []).reduce((sum, p) => sum + ((p.quantity || 0) * (p.unitPrice || 0)), 0);
   const posa = cat.installationPrice || 0;
-  return {
-    fornitura: fornitura,
-    posa: posa,
-    total: fornitura + posa
-  };
+  return { fornitura, posa, total: fornitura + posa };
 }
 
 function updateCalculations() {
@@ -581,9 +625,91 @@ function escapeHtml(str) {
   });
 }
 
-// ==========================================
-// 8. SALVATAGGIO E CARICAMENTO JSON (pCloud)
-// ==========================================
+// ==========================================================================
+// 7. GESTIONE DELLA VISTA IMPOSTAZIONI
+// ==========================================================================
+function initSettingsUI() {
+  document.getElementById('set-company-name').value = companySettings.name || '';
+  document.getElementById('set-company-address').value = companySettings.address || '';
+  document.getElementById('set-company-taxid').value = companySettings.taxId || '';
+  document.getElementById('set-company-contacts').value = companySettings.contacts || '';
+
+  renderSettingsCategoriesList();
+}
+
+function renderSettingsCategoriesList() {
+  const container = document.getElementById('settings-categories-list');
+  if (!container) return;
+  container.innerHTML = "";
+
+  Object.keys(catalogSettings).forEach((catName, idx) => {
+    const catData = catalogSettings[catName];
+    const suppCount = (catData.suppliers || []).length;
+
+    const div = document.createElement('div');
+    div.className = "settings-cat-item";
+    div.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; font-size: 0.95rem;">${idx + 1}. ${escapeHtml(catName)}</span>
+        <span style="font-size: 0.8rem; color: var(--accent); font-weight: 600;">${suppCount} fornitore/i configurato/i</span>
+      </div>
+      <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
+        Fornitori: ${(catData.suppliers || []).map(s => escapeHtml(s.name)).join(', ')}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function saveSettingsFromUI() {
+  companySettings.name = document.getElementById('set-company-name').value;
+  companySettings.address = document.getElementById('set-company-address').value;
+  companySettings.taxId = document.getElementById('set-company-taxid').value;
+  companySettings.contacts = document.getElementById('set-company-contacts').value;
+
+  persistSettings();
+  alert("Impostazioni salvate con successo nel browser!");
+}
+
+function exportSettingsJSON() {
+  const exportData = {
+    company: companySettings,
+    catalog: catalogSettings,
+    exportedAt: new Date().toISOString()
+  };
+  const jsonStr = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([jsonStr], { type: "application/json" });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Impostazioni_Preventivatore_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+}
+
+function importSettingsJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const data = JSON.parse(event.target.result);
+      if (data.company) companySettings = data.company;
+      if (data.catalog) catalogSettings = data.catalog;
+      persistSettings();
+      initSettingsUI();
+      renderCategoriesUI();
+      alert("Configurazione aziendale importata con successo!");
+    } catch (err) {
+      alert("File di configurazione non valido: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ==========================================================================
+// 8. SALVATAGGIO & APERTURA PREVENTIVI (pCloud)
+// ==========================================================================
 async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
   const clientName = docState.client.name.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || "Cliente";
@@ -594,15 +720,12 @@ async function saveToFile() {
     try {
       const handle = await window.showSaveFilePicker({
         suggestedName: fileName,
-        types: [{
-          description: 'File Preventivo JSON',
-          accept: { 'application/json': ['.json'] }
-        }]
+        types: [{ description: 'File Preventivo JSON', accept: { 'application/json': ['.json'] } }]
       });
       const writable = await handle.createWritable();
       await writable.write(jsonStr);
       await writable.close();
-      alert("Preventivo salvato correttamente in pCloud / archivio!");
+      alert("Preventivo salvato correttamente in archivio!");
       return;
     } catch (err) {
       if (err.name === 'AbortError') return;
@@ -653,6 +776,7 @@ function openFromFile(e) {
       document.getElementById('delivery-terms').value = docState.deliveryTerms || '';
       document.getElementById('final-notes').value = docState.finalNotes || '';
 
+      switchView('editor');
       renderCategoriesUI();
       updateCalculations();
       alert("Preventivo caricato con successo!");
@@ -686,9 +810,9 @@ function resetDocument() {
   updateCalculations();
 }
 
-// ==========================================
-// 9. GENERAZIONE STAMPA A4 E PDF
-// ==========================================
+// ==========================================================================
+// 9. GENERAZIONE STAMPA A4 E PDF RISPETTANDO L'ORDINAMENTO SCELTO
+// ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
   if (!printRoot) return;
@@ -714,10 +838,10 @@ function prepareAndPrint() {
     <div>
       <div class="p-header">
         <div class="p-company">
-          <div class="p-company-title">${escapeHtml(COMPANY.name)}</div>
-          <div>${escapeHtml(COMPANY.address)}</div>
-          <div>${escapeHtml(COMPANY.taxId)}</div>
-          <div>${escapeHtml(COMPANY.contacts)}</div>
+          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+          <div>${escapeHtml(companySettings.address)}</div>
+          <div>${escapeHtml(companySettings.taxId)}</div>
+          <div>${escapeHtml(companySettings.contacts)}</div>
         </div>
         <div class="p-doc-details">
           <div class="p-doc-type">${escapeHtml(docState.type)}</div>
@@ -743,23 +867,22 @@ function prepareAndPrint() {
       <div class="p-box" style="margin-top: 25px;">
         <div class="p-box-title">Oggetto della Fornitura</div>
         <p style="font-size: 0.9rem; line-height: 1.5;">
-          La presente proposta descrive la fornitura e posa in opera a regola d'arte dei manufatti dettagliati nelle schede tecniche successive.
-          Ogni categoria merceologica è riportata su scheda autonoma con l'indicazione analitica delle singole posizioni, quote dimensionali e specifici costi di montaggio.
+          La presente proposta descrive la fornitura e posa in opera a regola d'arte dei manufatti dettagliati analiticamente nelle schede tecniche successive.
+          Ogni tipologia merceologica è riportata su scheda autonoma con l'indicazione delle singole posizioni, quote dimensionali e specifici costi di montaggio.
         </p>
       </div>
     </div>
     <div class="p-footer">
-      <span>${escapeHtml(COMPANY.name)}</span>
+      <span>${escapeHtml(companySettings.name)}</span>
       <span>Pagina 1 di intestazione</span>
     </div>
   `;
   printRoot.appendChild(page1);
 
-  // PAGINE 2..N: SCHEDE CATEGORIA (Una distinta per ogni foglio A4)
+  // PAGINE 2..N: SCHEDE CATEGORIA (SECONDO L'ORDINE SCELTO)
   docState.categories.forEach((cat, idx) => {
     const pageCat = document.createElement('div');
     pageCat.className = "sheet";
-
     const catTotals = calculateCategoryTotals(cat);
 
     let posRows = (cat.positions || []).map(p => {
@@ -776,19 +899,11 @@ function prepareAndPrint() {
       `;
     }).join('');
 
-    let headerSubtitle = "";
-    if (cat.isSerramenti) {
-      const supp = DEFAULT_CATALOG.suppliers.find(s => s.id === cat.supplierId);
-      const mat = supp ? supp.categories.find(m => m.id === cat.materialId) : null;
-      const mod = mat ? mat.models.find(m => m.id === cat.modelId) : null;
-      headerSubtitle = `${supp ? supp.name : ''} - ${mod ? mod.name : ''}`;
-    }
-
     pageCat.innerHTML = `
       <div>
         <div class="p-header">
           <div class="p-company">
-            <div class="p-company-title">${escapeHtml(COMPANY.name)}</div>
+            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
             <div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ${escapeHtml(docState.number || 'BOZZA')}</div>
           </div>
           <div class="p-doc-details">
@@ -799,16 +914,16 @@ function prepareAndPrint() {
 
         <div style="margin: 10px 0 15px 0;">
           <h2 style="font-size: 1.3rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
-            ${escapeHtml(cat.name)} ${headerSubtitle ? `— <span style="font-size: 1.1rem; font-weight: normal;">${escapeHtml(headerSubtitle)}</span>` : ''}
+            ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: normal;">${escapeHtml(cat.supplierName)} (${escapeHtml(cat.modelName)})</span>
           </h2>
         </div>
 
-        ${cat.profileSpecs || cat.color || cat.glass ? `
+        ${cat.specs || cat.color || cat.glass ? `
           <div class="p-box" style="margin-bottom: 12px; padding: 8px 12px; background: #fafafa;">
             <div style="font-size: 0.85rem; line-height: 1.5;">
-              ${cat.profileSpecs ? `<div><strong>Caratteristiche Sistema:</strong> ${escapeHtml(cat.profileSpecs)}</div>` : ''}
+              ${cat.specs ? `<div><strong>Caratteristiche Sistema:</strong> ${escapeHtml(cat.specs)}</div>` : ''}
               ${cat.color ? `<div><strong>Finitura / Colore:</strong> ${escapeHtml(cat.color)}</div>` : ''}
-              ${cat.glass ? `<div><strong>Vetraggio Base:</strong> ${escapeHtml(cat.glass)}</div>` : ''}
+              ${cat.glass ? `<div><strong>Vetraggio / Accessori:</strong> ${escapeHtml(cat.glass)}</div>` : ''}
             </div>
           </div>
         ` : ''}
@@ -819,7 +934,6 @@ function prepareAndPrint() {
           </div>
         ` : ''}
 
-        <!-- TABELLA DELLE POSIZIONI A4 -->
         <table class="p-table" style="margin-top: 10px;">
           <thead>
             <tr>
@@ -836,7 +950,6 @@ function prepareAndPrint() {
           </tbody>
         </table>
 
-        <!-- QUADRO ECONOMICO CATEGORIA -->
         <div style="margin-top: 15px; border: 1px solid #999; padding: 10px 14px; background: #fdfdfd;">
           <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">
             <span>Subtotale Fornitura Manufatti:</span>
@@ -847,7 +960,7 @@ function prepareAndPrint() {
             <strong>${formatCurrency(catTotals.posa)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
-            <span>TOTALE NETTO CATEGORIA:</span>
+            <span>TOTALE NETTO SCHEDA ${idx + 1}:</span>
             <span>${formatCurrency(catTotals.total)}</span>
           </div>
         </div>
@@ -865,11 +978,11 @@ function prepareAndPrint() {
   const pageTotals = document.createElement('div');
   pageTotals.className = "sheet";
   
-  let catSummaryRows = docState.categories.map(c => {
+  let catSummaryRows = docState.categories.map((c, i) => {
     const t = calculateCategoryTotals(c);
     return `
       <tr>
-        <td><strong>${escapeHtml(c.name)}</strong></td>
+        <td><strong>${escapeHtml(c.name)}</strong> (Scheda ${i + 1})</td>
         <td class="text-right">${formatCurrency(t.fornitura)}</td>
         <td class="text-right">${formatCurrency(t.posa)}</td>
         <td class="text-right"><strong>${formatCurrency(t.total)}</strong></td>
@@ -881,7 +994,7 @@ function prepareAndPrint() {
     <div>
       <div class="p-header">
         <div class="p-company">
-          <div class="p-company-title">${escapeHtml(COMPANY.name)}</div>
+          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
           <div>Quadro Economico Complessivo</div>
         </div>
         <div class="p-doc-details">
@@ -958,7 +1071,7 @@ function prepareAndPrint() {
     <div>
       <div class="p-header">
         <div class="p-company">
-          <div class="p-company-title">${escapeHtml(COMPANY.name)}</div>
+          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
           <div>Condizioni Contrattuali e Normativa Privacy</div>
         </div>
       </div>
@@ -1000,7 +1113,7 @@ function prepareAndPrint() {
   window.print();
 }
 
-// Service Worker
+// Service Worker Registration
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
     .then(() => console.log('Service Worker Registrato'))
