@@ -443,7 +443,7 @@ textarea {
     justify-content: space-between;
     align-items: flex-start;
     border-bottom: 2px solid #000;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     margin-bottom: 16px;
   }
 
@@ -461,79 +461,137 @@ textarea {
 
   .p-company {
     font-size: 0.85rem;
-    line-height: 1.35;
+    line-height: 1.4;
   }
 
   .p-company-title {
     font-size: 1.25rem;
     font-weight: 800;
     margin-bottom: 3px;
+    color: #0f172a;
   }
 
   .p-doc-details {
     text-align: right;
   }
 
-  .p-doc-meta {
-    font-size: 0.9rem;
-    margin-top: 3px;
-  }
-
-  /* STILI SCHEMA GRAFICO PAGINA 1 (COMMITTENTE, CANTIERE & TITOLO CENTRALE) */
-  .p1-recipient-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-top: 30px;
-  }
-
-  .p1-client-card {
-    width: 55%;
-    border: 1.5px solid #222;
-    border-radius: 4px;
-    padding: 14px 18px;
-    background: #fff;
-    font-size: 0.95rem;
-    line-height: 1.55;
-  }
-
-  .p1-client-title {
-    font-size: 1.15rem;
+  .p-doc-number {
+    font-size: 1.25rem;
     font-weight: 800;
-    color: #000;
+    color: #0f172a;
     margin-bottom: 4px;
   }
 
-  .p1-site-card {
-    width: 55%;
-    border: 1.5px solid #222;
-    border-radius: 4px;
-    padding: 10px 18px;
-    margin-top: 10px;
-    background: #fff;
-    font-size: 0.9rem;
+  .p-doc-date {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
   }
 
-  .p1-title-container {
-    margin-top: 80px;
+  /* ========================================================== */
+  /* STILI DEFINITIVI PAGINA 1 (IDENTICI AL RENDERING FORNITO) */
+  /* ========================================================== */
+  .p1-sheet {
+    position: relative;
+    height: calc(297mm - 30mm);
+  }
+
+  /* Dati cliente: centrati a circa metà altezza foglio */
+  .p1-client-center {
+    position: absolute;
+    top: 98mm;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+
+  .p1-client-name {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+
+  .p1-client-address {
+    font-size: 1.1rem;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+
+  .p1-client-tax {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+
+  .p1-client-line {
+    font-size: 1.05rem;
+    color: #0f172a;
+    line-height: 1.5;
+  }
+
+  .p1-site-info {
+    margin-top: 18px;
+    font-size: 1.05rem;
+    color: #0f172a;
+  }
+
+  /* Titolo e validità: a circa 3/4 di altezza */
+  .p1-title-bottom {
+    position: absolute;
+    top: 175mm;
+    left: 0;
+    right: 0;
     text-align: center;
   }
 
   .p1-main-title {
-    font-size: 2.6rem;
+    font-size: 3rem;
     font-weight: 900;
-    letter-spacing: 5px;
+    letter-spacing: 8px;
     text-transform: uppercase;
     color: #000;
     margin-bottom: 12px;
   }
 
   .p1-validity-text {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     font-weight: 600;
     text-decoration: underline;
     font-style: italic;
-    color: #333;
+    color: #334155;
+  }
+
+  /* Piè di pagina Pagina 1 */
+  .p1-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid #000;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .p1-footer-company {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #334155;
+    text-align: left;
+  }
+
+  .p1-footer-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+
+  .p1-footer-page {
+    font-size: 0.85rem;
+    color: #475569;
   }
 
   /* Schede Categorie e Tabelle */
