@@ -9,9 +9,16 @@
 </head>
 <body>
 
-  <!-- BARRA DEGLI STRUMENTI -->
+  <!-- BARRA DEGLI STRUMENTI PRINCIPALE -->
   <header class="top-bar">
-    <h1 id="app-title">Preventivatore</h1>
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <h1 id="app-title">Preventivatore</h1>
+      <!-- Selettore Viste: Preventivo vs Impostazioni -->
+      <nav class="nav-tabs">
+        <button type="button" class="tab-btn active" id="tab-editor-btn">📝 Preventivo</button>
+        <button type="button" class="tab-btn" id="tab-settings-btn">⚙️ Impostazioni</button>
+      </nav>
+    </div>
     <div class="btn-group">
       <button class="btn btn-secondary" id="btn-new">Nuovo</button>
       <button class="btn btn-secondary" id="btn-open">Apri (.json)</button>
@@ -20,8 +27,10 @@
     </div>
   </header>
 
-  <!-- FORM INTERATTIVO PRINCIPALE -->
-  <main class="container" id="editor-container">
+  <!-- ========================================== -->
+  <!-- VISTA 1: EDITOR PREVENTIVO                 -->
+  <!-- ========================================== -->
+  <main class="container" id="view-editor">
 
     <!-- DATI GENERALI E DOCUMENTO -->
     <section class="card">
@@ -91,33 +100,38 @@
       </div>
     </section>
 
-    <!-- SEZIONE CATEGORIE MERCEOLOGICHE DINAMICHE -->
+    <!-- SEZIONE CATEGORIE / FOGLI DEL PREVENTIVO -->
     <section class="card">
       <div class="card-title">
-        <span>Categorie Merceologiche (Ogni categoria avrà la sua pagina distinta)</span>
+        <span>Pagine Categoria (Seleziona, ordina e componi le schede)</span>
       </div>
       
+      <!-- Barra di aggiunta con le 11 Macro-Categorie -->
       <div class="add-category-bar">
-        <select id="select-category-type" style="flex-grow: 1;">
-          <option value="Serramenti">Serramenti (PVC / Alluminio / Legno)</option>
-          <option value="Zanzariere">Zanzariere</option>
-          <option value="Avvolgibili e Frangisole">Avvolgibili e Frangisole</option>
-          <option value="Porte Interne">Porte Interne</option>
-          <option value="Porte Blindate e Portoncini">Porte Blindate e Portoncini</option>
-          <option value="Scuri e Persiane">Scuri e Persiane</option>
-          <option value="Opere Complementari e Varie">Opere Complementari e Varie</option>
+        <select id="select-category-type" style="flex-grow: 1; font-weight: 600;">
+          <option value="Portoncini">1. Portoncini</option>
+          <option value="Serramenti" selected>2. Serramenti</option>
+          <option value="Zanzariere">3. Zanzariere</option>
+          <option value="Avvolgibili">4. Avvolgibili</option>
+          <option value="Scuri">5. Scuri</option>
+          <option value="Teli filtranti / oscuranti">6. Teli filtranti / oscuranti</option>
+          <option value="Porte interne">7. Porte interne</option>
+          <option value="Portoni Garage">8. Portoni Garage</option>
+          <option value="Monoblocchi Isolanti">9. Monoblocchi Isolanti</option>
+          <option value="Porte a vetro">10. Porte a vetro</option>
+          <option value="Altro">11. Altro (Compilazione libera)</option>
         </select>
         <button type="button" class="btn btn-primary" id="btn-add-category">+ Aggiungi Pagina Categoria</button>
       </div>
 
-      <!-- Elenco contenitore delle categorie -->
+      <!-- Elenco contenitore delle categorie con ordinamento -->
       <div id="categories-container" style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px;"></div>
     </section>
 
     <!-- TOTALI, PAGAMENTI E FISCALITÀ -->
     <section class="card">
       <div class="card-title">
-        <span>Quadro Economico e Condizioni</span>
+        <span>Quadro Economico e Condizioni Finali</span>
       </div>
       <div class="form-grid">
         <div class="form-group">
@@ -147,18 +161,78 @@
         </div>
       </div>
 
-      <div style="margin-top: 20px; padding: 14px; background: #e0f2fe; border-radius: 6px; font-size: 1.1rem; text-align: right;">
-        <div>Totale Imponibile Categorie: <strong id="lbl-subtotal">€ 0,00</strong></div>
+      <div style="margin-top: 20px; padding: 14px; background: #e0f2fe; border-radius: 6px; font-size: 1.05rem; text-align: right;">
+        <div>Totale Fornitura & Posa: <strong id="lbl-subtotal">€ 0,00</strong></div>
         <div style="font-size: 0.95rem; color: #475569; margin: 4px 0;">Totale IVA: <span id="lbl-tax">€ 0,00</span></div>
         <div style="font-size: 1.35rem; color: var(--accent); margin-top: 6px;">Totale Complessivo: <strong id="lbl-total">€ 0,00</strong></div>
       </div>
     </section>
   </main>
 
+  <!-- ========================================== -->
+  <!-- VISTA 2: IMPOSTAZIONI AZIENDALI            -->
+  <!-- ========================================== -->
+  <main class="container" id="view-settings" style="display: none;">
+    
+    <!-- GESTIONE DATI AZIENDA -->
+    <section class="card">
+      <div class="card-title">
+        <span>Intestazione Aziendale (Stampata nei documenti)</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Ragione Sociale / Nome Ditta</label>
+          <input type="text" id="set-company-name">
+        </div>
+        <div class="form-group full">
+          <label>Indirizzo Sede Legale ed Operativa</label>
+          <input type="text" id="set-company-address">
+        </div>
+        <div class="form-group">
+          <label>Partita IVA / Codice Fiscale</label>
+          <input type="text" id="set-company-taxid">
+        </div>
+        <div class="form-group">
+          <label>Recapiti (Telefono, Cellulare, Email)</label>
+          <input type="text" id="set-company-contacts">
+        </div>
+      </div>
+    </section>
+
+    <!-- GESTIONE CATALOGO FORNITORI DELLE 11 CATEGORIE -->
+    <section class="card">
+      <div class="card-title">
+        <span>Gestione Macro-Categorie & Fornitori Predefiniti</span>
+        <button type="button" class="btn btn-secondary" id="btn-save-settings">💾 Salva Impostazioni</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+        Configura i fornitori e le specifiche di default per le 11 categorie. Queste opzioni alimentano i menu a cascata durante la stesura del preventivo.
+      </p>
+
+      <div id="settings-categories-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+    </section>
+
+    <!-- BACKUP / SINCRONIZZAZIONE PCLOUD DELLE IMPOSTAZIONI -->
+    <section class="card">
+      <div class="card-title">
+        <span>Condivisione Impostazioni con i Colleghi (pCloud)</span>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+        Puoi esportare l'intera configurazione (dati azienda, fornitori e modelli) in un file da salvare nella cartella condivisa di pCloud. Sugli altri PC basterà importarlo una sola volta.
+      </p>
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" id="btn-export-settings">Esporta Impostazioni (.json)</button>
+        <button type="button" class="btn btn-secondary" id="btn-import-settings">Importa Impostazioni (.json)</button>
+        <input type="file" id="settings-file-input" accept=".json" style="display: none;">
+      </div>
+    </section>
+
+  </main>
+
   <!-- STRUTTURA A4 PER GENERAZIONE STAMPA / PDF -->
   <div id="print-root"></div>
 
-  <!-- Input file nascosto per caricamento manuale JSON -->
+  <!-- Input file nascosto per caricamento manuale JSON Preventivo -->
   <input type="file" id="file-input" accept=".json" style="display: none;">
 
   <script src="app.js"></script>
