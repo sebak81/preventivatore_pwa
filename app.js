@@ -275,7 +275,6 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
-  // Impostazioni, Logo e Macro-Categorie
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
   safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
@@ -675,7 +674,7 @@ function importSettingsJSON(e) {
       initSettingsUI();
       populateCategorySelector();
       renderCategoriesUI();
-      alert("Configurazione aziendale importata con successo!");
+      alert("Configurazione aziendale (incluso il logo) importata con successo!");
     } catch (err) {
       alert("File non valido: " + err.message);
     }
@@ -791,7 +790,7 @@ function renderCategoriesUI() {
 
       <div class="cat-summary-box">
         <div class="cat-summary-row">
-          <span>Subtotale Fornitura Manufatti:</span>
+          <span>Subtotale Fornitura:</span>
           <strong id="cat-fornitura-${cat.id}">${formatCurrency(totalsCat.fornitura)}</strong>
         </div>
         <div class="cat-summary-row" style="align-items: center;">
@@ -802,7 +801,7 @@ function renderCategoriesUI() {
           </div>
         </div>
         <div class="cat-summary-row cat-summary-total">
-          <span>Totale Pagina ${pageNum} (${escapeHtml(cat.name)}):</span>
+          <span>Totale ${escapeHtml(cat.name)}:</span>
           <span id="cat-total-${cat.id}">${formatCurrency(totalsCat.total)}</span>
         </div>
       </div>
@@ -992,7 +991,6 @@ window.removePosition = function(catId, posId) {
   updateCalculations();
 };
 
-// Aggiornamento sul campo senza distruggere il DOM (non fa perdere il focus alle cifre)
 window.updatePosField = function(catId, posId, field, val) {
   const cat = docState.categories.find(c => c.id === catId);
   if (!cat) return;
@@ -1018,7 +1016,6 @@ window.updatePosField = function(catId, posId, field, val) {
   }
 };
 
-// Aggiorna solo i valori a video della riga riassuntiva senza distruggere i campi input
 function updateCatSummaryDOM(cat) {
   const totalsCat = calculateCategoryTotals(cat);
   const fornituraEl = document.getElementById(`cat-fornitura-${cat.id}`);
@@ -1331,7 +1328,7 @@ function prepareAndPrint() {
 
         <div style="margin-top: 15px; border: 1px solid #999; padding: 10px 14px; background: #fdfdfd;">
           <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">
-            <span>Subtotale Fornitura Manufatti:</span>
+            <span>Subtotale Fornitura:</span>
             <strong>${formatCurrency(catTotals.fornitura)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #ccc;">
@@ -1339,7 +1336,7 @@ function prepareAndPrint() {
             <strong>${formatCurrency(catTotals.posa)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
-            <span>TOTALE NETTO SCHEDA ${idx + 1}:</span>
+            <span>Totale ${escapeHtml(cat.name)}:</span>
             <span>${formatCurrency(catTotals.total)}</span>
           </div>
         </div>
