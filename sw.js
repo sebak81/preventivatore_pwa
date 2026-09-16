@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v17'; // Incremento versione per logo esteso e contorno sottile
+const CACHE_NAME = 'prev-app-v18'; // Versione aggiornata per la nuova riga Data/Numero e gestione validità
 const ASSETS = [
   './',
   './index.html',
