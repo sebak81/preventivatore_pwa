@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v12'; // Versione aggiornata per la nuova testata Pagina 1 e suffissi
+const CACHE_NAME = 'prev-app-v13'; // Versione aggiornata per misure L/H e articoli generalizzati
 const ASSETS = [
   './',
   './index.html',
