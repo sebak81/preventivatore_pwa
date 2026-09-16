@@ -441,22 +441,25 @@ textarea {
   .p-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     border-bottom: 2px solid #000;
     padding-bottom: 12px;
     margin-bottom: 16px;
+    min-height: 80px;
   }
 
   .p-header-brand {
+    flex: 1;
     display: flex;
     align-items: center;
-    gap: 16px;
   }
 
-  .p-page1-logo {
-    max-height: 70px;
-    max-width: 180px;
+  /* LOGO A LARGHEZZA INTERA A SINISTRA */
+  .p-page1-logo-full {
+    max-height: 80px;
+    max-width: 380px;
     object-fit: contain;
+    object-position: left center;
   }
 
   .p-company {
@@ -473,30 +476,38 @@ textarea {
 
   .p-doc-details {
     text-align: right;
+    flex-shrink: 0;
   }
 
-  .p-doc-number {
-    font-size: 1.25rem;
+  /* CONTORNO SOTTILE INTORNO AL NUMERO DOCUMENTO */
+  .p-doc-number-box {
+    border: 1px solid #1e293b;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 1.15rem;
     font-weight: 800;
     color: #0f172a;
+    display: inline-block;
     margin-bottom: 4px;
+    background-color: #fff;
   }
 
   .p-doc-date {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    color: #0f172a;
+    color: #334155;
+    margin-right: 2px;
   }
 
   /* ========================================================== */
-  /* STILI DEFINITIVI PAGINA 1 (IDENTICI AL RENDERING FORNITO) */
+  /* STILI DEFINITIVI PAGINA 1                                  */
   /* ========================================================== */
   .p1-sheet {
     position: relative;
     height: calc(297mm - 30mm);
   }
 
-  /* Dati cliente: centrati a circa metà altezza foglio */
+  /* Dati cliente: centrati a metà altezza foglio */
   .p1-client-center {
     position: absolute;
     top: 98mm;
