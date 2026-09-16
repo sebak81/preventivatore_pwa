@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v11'; // Aggiornato per recepire le nuove etichette di riepilogo
+const CACHE_NAME = 'prev-app-v12'; // Versione aggiornata per la nuova testata Pagina 1 e suffissi
 const ASSETS = [
   './',
   './index.html',
