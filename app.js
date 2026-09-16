@@ -8,37 +8,42 @@ const DEFAULT_COMPANY = {
   contacts: "Tel: 06 1234567 | Cell: 340 0000000 | Email: info@azienda.it"
 };
 
-// Catalogo predefinito per le 11 categorie
 const DEFAULT_CATALOG = {
   "Portoncini": {
     suppliers: [
       {
-        id: "qfort_portoncini",
+        id: "supp_qfort_port",
         name: "QFORT",
         models: [
-          { id: "baby_stars", name: "Baby Stars", specs: "Alluminio/PVC, serratura automatica 5 punti", desc: "Portoncino d'ingresso ad elevata sicurezza con pannello coibentato ad alto isolamento." }
+          { id: "mod_baby_stars", name: "Baby Stars", specs: "Alluminio/PVC coibentato, serratura automatica 5 punti", glass: "Vetro blindato antisfondamento", desc: "Portoncino d'ingresso ad elevata sicurezza con pannello coibentato ad alto isolamento termico ed acustico." }
         ]
       },
-      { id: "altro_portoncini", name: "Altro / Blindato", models: [{ id: "custom", name: "Standard", specs: "Classe 3/4 antieffrazione", desc: "Porta blindata d'ingresso con cilindro europeo e defender." }] }
+      {
+        id: "supp_blindati_art",
+        name: "Blindati Artigianali",
+        models: [
+          { id: "mod_classe3", name: "Porta Blindata Classe 3", specs: "Struttura in doppia lamiera zincata, cilindro europeo ad alta sicurezza", glass: "-", desc: "Porta blindata d'ingresso certificata in classe antieffrazione 3 con defender e guarnizione parafreddo a pavimento." }
+        ]
+      }
     ]
   },
   "Serramenti": {
     suppliers: [
       {
-        id: "qfort",
+        id: "supp_qfort_serramenti",
         name: "QFORT",
         models: [
-          { id: "4_stars", name: "4 Stars (70mm - 5 cam - 2 guarn.)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm B.E. Warm Edge", desc: "Profilo in PVC classe A da 70 mm a 5 camere con rinforzi in acciaio zincato. Sistema a 2 guarnizioni di battuta." },
-          { id: "5_stars", name: "5 Stars (70mm - 5 cam - 2 guarn.)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm o 30 mm B.E. Warm Edge", desc: "Design squadrato ed essenziale. Profilo in PVC da 70 mm a 5 camere, ferramenta perimetrale con scontri antieffrazione." },
-          { id: "7_stars", name: "7 Stars (85mm - 7 cam - 3 guarn.)", specs: "85 mm - 7 camere - 3 guarnizioni (giunto aperto)", glass: "Triplo vetro 44 mm selettivo B.E. Warm Edge", desc: "Top di gamma a taglio termico passivo. Profilo da 85 mm a 7 camere e 3 guarnizioni per case a bassissimo consumo." },
-          { id: "stars_epiq", name: "Stars Epiq (82mm - 6 cam)", specs: "82 mm - 6 camere - 3 guarnizioni", glass: "Triplo vetro alte prestazioni", desc: "Sistema con estetica complanare o semi-complanare per grandi aperture." }
+          { id: "mod_4_stars", name: "4 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm B.E. Warm Edge", desc: "Profilo in PVC classe A da 70 mm a 5 camere con rinforzi in acciaio zincato. Sistema a 2 guarnizioni di battuta." },
+          { id: "mod_5_stars", name: "5 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm o 30 mm B.E. Warm Edge", desc: "Design squadrato ed essenziale. Profilo in PVC da 70 mm a 5 camere, ferramenta perimetrale con scontri antieffrazione." },
+          { id: "mod_7_stars", name: "7 Stars (85mm - 7 camere)", specs: "85 mm - 7 camere - 3 guarnizioni (giunto aperto)", glass: "Triplo vetro 44 mm selettivo B.E. Warm Edge", desc: "Top di gamma a taglio termico passivo. Profilo da 85 mm a 7 camere e 3 guarnizioni per case a bassissimo consumo energetico." },
+          { id: "mod_stars_epiq", name: "Stars Epiq (82mm - 6 camere)", specs: "82 mm - 6 camere - 3 guarnizioni", glass: "Triplo vetro alte prestazioni", desc: "Sistema innovativo con estetica moderna e complanare/semi-complanare per grandi specchiature." }
         ]
       },
       {
-        id: "alluminio_gen",
+        id: "supp_alluminio_tt",
         name: "Alluminio a Taglio Termico",
         models: [
-          { id: "alluminio_tt", name: "Alluminio TT 75mm", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", desc: "Profili estrusi in lega primaria a taglio termico. Massima resistenza meccanica." }
+          { id: "mod_alluminio_75", name: "Serie 75 TT", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", desc: "Profili estrusi in lega primaria a taglio termico. Massima indeformabilità, resistenza agli agenti atmosferici e manutenzione minima." }
         ]
       }
     ]
@@ -46,68 +51,103 @@ const DEFAULT_CATALOG = {
   "Zanzariere": {
     suppliers: [
       {
-        id: "bettio",
+        id: "supp_bettio",
         name: "Bettio",
         models: [
-          { id: "scenica", name: "Scenica (Senza guida a terra)", specs: "Rete in fibra di vetro, guida zero barriere", desc: "Zanzariera laterale senza inciampo a terra, fermo in qualsiasi posizione." },
-          { id: "verticale", name: "Verticale a molla/catenella", specs: "Cassonetto 40/50mm con rallentatore", desc: "Zanzariera classica a scorrimento verticale con spazzolini antivento." }
+          { id: "mod_scenica", name: "Scenica (Senza guida a terra)", specs: "Rete in fibra di vetro, zero barriere a terra", glass: "Rete alta trasparenza", desc: "Zanzariera laterale senza inciampo a pavimento, con blocco del movimento in qualsiasi punto." },
+          { id: "mod_verticale", name: "Verticale a molla", specs: "Cassonetto da 50 mm con freno frizionato", glass: "Rete grigia standard", desc: "Zanzariera classica a scorrimento verticale con guide dotate di spazzolini antivento." }
         ]
-      },
-      { id: "mvline", name: "MV Line", models: [{ id: "standard", name: "Modello Standard", specs: "Alluminio estruso", desc: "Zanzariera con aggancio rapido e rete ad alta trasparenza." }] }
+      }
     ]
   },
   "Avvolgibili": {
     suppliers: [
       {
-        id: "pinto",
+        id: "supp_avv_standard",
         name: "Pinto / Pasini",
         models: [
-          { id: "alluminio_coibentato", name: "Alluminio Coibentato media/alta densità", specs: "Poliuretano espanso ecologico, terminale estruso", desc: "Tapparella in alluminio coibentato ad elevata stabilità e leggerezza." },
-          { id: "acciaio", name: "Acciaio Coibentato Blindato", specs: "Lamiera di acciaio con poliuretano", desc: "Tapparella di sicurezza ad alta resistenza antieffrazione." }
+          { id: "mod_all_coib", name: "Alluminio Coibentato", specs: "Poliuretano espanso alta densità, terminale in alluminio estruso", glass: "-", desc: "Tapparella in alluminio coibentato ad elevata stabilità dimensionale e resistenza agli agenti atmosferici." },
+          { id: "mod_acciaio_sic", name: "Acciaio Coibentato Blindato", specs: "Lamiera d'acciaio con anima in poliuretano", glass: "-", desc: "Avvolgibile di sicurezza antieffrazione ad alta resistenza meccanica." }
         ]
       }
     ]
   },
   "Scuri": {
     suppliers: [
-      { id: "scuri_gen", name: "Scuri & Persiane", models: [{ id: "scuro_padovana", name: "Alla Padovana / Vicentina", specs: "Alluminio coibentato o dogato", desc: "Oscurante tradizionale a doghe con ferramenta alla piemontese o padovana." }] }
+      {
+        id: "supp_scuri_veneti",
+        name: "Scuri & Persiane Tradizionali",
+        models: [
+          { id: "mod_padovana", name: "Alla Padovana / Vicentina", specs: "Doghe verticali con anima coibentata, bandelle e spagnoletta nere", glass: "-", desc: "Oscurante tradizionale a pacchetto con ferramenta trattata per esterni." }
+        ]
+      }
     ]
   },
   "Teli filtranti / oscuranti": {
     suppliers: [
-      { id: "teli_gen", name: "Tende Tecniche", models: [{ id: "screen", name: "Telo Screen Filtrante", specs: "Fibra di vetro e PVC", desc: "Schermatura solare per la riduzione del carico termico estivo." }] }
+      {
+        id: "supp_tende_tec",
+        name: "Tende Tecniche & Schermature",
+        models: [
+          { id: "mod_screen_filtro", name: "Telo Screen Microforato", specs: "Tessuto tecnico fibra di vetro e PVC", glass: "-", desc: "Schermatura solare per la riduzione dell'irraggiamento termico estivo e dell'abbagliamento visivo." }
+        ]
+      }
     ]
   },
   "Porte interne": {
     suppliers: [
       {
-        id: "porte_standard",
+        id: "supp_porte_design",
         name: "Porte Interne Design",
         models: [
-          { id: "battente_cieca", name: "Battente Tamburata Microtek", specs: "Telaio e coprifili con guarnizione acustica, cerniere a scomparsa", desc: "Porta interna moderna ad anta liscia con serratura magnetica." },
-          { id: "scorrevole", name: "Scorrevole a scomparsa / esterno muro", specs: "Kit binario con carrelli ammortizzati", desc: "Porta scorrevole salvaspazio coordinata con le finiture dell'abitazione." }
+          { id: "mod_battente_cieca", name: "Battente Tamburata Microtek", specs: "Telaio e coprifili con guarnizione in gomma, cerniere a scomparsa", glass: "-", desc: "Porta interna moderna ad anta liscia con serratura magnetica e finiture antigraffio." },
+          { id: "mod_scorrevole_scomp", name: "Scorrevole a Scomparsa", specs: "Anta coordinata con telaio scrigno, carrelli ammortizzati", glass: "-", desc: "Soluzione salvaspazio a scomparsa all'interno del controtelaio murario." }
         ]
       }
     ]
   },
   "Portoni Garage": {
     suppliers: [
-      { id: "sezionale", name: "Portoni Sezionali Coibentati", models: [{ id: "pannello_40", name: "Pannello sandwich 40/42 mm", specs: "Doppia lamiera d'acciaio, motorizzazione a soffitto", desc: "Portone da garage ad apertura verticale a scorrimento sotto il soffitto." }] }
+      {
+        id: "supp_garage_sezionali",
+        name: "Portoni Sezionali Coibentati",
+        models: [
+          { id: "mod_sez_40", name: "Pannello Sandwich 40/42 mm", specs: "Doppia lamiera d'acciaio zincato, coibentazione in poliuretano, motore a soffitto", glass: "-", desc: "Portone da garage sezionale ad apertura verticale con guide di scorrimento silenziose e sistema paracadute molle." }
+        ]
+      }
     ]
   },
   "Monoblocchi Isolanti": {
     suppliers: [
-      { id: "monoblocco_termo", name: "Monoblocco Termico", models: [{ id: "termo_eps", name: "Spalle e cassonetto in EPS", specs: "Taglio termico quarto lato, predisposizione serramento e avvolgibile/frangisole", desc: "Sistema per l'isolamento completo del foro finestra conforme norma UNI 11673." }] }
+      {
+        id: "supp_monoblocchi_eps",
+        name: "Monoblocco Termico Finestra",
+        models: [
+          { id: "mod_mono_4lati", name: "Sistema Termoisolante 4 Lati", specs: "Spalle in EPS ad alta densità con quarto lato sottodavanzale a taglio termico", glass: "-", desc: "Monoblocco prefabbricato ad alto isolamento acustico e termico conforme alla norma UNI 11673 per la posa ad alta efficienza." }
+        ]
+      }
     ]
   },
   "Porte a vetro": {
     suppliers: [
-      { id: "vetro_arredo", name: "Porte in Cristallo Temperato", models: [{ id: "vetro_8_10", name: "Cristallo 8/10 mm temperato", specs: "Finitura trasparente, satinata o fumé con maniglione inox", desc: "Porta d'arredo a tutto vetro con cerniere a scatto o binario minimale." }] }
+      {
+        id: "supp_cristallo_arredo",
+        name: "Porte in Cristallo Temperato",
+        models: [
+          { id: "mod_vetro_scorrevole", name: "Vetro Temperato 10 mm", specs: "Cristallo trasparente, satinato o fumé con pinze e maniglione inox", glass: "Temperato di sicurezza 10 mm", desc: "Porta per interni a tutto vetro scorrevole con binario a vista minimale in alluminio satinato." }
+        ]
+      }
     ]
   },
   "Altro": {
     suppliers: [
-      { id: "libero", name: "Voce Libera", models: [{ id: "speciale", name: "Lavorazione Speciale", specs: "-", desc: "Fornitura ed opere complementari speciali secondo accordi." }] }
+      {
+        id: "supp_opere_varie",
+        name: "Lavorazioni Speciali & Varie",
+        models: [
+          { id: "mod_opera_custom", name: "Opere Complementari", specs: "Secondo specifiche concordate", glass: "-", desc: "Fornitura ed opere complementari speciali eseguite su misura secondo accordi contrattuali." }
+        ]
+      }
     ]
   }
 };
@@ -117,6 +157,8 @@ const DEFAULT_CATALOG = {
 // ==========================================================================
 let companySettings = loadCompanySettings();
 let catalogSettings = loadCatalogSettings();
+// Tiene traccia delle macro-categorie aperte/espanse nella schermata impostazioni
+let openSettingsCategories = { "Serramenti": true };
 
 function loadCompanySettings() {
   const saved = localStorage.getItem('prev_company_settings');
@@ -144,7 +186,7 @@ let docState = {
   client: { name: "", residence: "", taxId: "", phone: "", email: "" },
   sameSite: true,
   siteAddress: "",
-  categories: [], // Array ordinato delle pagine categoria inserite
+  categories: [],
   taxRate: 22,
   taxBonus: "Bonus Casa 50%",
   paymentTerms: "30% all'ordine come caparra confirmatoria, 40% a inizio posa, 30% a fine lavori collaudati.",
@@ -153,7 +195,7 @@ let docState = {
 };
 
 // ==========================================================================
-// 4. INIZIALIZZAZIONE & EVENTI
+// 4. INIZIALIZZAZIONE & EVENT LISTENERS
 // ==========================================================================
 function safeOn(id, event, handler) {
   const el = document.getElementById(id);
@@ -175,17 +217,14 @@ if (document.readyState === 'loading') {
 }
 
 function setupEventListeners() {
-  // Switch Viste (Preventivo vs Impostazioni)
   safeOn('tab-editor-btn', 'click', () => switchView('editor'));
   safeOn('tab-settings-btn', 'click', () => switchView('settings'));
 
-  // Campi Documento
   safeOn('doc-type', 'change', (e) => { docState.type = e.target.value; });
   safeOn('doc-number', 'input', (e) => { docState.number = e.target.value; });
   safeOn('doc-date', 'change', (e) => { docState.date = e.target.value; });
   safeOn('doc-validity', 'input', (e) => { docState.validity = e.target.value; });
 
-  // Dati Cliente
   safeOn('client-name', 'input', (e) => { docState.client.name = e.target.value; });
   safeOn('client-residence', 'input', (e) => { docState.client.residence = e.target.value; });
   safeOn('client-taxid', 'input', (e) => { docState.client.taxId = e.target.value; });
@@ -200,7 +239,6 @@ function setupEventListeners() {
 
   safeOn('site-address', 'input', (e) => { docState.siteAddress = e.target.value; });
 
-  // Totali e Note
   safeOn('tax-rate', 'change', (e) => {
     docState.taxRate = parseFloat(e.target.value) || 0;
     updateCalculations();
@@ -210,7 +248,6 @@ function setupEventListeners() {
   safeOn('delivery-terms', 'input', (e) => { docState.deliveryTerms = e.target.value; });
   safeOn('final-notes', 'input', (e) => { docState.finalNotes = e.target.value; });
 
-  // Pulsanti Principali
   safeOn('btn-add-category', 'click', addCategoryFromSelector);
   safeOn('btn-print', 'click', prepareAndPrint);
   safeOn('btn-save', 'click', saveToFile);
@@ -218,7 +255,6 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
-  // Impostazioni
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
   safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
@@ -236,11 +272,14 @@ function switchView(view) {
     setView.style.display = 'none';
     btnEd.classList.add('active');
     btnSet.classList.remove('active');
+    // Quando si torna all'editor, aggiorna le schede con i cataloghi eventualmente modificati
+    renderCategoriesUI();
   } else {
     edView.style.display = 'none';
     setView.style.display = 'flex';
     btnEd.classList.remove('active');
     btnSet.classList.add('active');
+    renderSettingsCategoriesList();
   }
 }
 
@@ -250,16 +289,244 @@ function loadDefaultState() {
 }
 
 // ==========================================================================
-// 5. GESTIONE E ORDINAMENTO DELLE CATEGORIE (SU ▲ / GIÙ ▼)
+// 5. GESTIONE DELLA SCHERMATA IMPOSTAZIONI (CATALOGO INTERATTIVO)
+// ==========================================================================
+function initSettingsUI() {
+  document.getElementById('set-company-name').value = companySettings.name || '';
+  document.getElementById('set-company-address').value = companySettings.address || '';
+  document.getElementById('set-company-taxid').value = companySettings.taxId || '';
+  document.getElementById('set-company-contacts').value = companySettings.contacts || '';
+
+  renderSettingsCategoriesList();
+}
+
+// Render dell'accordion a 3 livelli: Macro-Categoria > Fornitori > Modelli
+function renderSettingsCategoriesList() {
+  const container = document.getElementById('settings-categories-list');
+  if (!container) return;
+  container.innerHTML = "";
+
+  Object.keys(catalogSettings).forEach((catName, idx) => {
+    const catData = catalogSettings[catName];
+    const suppliers = catData.suppliers || [];
+    const isOpen = !!openSettingsCategories[catName];
+
+    const accordionItem = document.createElement('div');
+    accordionItem.className = `settings-cat-accordion ${isOpen ? 'is-open' : ''}`;
+
+    let suppliersHtml = "";
+    if (isOpen) {
+      if (suppliers.length === 0) {
+        suppliersHtml = `
+          <div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            Nessun fornitore configurato per questa categoria.<br>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="addSupplierToCategory('${escapeHtml(catName)}')">+ Aggiungi Fornitore</button>
+          </div>
+        `;
+      } else {
+        suppliersHtml = suppliers.map((supp, sIdx) => {
+          const models = supp.models || [];
+          
+          let modelsHtml = models.map((mod, mIdx) => {
+            return `
+              <div class="settings-model-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent);">Modello #${mIdx + 1}</span>
+                  <button type="button" class="btn-icon-del" onclick="deleteModel('${escapeHtml(catName)}', ${sIdx}, ${mIdx})" title="Elimina modello">&times;</button>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Nome Modello / Serie</label>
+                    <input type="text" value="${escapeHtml(mod.name)}" placeholder="es. 7 Stars, Scenica, Sezionale 40" oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'name', this.value)">
+                  </div>
+                  <div class="form-group">
+                    <label>Specifiche Tecniche Base (spessore, camere, ecc.)</label>
+                    <input type="text" value="${escapeHtml(mod.specs || '')}" placeholder="es. 85 mm - 7 camere - 3 guarnizioni" oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'specs', this.value)">
+                  </div>
+                  <div class="form-group">
+                    <label>Vetraggio / Accessori Consigliati</label>
+                    <input type="text" value="${escapeHtml(mod.glass || '')}" placeholder="es. Triplo vetro 44 mm selettivo B.E." oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'glass', this.value)">
+                  </div>
+                </div>
+                <div class="form-group full" style="margin-top: 8px;">
+                  <label>Descrizione Generale Precompilata</label>
+                  <textarea placeholder="Descrizione tecnica e commerciale che comparirà nel preventivo..." oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'desc', this.value)">${escapeHtml(mod.desc || '')}</textarea>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          return `
+            <div class="settings-supplier-card">
+              <div class="settings-supplier-header">
+                <div style="display: flex; align-items: center; gap: 8px; flex-grow: 1;">
+                  <label style="margin: 0; font-size: 0.8rem; min-width: 70px;">Fornitore:</label>
+                  <input type="text" value="${escapeHtml(supp.name)}" placeholder="Nome Fornitore" style="font-weight: 700; max-width: 280px;" oninput="updateSupplierName('${escapeHtml(catName)}', ${sIdx}, this.value)">
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina Fornitore</button>
+                </div>
+              </div>
+
+              <div class="settings-models-wrapper">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
+                  Modelli / Serie di questo fornitore (${models.length}):
+                </div>
+                ${modelsHtml || '<div style="font-size: 0.8rem; color: var(--text-muted); padding: 8px;">Nessun modello inserito per questo fornitore. Clicca su "+ Aggiungi Modello" sopra.</div>'}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        suppliersHtml += `
+          <div style="margin-top: 10px; text-align: right;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="addSupplierToCategory('${escapeHtml(catName)}')">+ Aggiungi Altro Fornitore a ${escapeHtml(catName)}</button>
+          </div>
+        `;
+      }
+    }
+
+    accordionItem.innerHTML = `
+      <div class="settings-cat-header" onclick="toggleSettingsCategory('${escapeHtml(catName)}')">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="accordion-arrow">${isOpen ? '▼' : '▶'}</span>
+          <span style="font-weight: 700; font-size: 1rem;">${idx + 1}. ${escapeHtml(catName)}</span>
+        </div>
+        <span class="cat-badge">${suppliers.length} fornitore/i configurato/i</span>
+      </div>
+      ${isOpen ? `<div class="settings-cat-body">${suppliersHtml}</div>` : ''}
+    `;
+
+    container.appendChild(accordionItem);
+  });
+}
+
+// Apertura/Chiusura Accordion
+window.toggleSettingsCategory = function(catName) {
+  openSettingsCategories[catName] = !openSettingsCategories[catName];
+  renderSettingsCategoriesList();
+};
+
+// CRUD FORNITORI
+window.addSupplierToCategory = function(catName) {
+  if (!catalogSettings[catName]) catalogSettings[catName] = { suppliers: [] };
+  const newSupp = {
+    id: 'supp_' + Date.now(),
+    name: "Nuovo Fornitore",
+    models: [
+      { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: "Descrizione generale del modello..." }
+    ]
+  };
+  catalogSettings[catName].suppliers.push(newSupp);
+  openSettingsCategories[catName] = true;
+  persistSettings();
+  renderSettingsCategoriesList();
+};
+
+window.updateSupplierName = function(catName, sIdx, val) {
+  if (catalogSettings[catName] && catalogSettings[catName].suppliers[sIdx]) {
+    catalogSettings[catName].suppliers[sIdx].name = val;
+    persistSettings();
+  }
+};
+
+window.deleteSupplier = function(catName, sIdx) {
+  if (confirm("Vuoi davvero eliminare questo fornitore e tutti i suoi modelli?")) {
+    catalogSettings[catName].suppliers.splice(sIdx, 1);
+    persistSettings();
+    renderSettingsCategoriesList();
+  }
+};
+
+// CRUD MODELLI
+window.addModelToSupplier = function(catName, sIdx) {
+  const supp = catalogSettings[catName].suppliers[sIdx];
+  if (!supp) return;
+  if (!supp.models) supp.models = [];
+  supp.models.push({
+    id: 'mod_' + Date.now(),
+    name: "Nuovo Modello",
+    specs: "",
+    glass: "",
+    desc: ""
+  });
+  persistSettings();
+  renderSettingsCategoriesList();
+};
+
+window.updateModelField = function(catName, sIdx, mIdx, field, val) {
+  const supp = catalogSettings[catName]?.suppliers[sIdx];
+  if (supp && supp.models[mIdx]) {
+    supp.models[mIdx][field] = val;
+    persistSettings();
+  }
+};
+
+window.deleteModel = function(catName, sIdx, mIdx) {
+  if (confirm("Vuoi eliminare questo modello?")) {
+    catalogSettings[catName].suppliers[sIdx].models.splice(mIdx, 1);
+    persistSettings();
+    renderSettingsCategoriesList();
+  }
+};
+
+function saveSettingsFromUI() {
+  companySettings.name = document.getElementById('set-company-name').value;
+  companySettings.address = document.getElementById('set-company-address').value;
+  companySettings.taxId = document.getElementById('set-company-taxid').value;
+  companySettings.contacts = document.getElementById('set-company-contacts').value;
+
+  persistSettings();
+  alert("Tutte le impostazioni aziendali e i cataloghi sono stati salvati correttamente!");
+}
+
+function exportSettingsJSON() {
+  const exportData = {
+    company: companySettings,
+    catalog: catalogSettings,
+    exportedAt: new Date().toISOString()
+  };
+  const jsonStr = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([jsonStr], { type: "application/json" });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Impostazioni_Aziendali_Preventivi.json`;
+  a.click();
+}
+
+function importSettingsJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const data = JSON.parse(event.target.result);
+      if (data.company) companySettings = data.company;
+      if (data.catalog) catalogSettings = data.catalog;
+      persistSettings();
+      initSettingsUI();
+      renderCategoriesUI();
+      alert("Configurazione aziendale importata con successo!");
+    } catch (err) {
+      alert("File di configurazione non valido: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ==========================================================================
+// 6. GESTIONE SCHEDE PREVENTIVO & ORDINAMENTO (SU ▲ / GIÙ ▼)
 // ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
   const catKey = sel ? sel.value : "Serramenti";
 
-  // Recupera la configurazione di questa categoria dalle impostazioni
-  const catConfig = catalogSettings[catKey] || { suppliers: [{ id: "gen", name: "Standard", models: [{ id: "m1", name: "Standard", specs: "-", desc: "" }] }] };
-  const firstSupp = catConfig.suppliers[0];
-  const firstModel = firstSupp.models[0];
+  const catDef = catalogSettings[catKey] || { suppliers: [{ id: "gen", name: "Standard", models: [{ id: "m1", name: "Standard", specs: "-", desc: "" }] }] };
+  const firstSupp = (catDef.suppliers && catDef.suppliers.length > 0) ? catDef.suppliers[0] : { name: "Standard", models: [{ name: "Standard", specs: "", desc: "" }] };
+  const firstModel = (firstSupp.models && firstSupp.models.length > 0) ? firstSupp.models[0] : { name: "Standard", specs: "", desc: "" };
 
   const newCat = {
     id: 'cat_' + Date.now(),
@@ -307,9 +574,6 @@ window.removeCategory = function(id) {
   }
 };
 
-// ==========================================================================
-// 6. RENDER DELL'INTERFACCIA DELLE SCHEDE
-// ==========================================================================
 function renderCategoriesUI() {
   const container = document.getElementById('categories-container');
   if (!container) return;
@@ -329,7 +593,7 @@ function renderCategoriesUI() {
 
     const isFirst = index === 0;
     const isLast = index === docState.categories.length - 1;
-    const pageNum = index + 2; // Pagina 1 è sempre l'intestazione
+    const pageNum = index + 2;
 
     const selectorBlock = renderCategoryOptionsBlock(cat);
     const positionsTable = renderPositionsTableHtml(cat);
@@ -398,13 +662,13 @@ function renderCategoryOptionsBlock(cat) {
         <div class="form-group">
           <label>Fornitore</label>
           <select onchange="onCatSupplierChange('${cat.id}', this.value)">
-            ${suppOptions}
+            ${suppOptions || '<option value="">Nessun Fornitore</option>'}
           </select>
         </div>
         <div class="form-group">
           <label>Modello / Serie</label>
           <select onchange="onCatModelChange('${cat.id}', this.value)">
-            ${modelOptions}
+            ${modelOptions || '<option value="">Nessun Modello</option>'}
           </select>
         </div>
         <div class="form-group">
@@ -420,7 +684,7 @@ function renderCategoryOptionsBlock(cat) {
         </div>
         <div class="form-group">
           <label>Vetraggio / Dettaglio Accessori</label>
-          <input type="text" value="${escapeHtml(cat.glass)}" placeholder="Tipologia vetro o rete" oninput="updateCatField('${cat.id}', 'glass', this.value)">
+          <input type="text" value="${escapeHtml(cat.glass)}" placeholder="Tipologia vetro o accessori" oninput="updateCatField('${cat.id}', 'glass', this.value)">
         </div>
       </div>
 
@@ -445,6 +709,11 @@ window.onCatSupplierChange = function(catId, suppName) {
       cat.specs = supp.models[0].specs || "";
       cat.glass = supp.models[0].glass || "";
       cat.description = supp.models[0].desc || "";
+    } else {
+      cat.modelName = "";
+      cat.specs = "";
+      cat.glass = "";
+      cat.description = "";
     }
   }
   renderCategoriesUI();
@@ -626,89 +895,7 @@ function escapeHtml(str) {
 }
 
 // ==========================================================================
-// 7. GESTIONE DELLA VISTA IMPOSTAZIONI
-// ==========================================================================
-function initSettingsUI() {
-  document.getElementById('set-company-name').value = companySettings.name || '';
-  document.getElementById('set-company-address').value = companySettings.address || '';
-  document.getElementById('set-company-taxid').value = companySettings.taxId || '';
-  document.getElementById('set-company-contacts').value = companySettings.contacts || '';
-
-  renderSettingsCategoriesList();
-}
-
-function renderSettingsCategoriesList() {
-  const container = document.getElementById('settings-categories-list');
-  if (!container) return;
-  container.innerHTML = "";
-
-  Object.keys(catalogSettings).forEach((catName, idx) => {
-    const catData = catalogSettings[catName];
-    const suppCount = (catData.suppliers || []).length;
-
-    const div = document.createElement('div');
-    div.className = "settings-cat-item";
-    div.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: 700; font-size: 0.95rem;">${idx + 1}. ${escapeHtml(catName)}</span>
-        <span style="font-size: 0.8rem; color: var(--accent); font-weight: 600;">${suppCount} fornitore/i configurato/i</span>
-      </div>
-      <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
-        Fornitori: ${(catData.suppliers || []).map(s => escapeHtml(s.name)).join(', ')}
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-function saveSettingsFromUI() {
-  companySettings.name = document.getElementById('set-company-name').value;
-  companySettings.address = document.getElementById('set-company-address').value;
-  companySettings.taxId = document.getElementById('set-company-taxid').value;
-  companySettings.contacts = document.getElementById('set-company-contacts').value;
-
-  persistSettings();
-  alert("Impostazioni salvate con successo nel browser!");
-}
-
-function exportSettingsJSON() {
-  const exportData = {
-    company: companySettings,
-    catalog: catalogSettings,
-    exportedAt: new Date().toISOString()
-  };
-  const jsonStr = JSON.stringify(exportData, null, 2);
-  const blob = new Blob([jsonStr], { type: "application/json" });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `Impostazioni_Preventivatore_${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-}
-
-function importSettingsJSON(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    try {
-      const data = JSON.parse(event.target.result);
-      if (data.company) companySettings = data.company;
-      if (data.catalog) catalogSettings = data.catalog;
-      persistSettings();
-      initSettingsUI();
-      renderCategoriesUI();
-      alert("Configurazione aziendale importata con successo!");
-    } catch (err) {
-      alert("File di configurazione non valido: " + err.message);
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-}
-
-// ==========================================================================
-// 8. SALVATAGGIO & APERTURA PREVENTIVI (pCloud)
+// 7. SALVATAGGIO & APERTURA PREVENTIVI (pCloud)
 // ==========================================================================
 async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
@@ -725,7 +912,7 @@ async function saveToFile() {
       const writable = await handle.createWritable();
       await writable.write(jsonStr);
       await writable.close();
-      alert("Preventivo salvato correttamente in archivio!");
+      alert("Preventivo salvato correttamente!");
       return;
     } catch (err) {
       if (err.name === 'AbortError') return;
@@ -811,7 +998,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 9. GENERAZIONE STAMPA A4 E PDF RISPETTANDO L'ORDINAMENTO SCELTO
+// 8. GENERAZIONE STAMPA A4 E PDF
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -879,7 +1066,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(page1);
 
-  // PAGINE 2..N: SCHEDE CATEGORIA (SECONDO L'ORDINE SCELTO)
+  // PAGINE 2..N: SCHEDE CATEGORIA
   docState.categories.forEach((cat, idx) => {
     const pageCat = document.createElement('div');
     pageCat.className = "sheet";
@@ -974,7 +1161,7 @@ function prepareAndPrint() {
     printRoot.appendChild(pageCat);
   });
 
-  // PAGINA TOTALI, DETRAZIONI E FIRMA
+  // PAGINA TOTALI & FIRMA
   const pageTotals = document.createElement('div');
   pageTotals.className = "sheet";
   
@@ -1064,7 +1251,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(pageTotals);
 
-  // ULTIMA PAGINA: CONDIZIONI GENERALI E PRIVACY
+  // ULTIMA PAGINA: NORMATIVA & PRIVACY
   const pageLegal = document.createElement('div');
   pageLegal.className = "sheet";
   pageLegal.innerHTML = `
@@ -1113,7 +1300,6 @@ function prepareAndPrint() {
   window.print();
 }
 
-// Service Worker Registration
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
     .then(() => console.log('Service Worker Registrato'))
