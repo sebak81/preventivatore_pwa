@@ -198,10 +198,10 @@ function persistSettings() {
 // 3. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
-  type: "PREVENTIVO",
+  type: "PREVENTIVO", // PREVENTIVO | REVISIONE | CONTRATTO
   number: "",
   date: new Date().toISOString().split('T')[0],
-  validity: "30 giorni",
+  validity: "15 giorni",
   client: { name: "", residence: "", taxId: "", phone: "", email: "" },
   sameSite: true,
   siteAddress: "",
@@ -308,6 +308,7 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
+  // Impostazioni, Logo e Macro-Categorie
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
   safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
@@ -1183,7 +1184,7 @@ function openFromFile(e) {
       document.getElementById('doc-type').value = docState.type || "PREVENTIVO";
       document.getElementById('doc-number').value = docState.number || '';
       document.getElementById('doc-date').value = docState.date || '';
-      document.getElementById('doc-validity').value = docState.validity || '30 giorni';
+      document.getElementById('doc-validity').value = docState.validity || '15 giorni';
 
       document.getElementById('client-name').value = docState.client?.name || '';
       document.getElementById('client-residence').value = docState.client?.residence || '';
@@ -1241,7 +1242,6 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
-//    - Pagina 1: Esatta riproduzione del template grafico approvato
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1264,23 +1264,28 @@ function prepareAndPrint() {
 
   const totalPages = docState.categories.length + 3;
 
-  // PAGINA 1: LAYOUT DEFINITIVO FEDELE ALL'IMMAGINE
+  // PAGINA 1: LOGO A LARGHEZZA INTERA (O TESTO), BORDO SOTTILE SUL NUMERO
   const page1 = document.createElement('div');
   page1.className = "sheet p1-sheet";
   page1.innerHTML = `
-    <!-- Testata Ditta a sinistra e Numero/Data a destra -->
+    <!-- Testata: se c'è il logo occupa tutto lo spazio a sinistra, altrimenti mostra i dati ditta -->
     <div class="p-header">
       <div class="p-header-brand">
-        ${companySettings.logo ? `<img src="${companySettings.logo}" class="p-page1-logo" alt="Logo">` : ''}
-        <div class="p-company">
-          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-          <div>${escapeHtml(companySettings.address)}</div>
-          ${companySettings.taxId ? `<div>${escapeHtml(companySettings.taxId)}</div>` : ''}
-          <div>${escapeHtml(companySettings.contacts)}</div>
-        </div>
+        ${companySettings.logo ? `
+          <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo Aziendale">
+        ` : `
+          <div class="p-company">
+            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+            <div>${escapeHtml(companySettings.address)}</div>
+            ${companySettings.taxId ? `<div>${escapeHtml(companySettings.taxId)}</div>` : ''}
+            <div>${escapeHtml(companySettings.contacts)}</div>
+          </div>
+        `}
       </div>
       <div class="p-doc-details">
-        <div class="p-doc-number"><strong>Numero:</strong> ${escapeHtml(formattedDocNum)}</div>
+        <div class="p-doc-number-box">
+          <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
+        </div>
         <div class="p-doc-date"><strong>Data:</strong> ${escapeHtml(docState.date)}</div>
       </div>
     </div>
@@ -1303,7 +1308,7 @@ function prepareAndPrint() {
       <div class="p1-validity-text">validità offerta ${escapeHtml(docState.validity || '15 giorni')}</div>
     </div>
 
-    <!-- PIÈ DI PAGINA DI PAGINA 1: RIGA, DATI DITTA A SINISTRA E PAGINA 1 DI X A DESTRA -->
+    <!-- PIÈ DI PAGINA: DATI DITTA A SINISTRA E PAGINA 1 DI X A DESTRA -->
     <div class="p1-footer">
       <div class="p1-footer-company">
         <div class="p1-footer-title">${escapeHtml(companySettings.name)}</div>
