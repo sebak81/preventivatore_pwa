@@ -42,13 +42,13 @@
           <label>Tipo Documento</label>
           <select id="doc-type">
             <option value="PREVENTIVO">Preventivo</option>
-            <option value="REVISIONE PREVENTIVO">Revisione Preventivo</option>
-            <option value="CONFERMA D'ORDINE / CONTRATTO">Conferma d'Ordine / Contratto</option>
+            <option value="REVISIONE">Revisione</option>
+            <option value="CONTRATTO">Contratto</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Numero Documento</label>
-          <input type="text" id="doc-number" placeholder="es. 2026/001">
+          <label>Numero Documento <span id="doc-number-preview" style="text-transform: none; color: var(--accent); font-weight: normal; margin-left: 6px;"></span></label>
+          <input type="text" id="doc-number" placeholder="es. 001-26">
         </div>
         <div class="form-group">
           <label>Data</label>
@@ -106,7 +106,7 @@
         <span>Pagine Categoria (Seleziona, ordina e componi le schede)</span>
       </div>
       
-      <!-- Barra di aggiunta dinamica alimentata dal catalogo -->
+      <!-- Barra di aggiunta dinamica -->
       <div class="add-category-bar">
         <select id="select-category-type" style="flex-grow: 1; font-weight: 600;"></select>
         <button type="button" class="btn btn-primary" id="btn-add-category">+ Aggiungi Pagina Categoria</button>
