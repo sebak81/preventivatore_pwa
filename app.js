@@ -1,5 +1,6 @@
 // ==========================================================================
-// 1. CONFIGURAZIONE E CATALOGO DI DEFAULT DELLE 11 MACRO-CATEGORIE
+// 1. CONFIGURAZIONE E CATALOGO DI DEFAULT A 3 LIVELLI
+//    Macro-categoria -> Fornitore -> Modello -> Dati Tecnici & Descrizione
 // ==========================================================================
 const DEFAULT_COMPANY = {
   name: "NOME AZIENDA / SERRAMENTI",
@@ -12,17 +13,17 @@ const DEFAULT_CATALOG = {
   "Portoncini": {
     suppliers: [
       {
-        id: "supp_qfort_port",
+        id: "supp_port_qfort",
         name: "QFORT",
         models: [
           { id: "mod_baby_stars", name: "Baby Stars", specs: "Alluminio/PVC coibentato, serratura automatica 5 punti", glass: "Vetro blindato antisfondamento", desc: "Portoncino d'ingresso ad elevata sicurezza con pannello coibentato ad alto isolamento termico ed acustico." }
         ]
       },
       {
-        id: "supp_blindati_art",
+        id: "supp_port_blindati",
         name: "Blindati Artigianali",
         models: [
-          { id: "mod_classe3", name: "Porta Blindata Classe 3", specs: "Struttura in doppia lamiera zincata, cilindro europeo ad alta sicurezza", glass: "-", desc: "Porta blindata d'ingresso certificata in classe antieffrazione 3 con defender e guarnizione parafreddo a pavimento." }
+          { id: "mod_classe3", name: "Porta Blindata Classe 3", specs: "Doppia lamiera zincata, cilindro europeo alta sicurezza", glass: "-", desc: "Porta blindata d'ingresso certificata classe antieffrazione 3 con defender e lama parafreddo a pavimento." }
         ]
       }
     ]
@@ -30,20 +31,29 @@ const DEFAULT_CATALOG = {
   "Serramenti": {
     suppliers: [
       {
-        id: "supp_qfort_serramenti",
+        id: "supp_ser_qfort",
         name: "QFORT",
         models: [
-          { id: "mod_4_stars", name: "4 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm B.E. Warm Edge", desc: "Profilo in PVC classe A da 70 mm a 5 camere con rinforzi in acciaio zincato. Sistema a 2 guarnizioni di battuta." },
+          { id: "mod_4_stars", name: "4 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni di battuta", glass: "24 mm B.E. Warm Edge", desc: "Profilo in PVC classe A da 70 mm a 5 camere con rinforzi in acciaio zincato. Sistema a 2 guarnizioni di battuta in EPDM." },
           { id: "mod_5_stars", name: "5 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm o 30 mm B.E. Warm Edge", desc: "Design squadrato ed essenziale. Profilo in PVC da 70 mm a 5 camere, ferramenta perimetrale con scontri antieffrazione." },
           { id: "mod_7_stars", name: "7 Stars (85mm - 7 camere)", specs: "85 mm - 7 camere - 3 guarnizioni (giunto aperto)", glass: "Triplo vetro 44 mm selettivo B.E. Warm Edge", desc: "Top di gamma a taglio termico passivo. Profilo da 85 mm a 7 camere e 3 guarnizioni per case a bassissimo consumo energetico." },
-          { id: "mod_stars_epiq", name: "Stars Epiq (82mm - 6 camere)", specs: "82 mm - 6 camere - 3 guarnizioni", glass: "Triplo vetro alte prestazioni", desc: "Sistema innovativo con estetica moderna e complanare/semi-complanare per grandi specchiature." }
+          { id: "mod_stars_epiq", name: "Stars Epiq (82mm - 6 camere)", specs: "82 mm - 6 camere - 3 guarnizioni", glass: "Triplo vetro alte prestazioni", desc: "Sistema innovativo con estetica moderna e complanare o semi-complanare per grandi aperture." }
         ]
       },
       {
-        id: "supp_alluminio_tt",
-        name: "Alluminio a Taglio Termico",
+        id: "supp_ser_cosmet",
+        name: "Cosmet",
         models: [
-          { id: "mod_alluminio_75", name: "Serie 75 TT", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", desc: "Profili estrusi in lega primaria a taglio termico. Massima indeformabilità, resistenza agli agenti atmosferici e manutenzione minima." }
+          { id: "mod_cosmet_sintesi", name: "Sintesi 76 (76mm - 5 camere)", specs: "76 mm - 5 camere - 2 guarnizioni", glass: "Vetrocamera 28 mm B.E. con gas Argon", desc: "Serramento in PVC Cosmet Serie Sintesi. Spessore 76 mm, ottimo bilanciamento tra leggerezza visiva ed isolamento termo-acustico." },
+          { id: "mod_cosmet_diamante", name: "Diamante 84 (84mm - 6 camere)", specs: "84 mm - 6 camere - 3 guarnizioni di tenuta", glass: "Triplo vetro 48 mm selettivo acustico", desc: "Sistema top level Cosmet Diamante. Elevatissimo isolamento termico con guarnizione centrale vulcanizzata e profili rinforzati." },
+          { id: "mod_cosmet_kristal", name: "Kristal (Tutto Vetro complanare)", specs: "Profilo a scomparsa con anta a tutto vetro", glass: "Vetro strutturale temperato/stratificato", desc: "Soluzione minimale Cosmet con anta a scomparsa per la massima luminosità naturale e design contemporaneo." }
+        ]
+      },
+      {
+        id: "supp_ser_alluminio",
+        name: "Alluminio Taglio Termico",
+        models: [
+          { id: "mod_all_75", name: "Serie 75 TT", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", desc: "Profili estrusi in lega primaria a taglio termico. Massima indeformabilità, resistenza agli agenti atmosferici e minima manutenzione." }
         ]
       }
     ]
@@ -51,11 +61,18 @@ const DEFAULT_CATALOG = {
   "Zanzariere": {
     suppliers: [
       {
-        id: "supp_bettio",
+        id: "supp_zanz_bettio",
         name: "Bettio",
         models: [
-          { id: "mod_scenica", name: "Scenica (Senza guida a terra)", specs: "Rete in fibra di vetro, zero barriere a terra", glass: "Rete alta trasparenza", desc: "Zanzariera laterale senza inciampo a pavimento, con blocco del movimento in qualsiasi punto." },
-          { id: "mod_verticale", name: "Verticale a molla", specs: "Cassonetto da 50 mm con freno frizionato", glass: "Rete grigia standard", desc: "Zanzariera classica a scorrimento verticale con guide dotate di spazzolini antivento." }
+          { id: "mod_scenica", name: "Scenica (Senza guida a terra)", specs: "Rete in fibra di vetro, guida a terra zero barriere", glass: "Rete alta trasparenza", desc: "Zanzariera laterale senza inciampo a pavimento, arresto manuale in qualsiasi posizione intermedia." },
+          { id: "mod_verticale", name: "Verticale a molla", specs: "Cassonetto 50 mm con freno frizionato", glass: "Rete grigia standard", desc: "Zanzariera classica a scorrimento verticale con guide dotate di spazzolini antivento." }
+        ]
+      },
+      {
+        id: "supp_zanz_mvline",
+        name: "MV Line",
+        models: [
+          { id: "mod_mv_bora", name: "Bora Laterale", specs: "Sistema antivento brevettato, guida bassa 3 mm", glass: "Rete rinforzata", desc: "Zanzariera ad avvolgimento laterale resistente a forti raffiche di vento." }
         ]
       }
     ]
@@ -63,11 +80,11 @@ const DEFAULT_CATALOG = {
   "Avvolgibili": {
     suppliers: [
       {
-        id: "supp_avv_standard",
-        name: "Pinto / Pasini",
+        id: "supp_avv_pinto",
+        name: "Pinto",
         models: [
-          { id: "mod_all_coib", name: "Alluminio Coibentato", specs: "Poliuretano espanso alta densità, terminale in alluminio estruso", glass: "-", desc: "Tapparella in alluminio coibentato ad elevata stabilità dimensionale e resistenza agli agenti atmosferici." },
-          { id: "mod_acciaio_sic", name: "Acciaio Coibentato Blindato", specs: "Lamiera d'acciaio con anima in poliuretano", glass: "-", desc: "Avvolgibile di sicurezza antieffrazione ad alta resistenza meccanica." }
+          { id: "mod_pinto_all", name: "Alluminio Coibentato Duero/Standard", specs: "Poliuretano espanso alta densità, terminale alluminio", glass: "-", desc: "Tapparella in alluminio coibentato ad elevata stabilità dimensionale e resistenza agli sbalzi termici." },
+          { id: "mod_pinto_acc", name: "Acciaio Blindato", specs: "Lamiera di acciaio con anima in resina poliuretanica", glass: "-", desc: "Avvolgibile di sicurezza antieffrazione ad alta resistenza meccanica contro tentativi di scasso." }
         ]
       }
     ]
@@ -75,10 +92,10 @@ const DEFAULT_CATALOG = {
   "Scuri": {
     suppliers: [
       {
-        id: "supp_scuri_veneti",
+        id: "supp_scuri_trad",
         name: "Scuri & Persiane Tradizionali",
         models: [
-          { id: "mod_padovana", name: "Alla Padovana / Vicentina", specs: "Doghe verticali con anima coibentata, bandelle e spagnoletta nere", glass: "-", desc: "Oscurante tradizionale a pacchetto con ferramenta trattata per esterni." }
+          { id: "mod_padovana", name: "Alla Padovana / Vicentina", specs: "Doghe verticali coibentate, bandelle e ferramenta nere", glass: "-", desc: "Oscurante tradizionale a pacchetto con ferramenta trattata per esterni ad alta resistenza corrosiva." }
         ]
       }
     ]
@@ -87,9 +104,9 @@ const DEFAULT_CATALOG = {
     suppliers: [
       {
         id: "supp_tende_tec",
-        name: "Tende Tecniche & Schermature",
+        name: "Schermature Tecniche",
         models: [
-          { id: "mod_screen_filtro", name: "Telo Screen Microforato", specs: "Tessuto tecnico fibra di vetro e PVC", glass: "-", desc: "Schermatura solare per la riduzione dell'irraggiamento termico estivo e dell'abbagliamento visivo." }
+          { id: "mod_screen_filtro", name: "Telo Screen Microforato", specs: "Tessuto tecnico fibra di vetro e PVC ignifugo", glass: "-", desc: "Schermatura solare filtrante per la riduzione del carico termico estivo e protezione dal riflesso." }
         ]
       }
     ]
@@ -97,11 +114,11 @@ const DEFAULT_CATALOG = {
   "Porte interne": {
     suppliers: [
       {
-        id: "supp_porte_design",
+        id: "supp_porte_int",
         name: "Porte Interne Design",
         models: [
           { id: "mod_battente_cieca", name: "Battente Tamburata Microtek", specs: "Telaio e coprifili con guarnizione in gomma, cerniere a scomparsa", glass: "-", desc: "Porta interna moderna ad anta liscia con serratura magnetica e finiture antigraffio." },
-          { id: "mod_scorrevole_scomp", name: "Scorrevole a Scomparsa", specs: "Anta coordinata con telaio scrigno, carrelli ammortizzati", glass: "-", desc: "Soluzione salvaspazio a scomparsa all'interno del controtelaio murario." }
+          { id: "mod_scorrevole_scomp", name: "Scorrevole a Scomparsa", specs: "Anta coordinata, carrelli ammortizzati tipo scrigno", glass: "-", desc: "Soluzione salvaspazio a scomparsa nel controtelaio murario con chiusura rallentata." }
         ]
       }
     ]
@@ -109,10 +126,10 @@ const DEFAULT_CATALOG = {
   "Portoni Garage": {
     suppliers: [
       {
-        id: "supp_garage_sezionali",
+        id: "supp_garage_sez",
         name: "Portoni Sezionali Coibentati",
         models: [
-          { id: "mod_sez_40", name: "Pannello Sandwich 40/42 mm", specs: "Doppia lamiera d'acciaio zincato, coibentazione in poliuretano, motore a soffitto", glass: "-", desc: "Portone da garage sezionale ad apertura verticale con guide di scorrimento silenziose e sistema paracadute molle." }
+          { id: "mod_sez_40", name: "Pannello Sandwich 40/42 mm", specs: "Doppia lamiera d'acciaio zincato, poliuretano espanso, motore a soffitto", glass: "-", desc: "Portone da garage sezionale ad apertura verticale a soffitto con sistema paracadute molle e fotocellule." }
         ]
       }
     ]
@@ -120,10 +137,10 @@ const DEFAULT_CATALOG = {
   "Monoblocchi Isolanti": {
     suppliers: [
       {
-        id: "supp_monoblocchi_eps",
-        name: "Monoblocco Termico Finestra",
+        id: "supp_monoblocchi_termo",
+        name: "Monoblocco Termico",
         models: [
-          { id: "mod_mono_4lati", name: "Sistema Termoisolante 4 Lati", specs: "Spalle in EPS ad alta densità con quarto lato sottodavanzale a taglio termico", glass: "-", desc: "Monoblocco prefabbricato ad alto isolamento acustico e termico conforme alla norma UNI 11673 per la posa ad alta efficienza." }
+          { id: "mod_mono_4lati", name: "Sistema Termoisolante 4 Lati", specs: "Spalle in EPS grafitato con quarto lato sottodavanzale a taglio termico", glass: "-", desc: "Monoblocco prefabbricato ad alto isolamento conforme alla norma UNI 11673 per la corretta posa in opera del foro finestra." }
         ]
       }
     ]
@@ -131,8 +148,8 @@ const DEFAULT_CATALOG = {
   "Porte a vetro": {
     suppliers: [
       {
-        id: "supp_cristallo_arredo",
-        name: "Porte in Cristallo Temperato",
+        id: "supp_porte_vetro",
+        name: "Cristalli d'Arredo",
         models: [
           { id: "mod_vetro_scorrevole", name: "Vetro Temperato 10 mm", specs: "Cristallo trasparente, satinato o fumé con pinze e maniglione inox", glass: "Temperato di sicurezza 10 mm", desc: "Porta per interni a tutto vetro scorrevole con binario a vista minimale in alluminio satinato." }
         ]
@@ -145,7 +162,7 @@ const DEFAULT_CATALOG = {
         id: "supp_opere_varie",
         name: "Lavorazioni Speciali & Varie",
         models: [
-          { id: "mod_opera_custom", name: "Opere Complementari", specs: "Secondo specifiche concordate", glass: "-", desc: "Fornitura ed opere complementari speciali eseguite su misura secondo accordi contrattuali." }
+          { id: "mod_opera_custom", name: "Opere Complementari", specs: "Secondo specifiche concordate", glass: "-", desc: "Fornitura ed opere complementari speciali eseguite su misura secondo gli accordi contrattuali." }
         ]
       }
     ]
@@ -153,12 +170,14 @@ const DEFAULT_CATALOG = {
 };
 
 // ==========================================================================
-// 2. GESTIONE STORAGE LOCALE DELLE IMPOSTAZIONI
+// 2. GESTIONE STORAGE LOCALE
 // ==========================================================================
 let companySettings = loadCompanySettings();
 let catalogSettings = loadCatalogSettings();
-// Tiene traccia delle macro-categorie aperte/espanse nella schermata impostazioni
+
+// Traccia le macrocategorie e i singoli fornitori aperti nell'accordion
 let openSettingsCategories = { "Serramenti": true };
+let openSettingsSuppliers = {}; // es: { "Serramenti_0": true }
 
 function loadCompanySettings() {
   const saved = localStorage.getItem('prev_company_settings');
@@ -195,7 +214,7 @@ let docState = {
 };
 
 // ==========================================================================
-// 4. INIZIALIZZAZIONE & EVENT LISTENERS
+// 4. INIZIALIZZAZIONE & EVENTI
 // ==========================================================================
 function safeOn(id, event, handler) {
   const el = document.getElementById(id);
@@ -272,7 +291,6 @@ function switchView(view) {
     setView.style.display = 'none';
     btnEd.classList.add('active');
     btnSet.classList.remove('active');
-    // Quando si torna all'editor, aggiorna le schede con i cataloghi eventualmente modificati
     renderCategoriesUI();
   } else {
     edView.style.display = 'none';
@@ -289,7 +307,7 @@ function loadDefaultState() {
 }
 
 // ==========================================================================
-// 5. GESTIONE DELLA SCHERMATA IMPOSTAZIONI (CATALOGO INTERATTIVO)
+// 5. GESTIONE IMPOSTAZIONI: GERARCHIA MACROCATEGORIA > FORNITORE > MODELLI
 // ==========================================================================
 function initSettingsUI() {
   document.getElementById('set-company-name').value = companySettings.name || '';
@@ -300,7 +318,6 @@ function initSettingsUI() {
   renderSettingsCategoriesList();
 }
 
-// Render dell'accordion a 3 livelli: Macro-Categoria > Fornitori > Modelli
 function renderSettingsCategoriesList() {
   const container = document.getElementById('settings-categories-list');
   if (!container) return;
@@ -309,38 +326,40 @@ function renderSettingsCategoriesList() {
   Object.keys(catalogSettings).forEach((catName, idx) => {
     const catData = catalogSettings[catName];
     const suppliers = catData.suppliers || [];
-    const isOpen = !!openSettingsCategories[catName];
+    const isCatOpen = !!openSettingsCategories[catName];
 
     const accordionItem = document.createElement('div');
-    accordionItem.className = `settings-cat-accordion ${isOpen ? 'is-open' : ''}`;
+    accordionItem.className = `settings-cat-accordion ${isCatOpen ? 'is-open' : ''}`;
 
     let suppliersHtml = "";
-    if (isOpen) {
+    if (isCatOpen) {
       if (suppliers.length === 0) {
         suppliersHtml = `
           <div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-            Nessun fornitore configurato per questa categoria.<br>
-            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="addSupplierToCategory('${escapeHtml(catName)}')">+ Aggiungi Fornitore</button>
+            Nessun fornitore registrato per questa categoria.<br>
+            <button type="button" class="btn btn-primary btn-sm" style="margin-top: 8px;" onclick="addSupplierToCategory('${escapeHtml(catName)}')">+ Aggiungi Primo Fornitore</button>
           </div>
         `;
       } else {
         suppliersHtml = suppliers.map((supp, sIdx) => {
+          const suppKey = `${catName}_${sIdx}`;
+          const isSuppOpen = openSettingsSuppliers[suppKey] !== false; // aperto di default
           const models = supp.models || [];
-          
+
           let modelsHtml = models.map((mod, mIdx) => {
             return `
               <div class="settings-model-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent);">Modello #${mIdx + 1}</span>
+                  <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent);">Modello #${mIdx + 1}: ${escapeHtml(mod.name || 'Nuovo')}</span>
                   <button type="button" class="btn-icon-del" onclick="deleteModel('${escapeHtml(catName)}', ${sIdx}, ${mIdx})" title="Elimina modello">&times;</button>
                 </div>
                 <div class="form-grid">
                   <div class="form-group">
                     <label>Nome Modello / Serie</label>
-                    <input type="text" value="${escapeHtml(mod.name)}" placeholder="es. 7 Stars, Scenica, Sezionale 40" oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'name', this.value)">
+                    <input type="text" value="${escapeHtml(mod.name)}" placeholder="es. 7 Stars, Diamante 84" oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'name', this.value)">
                   </div>
                   <div class="form-group">
-                    <label>Specifiche Tecniche Base (spessore, camere, ecc.)</label>
+                    <label>Specifiche Sistema (spessore, camere, ecc.)</label>
                     <input type="text" value="${escapeHtml(mod.specs || '')}" placeholder="es. 85 mm - 7 camere - 3 guarnizioni" oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'specs', this.value)">
                   </div>
                   <div class="form-group">
@@ -349,32 +368,43 @@ function renderSettingsCategoriesList() {
                   </div>
                 </div>
                 <div class="form-group full" style="margin-top: 8px;">
-                  <label>Descrizione Generale Precompilata</label>
-                  <textarea placeholder="Descrizione tecnica e commerciale che comparirà nel preventivo..." oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'desc', this.value)">${escapeHtml(mod.desc || '')}</textarea>
+                  <label>Descrizione Generale Precompilata (compare nel preventivo)</label>
+                  <textarea placeholder="Descrizione tecnica e prestazionale del prodotto..." oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'desc', this.value)">${escapeHtml(mod.desc || '')}</textarea>
                 </div>
               </div>
             `;
           }).join('');
 
           return `
-            <div class="settings-supplier-card">
-              <div class="settings-supplier-header">
-                <div style="display: flex; align-items: center; gap: 8px; flex-grow: 1;">
-                  <label style="margin: 0; font-size: 0.8rem; min-width: 70px;">Fornitore:</label>
-                  <input type="text" value="${escapeHtml(supp.name)}" placeholder="Nome Fornitore" style="font-weight: 700; max-width: 280px;" oninput="updateSupplierName('${escapeHtml(catName)}', ${sIdx}, this.value)">
+            <div class="settings-supplier-box">
+              <div class="settings-supplier-head" onclick="toggleSettingsSupplier('${escapeHtml(catName)}', ${sIdx})">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="accordion-arrow" style="font-size: 0.75rem;">${isSuppOpen ? '▼' : '▶'}</span>
+                  <strong style="color: var(--primary); font-size: 0.95rem;">Fornitore: ${escapeHtml(supp.name)}</strong>
+                  <span style="font-size: 0.75rem; background: #e0f2fe; color: var(--accent); padding: 2px 7px; border-radius: 10px; font-weight: 600;">
+                    ${models.length} modello/i
+                  </span>
                 </div>
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
                   <button type="button" class="btn btn-secondary btn-sm" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
-                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina Fornitore</button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina</button>
                 </div>
               </div>
 
-              <div class="settings-models-wrapper">
-                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
-                  Modelli / Serie di questo fornitore (${models.length}):
+              ${isSuppOpen ? `
+                <div class="settings-supplier-body">
+                  <div class="form-group" style="max-width: 320px; margin-bottom: 12px;">
+                    <label>Rinomina Fornitore</label>
+                    <input type="text" value="${escapeHtml(supp.name)}" oninput="updateSupplierName('${escapeHtml(catName)}', ${sIdx}, this.value)">
+                  </div>
+                  <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    Elenco Modelli di ${escapeHtml(supp.name)}:
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${modelsHtml || '<div style="font-size: 0.8rem; color: var(--text-muted); padding: 8px;">Nessun modello inserito. Clicca su "+ Aggiungi Modello" sopra.</div>'}
+                  </div>
                 </div>
-                ${modelsHtml || '<div style="font-size: 0.8rem; color: var(--text-muted); padding: 8px;">Nessun modello inserito per questo fornitore. Clicca su "+ Aggiungi Modello" sopra.</div>'}
-              </div>
+              ` : ''}
             </div>
           `;
         }).join('');
@@ -390,32 +420,40 @@ function renderSettingsCategoriesList() {
     accordionItem.innerHTML = `
       <div class="settings-cat-header" onclick="toggleSettingsCategory('${escapeHtml(catName)}')">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="accordion-arrow">${isOpen ? '▼' : '▶'}</span>
+          <span class="accordion-arrow">${isCatOpen ? '▼' : '▶'}</span>
           <span style="font-weight: 700; font-size: 1rem;">${idx + 1}. ${escapeHtml(catName)}</span>
         </div>
-        <span class="cat-badge">${suppliers.length} fornitore/i configurato/i</span>
+        <span class="cat-badge">${suppliers.length} fornitore/i</span>
       </div>
-      ${isOpen ? `<div class="settings-cat-body">${suppliersHtml}</div>` : ''}
+      ${isCatOpen ? `<div class="settings-cat-body">${suppliersHtml}</div>` : ''}
     `;
 
     container.appendChild(accordionItem);
   });
 }
 
-// Apertura/Chiusura Accordion
 window.toggleSettingsCategory = function(catName) {
   openSettingsCategories[catName] = !openSettingsCategories[catName];
+  renderSettingsCategoriesList();
+};
+
+window.toggleSettingsSupplier = function(catName, sIdx) {
+  const key = `${catName}_${sIdx}`;
+  openSettingsSuppliers[key] = !openSettingsSuppliers[key];
   renderSettingsCategoriesList();
 };
 
 // CRUD FORNITORI
 window.addSupplierToCategory = function(catName) {
   if (!catalogSettings[catName]) catalogSettings[catName] = { suppliers: [] };
+  const suppName = prompt("Inserisci il nome del nuovo fornitore (es. QFORT, Cosmet, Bettio):");
+  if (!suppName || !suppName.trim()) return;
+
   const newSupp = {
     id: 'supp_' + Date.now(),
-    name: "Nuovo Fornitore",
+    name: suppName.trim(),
     models: [
-      { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: "Descrizione generale del modello..." }
+      { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: "Descrizione tecnica del modello..." }
     ]
   };
   catalogSettings[catName].suppliers.push(newSupp);
@@ -432,7 +470,7 @@ window.updateSupplierName = function(catName, sIdx, val) {
 };
 
 window.deleteSupplier = function(catName, sIdx) {
-  if (confirm("Vuoi davvero eliminare questo fornitore e tutti i suoi modelli?")) {
+  if (confirm("Vuoi davvero eliminare questo fornitore e tutti i suoi modelli associati?")) {
     catalogSettings[catName].suppliers.splice(sIdx, 1);
     persistSettings();
     renderSettingsCategoriesList();
@@ -451,6 +489,7 @@ window.addModelToSupplier = function(catName, sIdx) {
     glass: "",
     desc: ""
   });
+  openSettingsSuppliers[`${catName}_${sIdx}`] = true;
   persistSettings();
   renderSettingsCategoriesList();
 };
@@ -478,7 +517,7 @@ function saveSettingsFromUI() {
   companySettings.contacts = document.getElementById('set-company-contacts').value;
 
   persistSettings();
-  alert("Tutte le impostazioni aziendali e i cataloghi sono stati salvati correttamente!");
+  alert("Tutte le impostazioni aziendali, fornitori e modelli sono stati salvati correttamente!");
 }
 
 function exportSettingsJSON() {
@@ -510,7 +549,7 @@ function importSettingsJSON(e) {
       renderCategoriesUI();
       alert("Configurazione aziendale importata con successo!");
     } catch (err) {
-      alert("File di configurazione non valido: " + err.message);
+      alert("File non valido: " + err.message);
     }
   };
   reader.readAsText(file);
@@ -518,13 +557,13 @@ function importSettingsJSON(e) {
 }
 
 // ==========================================================================
-// 6. GESTIONE SCHEDE PREVENTIVO & ORDINAMENTO (SU ▲ / GIÙ ▼)
+// 6. GESTIONE SCHEDE PREVENTIVO (EDITOR A CASCATA)
 // ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
   const catKey = sel ? sel.value : "Serramenti";
 
-  const catDef = catalogSettings[catKey] || { suppliers: [{ id: "gen", name: "Standard", models: [{ id: "m1", name: "Standard", specs: "-", desc: "" }] }] };
+  const catDef = catalogSettings[catKey] || { suppliers: [{ name: "Standard", models: [{ name: "Standard", specs: "", desc: "" }] }] };
   const firstSupp = (catDef.suppliers && catDef.suppliers.length > 0) ? catDef.suppliers[0] : { name: "Standard", models: [{ name: "Standard", specs: "", desc: "" }] };
   const firstModel = (firstSupp.models && firstSupp.models.length > 0) ? firstSupp.models[0] : { name: "Standard", specs: "", desc: "" };
 
@@ -660,13 +699,13 @@ function renderCategoryOptionsBlock(cat) {
     <div style="background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: 6px;">
       <div class="form-grid">
         <div class="form-group">
-          <label>Fornitore</label>
+          <label style="color: var(--accent);">Fornitore</label>
           <select onchange="onCatSupplierChange('${cat.id}', this.value)">
             ${suppOptions || '<option value="">Nessun Fornitore</option>'}
           </select>
         </div>
         <div class="form-group">
-          <label>Modello / Serie</label>
+          <label style="color: var(--accent);">Modello / Serie</label>
           <select onchange="onCatModelChange('${cat.id}', this.value)">
             ${modelOptions || '<option value="">Nessun Modello</option>'}
           </select>
@@ -683,7 +722,7 @@ function renderCategoryOptionsBlock(cat) {
           <input type="text" value="${escapeHtml(cat.specs)}" placeholder="Spessore, guarnizioni, caratteristiche" oninput="updateCatField('${cat.id}', 'specs', this.value)">
         </div>
         <div class="form-group">
-          <label>Vetraggio / Dettaglio Accessori</label>
+          <label>Vetraggio / Accessori</label>
           <input type="text" value="${escapeHtml(cat.glass)}" placeholder="Tipologia vetro o accessori" oninput="updateCatField('${cat.id}', 'glass', this.value)">
         </div>
       </div>
@@ -1100,8 +1139,8 @@ function prepareAndPrint() {
         </div>
 
         <div style="margin: 10px 0 15px 0;">
-          <h2 style="font-size: 1.3rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
-            ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: normal;">${escapeHtml(cat.supplierName)} (${escapeHtml(cat.modelName)})</span>
+          <h2 style="font-size: 1.25rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
+            ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: 800; color: #1e293b;">${escapeHtml(cat.supplierName)}</span> <span style="font-size: 0.95rem; font-weight: normal;">(${escapeHtml(cat.modelName)})</span>
           </h2>
         </div>
 
@@ -1154,7 +1193,7 @@ function prepareAndPrint() {
       </div>
 
       <div class="p-footer">
-        <span>Scheda: ${escapeHtml(cat.name)}</span>
+        <span>Scheda: ${escapeHtml(cat.name)} (${escapeHtml(cat.supplierName)})</span>
         <span>Pagina Tecnica ${idx + 2}</span>
       </div>
     `;
@@ -1169,7 +1208,7 @@ function prepareAndPrint() {
     const t = calculateCategoryTotals(c);
     return `
       <tr>
-        <td><strong>${escapeHtml(c.name)}</strong> (Scheda ${i + 1})</td>
+        <td><strong>${escapeHtml(c.name)}</strong> - ${escapeHtml(c.supplierName)} (${escapeHtml(c.modelName)})</td>
         <td class="text-right">${formatCurrency(t.fornitura)}</td>
         <td class="text-right">${formatCurrency(t.posa)}</td>
         <td class="text-right"><strong>${formatCurrency(t.total)}</strong></td>
@@ -1193,7 +1232,7 @@ function prepareAndPrint() {
       <table class="p-table">
         <thead>
           <tr>
-            <th>Tipologia Merceologica</th>
+            <th>Tipologia Merceologica & Fornitore</th>
             <th class="text-right" style="width: 120px;">Fornitura</th>
             <th class="text-right" style="width: 120px;">Posa in Opera</th>
             <th class="text-right" style="width: 130px;">Totale Netto</th>
@@ -1251,7 +1290,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(pageTotals);
 
-  // ULTIMA PAGINA: NORMATIVA & PRIVACY
+  // ULTIMA PAGINA: CONDIZIONI GENERALI E PRIVACY
   const pageLegal = document.createElement('div');
   pageLegal.className = "sheet";
   pageLegal.innerHTML = `
