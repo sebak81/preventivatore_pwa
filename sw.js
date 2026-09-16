@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v10'; // Aggiornato per recepire le modifiche a campi prezzo e posa
+const CACHE_NAME = 'prev-app-v11'; // Aggiornato per recepire le nuove etichette di riepilogo
 const ASSETS = [
   './',
   './index.html',
