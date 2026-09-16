@@ -1,1 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preventivatore & Contratti</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+  <!-- BARRA DEGLI STRUMENTI -->
+  <header class="top-bar">
+    <h1 id="app-title">Preventivatore</h1>
+    <div class="btn-group">
+      <button class="btn btn-secondary" id="btn-new">Nuovo</button>
+      <button class="btn btn-secondary" id="btn-open">Apri (.json)</button>
+      <button class="btn btn-secondary" id="btn-save">Salva (.json)</button>
+      <button class="btn btn-primary" id="btn-print">Stampa / Salva PDF</button>
+    </div>
+  </header>
+
+  <!-- FORM INTERATTIVO PRINCIPALE -->
+  <main class="container" id="editor-container">
+
+    <!-- DATI GENERALI E DOCUMENTO -->
+    <section class="card">
+      <div class="card-title">
+        <span>Tipo Documento e Dati Generali</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tipo Documento</label>
+          <select id="doc-type">
+            <option value="PREVENTIVO">Preventivo</option>
+            <option value="REVISIONE PREVENTIVO">Revisione Preventivo</option>
+            <option value="CONFERMA D'ORDINE / CONTRATTO">Conferma d'Ordine / Contratto</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Numero Documento</label>
+          <input type="text" id="doc-number" placeholder="es. 2026/001">
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="doc-date">
+        </div>
+        <div class="form-group">
+          <label>Validità Offerta</label>
+          <input type="text" id="doc-validity" value="30 giorni">
+        </div>
+      </div>
+    </section>
+
+    <!-- DATI CLIENTE E CANTIERE -->
+    <section class="card">
+      <div class="card-title">
+        <span>Committente e Cantiere</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Cognome e Nome / Ragione Sociale</label>
+          <input type="text" id="client-name" placeholder="Mario Rossi">
+        </div>
+        <div class="form-group full">
+          <label>Indirizzo Residenza (Via, Civico, CAP, Città, Prov)</label>
+          <input type="text" id="client-residence" placeholder="Via Roma 10, 00100 Roma (RM)">
+        </div>
+        <div class="form-group">
+          <label>Codice Fiscale / P.IVA</label>
+          <input type="text" id="client-taxid">
+        </div>
+        <div class="form-group">
+          <label>Telefono</label>
+          <input type="tel" id="client-phone">
+        </div>
+        <div class="form-group full">
+          <label>Email</label>
+          <input type="email" id="client-email">
+        </div>
+      </div>
+
+      <div class="checkbox-group" style="margin-top: 15px;">
+        <input type="checkbox" id="same-site" checked>
+        <label for="same-site" style="font-size: 0.9rem; text-transform: none; color: var(--text);">L'indirizzo del cantiere coincide con la residenza</label>
+      </div>
+
+      <div class="form-group full" id="site-group" style="display: none; margin-top: 10px;">
+        <label>Indirizzo Cantiere (se diverso)</label>
+        <input type="text" id="site-address" placeholder="Via Cantiere 22, Milano (MI)">
+      </div>
+    </section>
+
+    <!-- SEZIONE CATEGORIE MERCEOLOGICHE DINAMICHE -->
+    <section class="card">
+      <div class="card-title">
+        <span>Categorie Merceologiche (Ogni categoria avrà la sua pagina distinta)</span>
+      </div>
+      
+      <div class="add-category-bar">
+        <select id="select-category-type" style="flex-grow: 1;">
+          <option value="Serramenti">Serramenti (PVC / Alluminio / Legno)</option>
+          <option value="Zanzariere">Zanzariere</option>
+          <option value="Avvolgibili e Frangisole">Avvolgibili e Frangisole</option>
+          <option value="Porte Interne">Porte Interne</option>
+          <option value="Porte Blindate e Portoncini">Porte Blindate e Portoncini</option>
+          <option value="Scuri e Persiane">Scuri e Persiane</option>
+          <option value="Opere Complementari e Varie">Opere Complementari e Varie</option>
+        </select>
+        <button type="button" class="btn btn-primary" id="btn-add-category">+ Aggiungi Pagina Categoria</button>
+      </div>
+
+      <!-- Elenco contenitore delle categorie -->
+      <div id="categories-container" style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px;"></div>
+    </section>
+
+    <!-- TOTALI, PAGAMENTI E FISCALITÀ -->
+    <section class="card">
+      <div class="card-title">
+        <span>Quadro Economico e Condizioni</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Aliquota IVA</label>
+          <select id="tax-rate">
+            <option value="22">22% (Ordinaria)</option>
+            <option value="10">10% (Ristrutturazione / Recupero)</option>
+            <option value="4">4% (Prima Casa)</option>
+            <option value="0">0% (Inversione contabile / Esente)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Agevolazione Fiscale</label>
+          <input type="text" id="tax-bonus" placeholder="es. Bonus Casa 50% - Bonifico Parlante">
+        </div>
+        <div class="form-group full">
+          <label>Condizioni di Pagamento</label>
+          <input type="text" id="payment-terms" value="30% all'ordine come caparra confirmatoria, 40% a inizio posa, 30% a fine lavori collaudati.">
+        </div>
+        <div class="form-group full">
+          <label>Tempi Stimati di Consegna / Posa</label>
+          <input type="text" id="delivery-terms" value="Circa 6-8 settimane lavorative dall'avvenuto rilievo misure definitive.">
+        </div>
+        <div class="form-group full">
+          <label>Note e Conclusioni</label>
+          <textarea id="final-notes" placeholder="Eventuali annotazioni conclusive..."></textarea>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; padding: 14px; background: #e0f2fe; border-radius: 6px; font-size: 1.1rem; text-align: right;">
+        <div>Totale Imponibile Categorie: <strong id="lbl-subtotal">€ 0,00</strong></div>
+        <div style="font-size: 0.95rem; color: #475569; margin: 4px 0;">Totale IVA: <span id="lbl-tax">€ 0,00</span></div>
+        <div style="font-size: 1.35rem; color: var(--accent); margin-top: 6px;">Totale Complessivo: <strong id="lbl-total">€ 0,00</strong></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- STRUTTURA A4 PER GENERAZIONE STAMPA / PDF -->
+  <div id="print-root"></div>
+
+  <!-- Input file nascosto per caricamento manuale JSON -->
+  <input type="file" id="file-input" accept=".json" style="display: none;">
+
+  <script src="app.js"></script>
+</body>
+</html>
