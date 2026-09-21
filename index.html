@@ -106,13 +106,11 @@
         <span>Pagine Categoria (Seleziona, ordina e componi le schede)</span>
       </div>
       
-      <!-- Barra di aggiunta dinamica -->
       <div class="add-category-bar">
         <select id="select-category-type" style="flex-grow: 1; font-weight: 600;"></select>
         <button type="button" class="btn btn-primary" id="btn-add-category">+ Aggiungi Pagina Categoria</button>
       </div>
 
-      <!-- Elenco contenitore delle categorie con ordinamento -->
       <div id="categories-container" style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px;"></div>
     </section>
 
@@ -125,20 +123,38 @@
         <div class="form-group">
           <label>Aliquota IVA</label>
           <select id="tax-rate">
-            <option value="22">22% (Ordinaria)</option>
-            <option value="10">10% (Ristrutturazione / Recupero)</option>
-            <option value="4">4% (Prima Casa)</option>
-            <option value="0">0% (Inversione contabile / Esente)</option>
+            <option value="22">Iva ordinaria 22%</option>
+            <option value="mista">Iva mista 10% - 22%</option>
+            <option value="10">Iva agevolata 10%</option>
+            <option value="4">Iva agevolata 4%</option>
           </select>
         </div>
+
+        <div class="form-group" id="tax-mista-box" style="display: none;">
+          <label>Importo IVA Mista (€ manuale)</label>
+          <input type="number" step="0.01" min="0" id="tax-mista-amount" placeholder="Calcolo automatico beni sign.">
+        </div>
+
         <div class="form-group">
           <label>Agevolazione Fiscale</label>
-          <input type="text" id="tax-bonus" placeholder="es. Bonus Casa 50% - Bonifico Parlante">
+          <select id="tax-bonus">
+            <option value="nessuna">nessuna</option>
+            <option value="Eco Bonus">Eco Bonus</option>
+            <option value="Bonus Casa" selected>Bonus Casa</option>
+          </select>
         </div>
+
         <div class="form-group full">
           <label>Condizioni di Pagamento</label>
-          <input type="text" id="payment-terms" value="30% all'ordine come caparra confirmatoria, 40% a inizio posa, 30% a fine lavori collaudati.">
+          <select id="payment-terms-select">
+            <option value="da concordare">da concordare</option>
+            <option value="50% acconto all'ordine + 50% saldo a fine posa" selected>50% acconto all'ordine + 50% saldo a fine posa</option>
+            <option value="30% acconto all'ordine + 70% finanziato">30% acconto all'ordine + 70% finanziato</option>
+            <option value="custom">Altro (personalizzato)...</option>
+          </select>
+          <input type="text" id="payment-terms-custom" placeholder="Scrivi la condizione di pagamento personalizzata..." style="display: none; margin-top: 8px;">
         </div>
+
         <div class="form-group full">
           <label>Tempi Stimati di Consegna / Posa</label>
           <input type="text" id="delivery-terms" value="Circa 6-8 settimane lavorative dall'avvenuto rilievo misure definitive.">
@@ -162,7 +178,6 @@
   <!-- ========================================== -->
   <main class="container" id="view-settings" style="display: none;">
     
-    <!-- GESTIONE DATI AZIENDA & LOGO -->
     <section class="card">
       <div class="card-title">
         <span>Intestazione Aziendale & Logo</span>
@@ -183,23 +198,22 @@
         </div>
         <div class="form-group full">
           <label>Sede 1 (Indirizzo principale)</label>
-          <input type="text" id="set-company-address" placeholder="Via Treviso 5 - 31040 Signoressa di Trevignano TV">
+          <input type="text" id="set-company-address" placeholder="via Treviso, 5 - 31040 Signoressa di Trevignano (TV)">
         </div>
         <div class="form-group full">
-          <label>Sede 2 (Eventuale seconda sede / showroom)</label>
-          <input type="text" id="set-company-address2" placeholder="Via Feltrina 33 - 31038 Castagnole di Paese TV">
+          <label>Sede 2 (Seconda sede / showroom)</label>
+          <input type="text" id="set-company-address2" placeholder="via Feltrina, 33 - 31038 Castagnole di Paese (TV)">
         </div>
         <div class="form-group">
           <label>Recapiti Telefonici</label>
-          <input type="text" id="set-company-contacts" placeholder="Tel. 0423 670806; cel 389 8959622">
+          <input type="text" id="set-company-contacts" placeholder="Tel. 0423 670806">
         </div>
         <div class="form-group">
           <label>Indirizzi Email</label>
-          <input type="text" id="set-company-email" placeholder="info@3esseserramenti.com; preventivi.3esse@gmail.com">
+          <input type="text" id="set-company-email" placeholder="info@3esseserramenti.it \ preventivi.3esse@gmail.com">
         </div>
       </div>
 
-      <!-- SEZIONE LOGO AZIENDALE -->
       <div class="form-group full" style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border);">
         <label>Logo Aziendale (apposto in alto a sinistra su Pagina 1)</label>
         <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px; flex-wrap: wrap;">
@@ -221,7 +235,6 @@
       </div>
     </section>
 
-    <!-- GESTIONE CATALOGO: AGGIUNTA E MODIFICA MACRO-CATEGORIE -->
     <section class="card">
       <div class="card-title">
         <span>Gestione Macro-Categorie, Fornitori & Modelli</span>
@@ -230,16 +243,14 @@
         Puoi creare nuove macro-categorie su misura o gestire quelle esistenti. Clicca sulla macro-categoria per visualizzare i relativi fornitori e modelli.
       </p>
 
-      <!-- BARRA CREAZIONE NUOVA MACROCATEGORIA -->
       <div style="display: flex; gap: 10px; margin-bottom: 16px; background: #f8fafc; padding: 12px; border: 1px solid var(--border); border-radius: 6px;">
-        <input type="text" id="new-macro-cat-input" placeholder="Nome nuova macro-categoria (es. Pergole Bioclimatiche, Inferriate, Tende da sole...)" style="flex-grow: 1;">
+        <input type="text" id="new-macro-cat-input" placeholder="Nome nuova macro-categoria (es. Pergole Bioclimatiche, Inferriate...)" style="flex-grow: 1;">
         <button type="button" class="btn btn-primary" id="btn-add-macro-cat">+ Aggiungi Macro-categoria</button>
       </div>
 
       <div id="settings-categories-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
     </section>
 
-    <!-- BACKUP / SINCRONIZZAZIONE PCLOUD DELLE IMPOSTAZIONI -->
     <section class="card">
       <div class="card-title">
         <span>Condivisione Impostazioni & Logo con i Colleghi (pCloud)</span>
@@ -256,10 +267,7 @@
 
   </main>
 
-  <!-- STRUTTURA A4 PER GENERAZIONE STAMPA / PDF -->
   <div id="print-root"></div>
-
-  <!-- Input file nascosto per caricamento manuale JSON Preventivo -->
   <input type="file" id="file-input" accept=".json" style="display: none;">
 
   <script src="app.js"></script>
