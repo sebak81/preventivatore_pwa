@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v25'; // Versione aggiornata con Anteprima Markdown e Anteprima Documento
+const CACHE_NAME = 'prev-app-v26'; // Versione aggiornata con live preview dinamico in tempo reale
 const ASSETS = [
   './',
   './index.html',
