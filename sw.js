@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v23'; // Versione aggiornata per modifiche grafiche totali e testi legali
+const CACHE_NAME = 'prev-app-v24'; // Versione aggiornata per supporto Markdown e salvataggio condizioni JSON
 const ASSETS = [
   './',
   './index.html',
