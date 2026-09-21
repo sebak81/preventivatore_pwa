@@ -1,5 +1,5 @@
 // ==========================================================================
-// 1. ANAGRAFICA AZIENDALE E CATALOGO 3 ESSE
+// 1. ANAGRAFICA AZIENDALE, TESTI LEGALI E CATALOGO
 // ==========================================================================
 const DEFAULT_COMPANY = {
   name: "3 ESSE SERRAMENTI",
@@ -10,6 +10,15 @@ const DEFAULT_COMPANY = {
   contacts: "Tel. 0423 670806",
   email: "info@3esseserramenti.it \\ preventivi.3esse@gmail.com",
   logo: ""
+};
+
+const DEFAULT_LEGAL = {
+  terms: `1. Misure ed Esecuzione: Tutte le misure indicate in fase di offerta si intendono indicative; le misure definitive verranno rilevate a cura del nostro personale tecnico solo ad avvenuta accettazione dell'ordine e con controtelai/opere murarie ultimate.
+2. Tolleranze e Caratteristiche: I manufatti sono soggetti alle tolleranze dimensionali e cromatiche previste dalle vigenti norme UNI e dalle schede tecniche dei rispettivi produttori.
+3. Opere Murarie ed Elettriche: Salvo diverso accordo scritto, sono escluse dalla fornitura tutte le opere murarie, di finitura intonaco, tinteggiatura, collegamenti elettrici per motorizzazioni e lo smaltimento di materiali nocivi preesistenti.
+4. Consegna e Riservato Dominio: I manufatti forniti rimangono di esclusiva proprietà della ditta venditrice fino al completo e integrale saldo dell'importo pattuito ai sensi dell'art. 1523 c.c. Eventuali ritardi indipendenti dalla nostra volontà non daranno diritto a risarcimento o recesso.
+5. Foro Competente: Per ogni controversia derivante dall'interpretazione o esecuzione del presente accordo, il foro competente esclusivo sarà quello del luogo ove ha sede legale la ditta fornitrice.`,
+  privacy: `Ai sensi del Regolamento UE 2016/679, La informiamo che i Suoi dati personali anagrafici e fiscali vengono raccolti e trattati esclusivamente per finalità connesse alla gestione amministrativa, contabile, fiscale e operativa del presente preventivo/contratto di fornitura. Il conferimento dei dati è obbligatorio per l'adempimento degli obblighi legali e fiscali. I dati non saranno comunicati a terzi non autorizzati né diffusi.`
 };
 
 const DEFAULT_CATALOG = {
@@ -176,6 +185,7 @@ const DEFAULT_CATALOG = {
 // 2. GESTIONE STORAGE LOCALE
 // ==========================================================================
 let companySettings = loadCompanySettings();
+let legalSettings = loadLegalSettings();
 let catalogSettings = loadCatalogSettings();
 
 let openSettingsCategories = { "Serramenti": true };
@@ -186,6 +196,11 @@ function loadCompanySettings() {
   return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_COMPANY);
 }
 
+function loadLegalSettings() {
+  const saved = localStorage.getItem('prev_legal_settings');
+  return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_LEGAL);
+}
+
 function loadCatalogSettings() {
   const saved = localStorage.getItem('prev_catalog_settings');
   return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATALOG));
@@ -193,6 +208,7 @@ function loadCatalogSettings() {
 
 function persistSettings() {
   localStorage.setItem('prev_company_settings', JSON.stringify(companySettings));
+  localStorage.setItem('prev_legal_settings', JSON.stringify(legalSettings));
   localStorage.setItem('prev_catalog_settings', JSON.stringify(catalogSettings));
 }
 
@@ -200,7 +216,7 @@ function persistSettings() {
 // 3. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
-  type: "PREVENTIVO", // PREVENTIVO | REVISIONE | CONTRATTO
+  type: "PREVENTIVO",
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "15 giorni",
@@ -208,9 +224,9 @@ let docState = {
   sameSite: true,
   siteAddress: "",
   categories: [],
-  taxRate: "22", // "22" | "mista" | "10" | "4"
-  customTaxAmount: null, // usato per override manuale di IVA mista se desiderato
-  taxBonus: "Bonus Casa", // "nessuna" | "Eco Bonus" | "Bonus Casa"
+  taxRate: "22",
+  customTaxAmount: null,
+  taxBonus: "Bonus Casa",
   paymentTerms: "50% acconto all'ordine + 50% saldo a fine posa",
   deliveryTerms: "Circa 6-8 settimane lavorative dall'avvenuto rilievo misure definitive.",
   finalNotes: ""
@@ -296,7 +312,6 @@ function setupEventListeners() {
 
   safeOn('site-address', 'input', (e) => { docState.siteAddress = e.target.value; });
 
-  // GESTIONE ALIQUOTA IVA
   safeOn('tax-rate', 'change', (e) => {
     docState.taxRate = e.target.value;
     const mistaBox = document.getElementById('tax-mista-box');
@@ -315,12 +330,10 @@ function setupEventListeners() {
     updateCalculations();
   });
 
-  // GESTIONE AGEVOLAZIONE FISCALE
   safeOn('tax-bonus', 'change', (e) => {
     docState.taxBonus = e.target.value;
   });
 
-  // GESTIONE CONDIZIONI DI PAGAMENTO
   safeOn('payment-terms-select', 'change', (e) => {
     const customInput = document.getElementById('payment-terms-custom');
     if (e.target.value === 'custom') {
@@ -359,6 +372,30 @@ function setupEventListeners() {
   safeOn('btn-add-macro-cat', 'click', handleAddMacroCategory);
   safeOn('new-macro-cat-input', 'keypress', (e) => {
     if (e.key === 'Enter') handleAddMacroCategory();
+  });
+
+  // Toggle e reset editor testi legali in Impostazioni
+  safeOn('btn-toggle-terms', 'click', () => {
+    const p = document.getElementById('panel-edit-terms');
+    if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
+  });
+  safeOn('btn-toggle-privacy', 'click', () => {
+    const p = document.getElementById('panel-edit-privacy');
+    if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
+  });
+  safeOn('btn-reset-terms', 'click', () => {
+    if (confirm("Vuoi ripristinare il testo standard delle condizioni contrattuali?")) {
+      legalSettings.terms = DEFAULT_LEGAL.terms;
+      document.getElementById('set-legal-terms').value = legalSettings.terms;
+      persistSettings();
+    }
+  });
+  safeOn('btn-reset-privacy', 'click', () => {
+    if (confirm("Vuoi ripristinare il testo standard dell'informativa privacy?")) {
+      legalSettings.privacy = DEFAULT_LEGAL.privacy;
+      document.getElementById('set-legal-privacy').value = legalSettings.privacy;
+      persistSettings();
+    }
   });
 }
 
@@ -413,7 +450,7 @@ function populateCategorySelector() {
 }
 
 // ==========================================================================
-// 5. GESTIONE IMPOSTAZIONI: LOGO & CATALOGO
+// 5. GESTIONE IMPOSTAZIONI: LOGO, CATALOGO E TESTI LEGALI
 // ==========================================================================
 function initSettingsUI() {
   document.getElementById('set-company-name').value = companySettings.name || '';
@@ -431,6 +468,13 @@ function initSettingsUI() {
   const emailInput = document.getElementById('set-company-email');
   if (emailInput) companySettings.email = companySettings.email || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
   if (emailInput) emailInput.value = companySettings.email;
+
+  // Carica i testi legali nelle textarea
+  const termsArea = document.getElementById('set-legal-terms');
+  if (termsArea) termsArea.value = legalSettings.terms || DEFAULT_LEGAL.terms;
+
+  const privacyArea = document.getElementById('set-legal-privacy');
+  if (privacyArea) privacyArea.value = legalSettings.privacy || DEFAULT_LEGAL.privacy;
 
   updateLogoPreviewUI();
   renderSettingsCategoriesList();
@@ -735,13 +779,21 @@ function saveSettingsFromUI() {
   const emailInput = document.getElementById('set-company-email');
   if (emailInput) companySettings.email = emailInput.value.trim();
 
+  // Salva anche i testi legali
+  const termsArea = document.getElementById('set-legal-terms');
+  if (termsArea) legalSettings.terms = termsArea.value;
+
+  const privacyArea = document.getElementById('set-legal-privacy');
+  if (privacyArea) legalSettings.privacy = privacyArea.value;
+
   persistSettings();
-  alert("Tutte le impostazioni aziendali, logo e cataloghi sono stati salvati correttamente!");
+  alert("Tutte le impostazioni aziendali, testi legali e cataloghi sono stati salvati correttamente!");
 }
 
 function exportSettingsJSON() {
   const exportData = {
     company: companySettings,
+    legal: legalSettings,
     catalog: catalogSettings,
     exportedAt: new Date().toISOString()
   };
@@ -762,12 +814,13 @@ function importSettingsJSON(e) {
     try {
       const data = JSON.parse(event.target.result);
       if (data.company) companySettings = data.company;
+      if (data.legal) legalSettings = data.legal;
       if (data.catalog) catalogSettings = data.catalog;
       persistSettings();
       initSettingsUI();
       populateCategorySelector();
       renderCategoriesUI();
-      alert("Configurazione aziendale (incluso il logo) importata con successo!");
+      alert("Configurazione aziendale importata con successo!");
     } catch (err) {
       alert("File non valido: " + err.message);
     }
@@ -1155,7 +1208,6 @@ function calculateCategoryTotals(cat) {
   return { fornitura, posa, total: fornitura + posa };
 }
 
-// CALCOLO TOTALI ED IVA (INCLUSA IVA MISTA BENI SIGNIFICATIVI)
 function updateCalculations() {
   let grandFornitura = 0;
   let grandPosa = 0;
@@ -1172,7 +1224,6 @@ function updateCalculations() {
 
   if (docState.taxRate === 'mista') {
     taxLabel = "Iva mista 10% - 22%";
-    // Regola beni significativi: posa a 10%, fornitura pari alla posa a 10%, eccedenza a 22%
     const quotaPosa = grandPosa;
     const quotaFornitura10 = Math.min(grandFornitura, grandPosa);
     const quotaFornitura22 = Math.max(0, grandFornitura - grandPosa);
@@ -1286,7 +1337,6 @@ function openFromFile(e) {
 
       document.getElementById('site-address').value = docState.siteAddress || '';
       
-      // Ripristino Aliquota IVA
       const taxRateEl = document.getElementById('tax-rate');
       if (taxRateEl) {
         taxRateEl.value = docState.taxRate || "22";
@@ -1296,13 +1346,9 @@ function openFromFile(e) {
       const mistaInput = document.getElementById('tax-mista-amount');
       if (mistaInput) mistaInput.value = docState.customTaxAmount ? docState.customTaxAmount : '';
 
-      // Ripristino Agevolazione Fiscale
       const taxBonusEl = document.getElementById('tax-bonus');
-      if (taxBonusEl) {
-        taxBonusEl.value = docState.taxBonus || "Bonus Casa";
-      }
+      if (taxBonusEl) taxBonusEl.value = docState.taxBonus || "Bonus Casa";
 
-      // Ripristino Condizioni di Pagamento
       const paySelect = document.getElementById('payment-terms-select');
       const payCustom = document.getElementById('payment-terms-custom');
       const standardTerms = [
@@ -1436,9 +1482,9 @@ function prepareAndPrint() {
     validityText = `validità offerta ${validityText}`;
   }
 
-  // Se l'agevolazione è 'nessuna', in stampa compare solo '-'
   const bonusPrint = (!docState.taxBonus || docState.taxBonus.toLowerCase() === 'nessuna') ? '-' : escapeHtml(docState.taxBonus);
 
+  // Stringhe del piè di pagina a due righe esatte
   const sede1 = companySettings.address || "via Treviso, 5 - 31040 Signoressa di Trevignano (TV)";
   const sede2 = companySettings.address2 || "via Feltrina, 33 - 31038 Castagnole di Paese (TV)";
   const telInfo = companySettings.contacts || "Tel. 0423 670806";
@@ -1487,6 +1533,7 @@ function prepareAndPrint() {
       ` : ''}
     </div>
 
+    <!-- 5. PIÈ DI PAGINA CENTRATO SU 2 RIGHE ESATTE -->
     <div class="p1-footer-center">
       <div>Sedi: &nbsp;${escapeHtml(sede1)} &nbsp;|&nbsp; ${escapeHtml(sede2)}</div>
       <div>${escapeHtml(telInfo)} &nbsp;|&nbsp; E-Mail: ${escapeHtml(emailInfo)}</div>
@@ -1621,7 +1668,7 @@ function prepareAndPrint() {
     printRoot.appendChild(pageCat);
   });
 
-  // PAGINA TOTALI & FIRMA
+  // PAGINA TOTALI & FIRMA (CON RETTIFICHE GRAFICHE)
   const pageTotalsNum = docState.categories.length + 2;
   const pageTotals = document.createElement('div');
   pageTotals.className = "sheet";
@@ -1662,19 +1709,21 @@ function prepareAndPrint() {
         </thead>
         <tbody>
           ${catSummaryRows || '<tr><td colspan="4">Nessuna categoria inserita</td></tr>'}
-          <tr style="background-color: #f9f9f9; font-size: 1rem;">
+          <!-- Riga Totale Netto proporzionata -->
+          <tr style="background-color: #f9f9f9; font-size: 0.95rem;">
             <td><strong>TOTALE NETTO FORNITURA & POSA</strong></td>
-            <td class="text-right"><strong>${formatCurrency(grandFornitura)}</strong></td>
-            <td class="text-right"><strong>${formatCurrency(grandPosa)}</strong></td>
-            <td class="text-right" style="font-size: 1.1rem; color: #000;"><strong>${formatCurrency(subtotal)}</strong></td>
+            <td class="text-right">${formatCurrency(grandFornitura)}</td>
+            <td class="text-right">${formatCurrency(grandPosa)}</td>
+            <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
           </tr>
           <tr>
             <td colspan="3">${escapeHtml(taxLabel)}</td>
             <td class="text-right">${formatCurrency(tax)}</td>
           </tr>
-          <tr style="background-color: #eee; font-size: 1.25rem;">
-            <td colspan="3"><strong>TOTALE COMPLESSIVO (IVA Inclusa)</strong></td>
-            <td class="text-right"><strong>${formatCurrency(total)}</strong></td>
+          <!-- Riga Totale Complessivo a caratteri maggiorati e altezza maggiore -->
+          <tr style="background-color: #eee; font-size: 1.3rem;">
+            <td colspan="3" style="padding: 12px 10px;"><strong>TOTALE COMPLESSIVO (IVA Inclusa)</strong></td>
+            <td class="text-right" style="padding: 12px 10px; font-weight: 900; font-size: 1.35rem;">${formatCurrency(total)}</td>
           </tr>
         </tbody>
       </table>
@@ -1687,18 +1736,15 @@ function prepareAndPrint() {
         ${docState.finalNotes ? `<div style="margin-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
       </div>
 
+      <!-- Spazio firma committente distaccato e a destra -->
       <div class="p-signature-area">
-        <div class="p-sign-box">
-          Timbro e Firma della Ditta<br><br><br>
-          ________________________________________
-        </div>
-        <div class="p-sign-box">
+        <div class="p-sign-box" style="width: 320px;">
           Firma per Accettazione del Committente<br><br><br>
           ________________________________________
         </div>
       </div>
 
-      <div style="font-size: 0.75rem; color: #555; margin-top: 20px; text-align: center;">
+      <div style="font-size: 0.75rem; color: #555; margin-top: 25px; text-align: center;">
         ${isContract 
           ? "La sottoscrizione costituisce formale stipula del contratto d'appalto/fornitura ai sensi dell'art. 1326 c.c." 
           : "Il presente preventivo ha mero valore di proposta economica ed è vincolato all'accettazione entro i termini di validità indicati."}
@@ -1712,7 +1758,7 @@ function prepareAndPrint() {
   `;
   printRoot.appendChild(pageTotals);
 
-  // ULTIMA PAGINA: NORMATIVA & PRIVACY
+  // ULTIMA PAGINA: NORMATIVA & PRIVACY (DINAMICHE DALLE IMPOSTAZIONI)
   const pageLegal = document.createElement('div');
   pageLegal.className = "sheet";
   pageLegal.innerHTML = `
@@ -1726,25 +1772,16 @@ function prepareAndPrint() {
 
       <div class="p-box">
         <div class="p-box-title">Condizioni Generali di Fornitura e Posa</div>
-        <div class="legal-text">
-          <strong>1. Misure ed Esecuzione:</strong> Tutte le misure indicate in fase di offerta si intendono indicative; le misure definitive verranno rilevate a cura del nostro personale tecnico solo ad avvenuta accettazione dell'ordine e con controtelai/opere murarie ultimate.<br>
-          <strong>2. Tolleranze e Caratteristiche:</strong> I manufatti sono soggetti alle tolleranze dimensionali e cromatiche previste dalle vigenti norme UNI e dalle schede tecniche dei rispettivi produttori.<br>
-          <strong>3. Opere Murarie ed Elettriche:</strong> Salvo diverso accordo scritto, sono escluse dalla fornitura tutte le opere murarie, di finitura intonaco, tinteggiatura, collegamenti elettrici per motorizzazioni e lo smaltimento di materiali nocivi preesistenti.<br>
-          <strong>4. Consegna e Riservato Dominio:</strong> I manufatti forniti rimangono di esclusiva proprietà della ditta venditrice fino al completo e integrale saldo dell'importo pattuito ai sensi dell'art. 1523 c.c.<br>
-          <strong>5. Foro Competente:</strong> Per ogni controversia derivante dall'interpretazione o esecuzione del presente accordo, il foro competente esclusivo sarà quello del luogo ove ha sede legale la ditta fornitrice.
-        </div>
+        <div class="legal-text">${escapeHtml(legalSettings.terms || DEFAULT_LEGAL.terms)}</div>
       </div>
 
       <div class="p-box" style="margin-top: 20px;">
         <div class="p-box-title">Informativa sul Trattamento dei Dati Personali (GDPR 2016/679)</div>
-        <div class="legal-text">
-          Ai sensi del Regolamento UE 2016/679, La informiamo che i Suoi dati personali anagrafici e fiscali vengono raccolti e trattati esclusivamente per finalità connesse alla gestione amministrativa, contabile, fiscale e operativa del presente preventivo/contratto di fornitura. Il conferimento dei dati è obbligatorio per l'adempimento degli obblighi legali e fiscali.
-        </div>
+        <div class="legal-text">${escapeHtml(legalSettings.privacy || DEFAULT_LEGAL.privacy)}</div>
       </div>
 
-      <div class="p-signature-area" style="margin-top: 40px;">
-        <div></div>
-        <div class="p-sign-box">
+      <div class="p-signature-area" style="margin-top: 45px;">
+        <div class="p-sign-box" style="width: 340px;">
           Firma per espressa approvazione clausole e Privacy<br><br><br>
           ________________________________________
         </div>
