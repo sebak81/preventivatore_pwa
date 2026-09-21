@@ -1,12 +1,14 @@
 // ==========================================================================
-// 1. CONFIGURAZIONE E CATALOGO DI DEFAULT A 3 LIVELLI
-//    Macro-categoria -> Fornitore -> Modello -> Dati Tecnici & Descrizione
+// 1. ANAGRAFICA AZIENDALE E CATALOGO 3 ESSE
 // ==========================================================================
 const DEFAULT_COMPANY = {
-  name: "NOME AZIENDA / SERRAMENTI",
-  address: "Via delle Industrie, 12 - 00100 Roma (RM)",
-  taxId: "P.IVA / C.F.: 01234567890",
-  contacts: "Tel: 06 1234567 | Cell: 340 0000000 | Email: info@azienda.it",
+  name: "3 ESSE SERRAMENTI",
+  city: "Trevignano",
+  address: "Via Treviso 5 - 31040 Signoressa di Trevignano TV",
+  address2: "Via Feltrina 33 - 31038 Castagnole di Paese TV",
+  taxId: "",
+  contacts: "Tel. 0423 670806; cel 389 8959622",
+  email: "info@3esseserramenti.com; preventivi.3esse@gmail.com; tecnico.3esse@gmail.com",
   logo: ""
 };
 
@@ -213,37 +215,30 @@ let docState = {
   finalNotes: ""
 };
 
-// Suffissi Documento: Preventivo -> _P | Revisione -> _Rev. | Contratto -> _C
 function getFormattedDocNumber() {
   const raw = (docState.number || "").trim();
   if (!raw) return "BOZZA";
-
-  let suffix = "_P";
-  if (docState.type === "REVISIONE" || docState.type.includes("REVISIONE")) {
-    suffix = "_Rev.";
-  } else if (docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO")) {
-    suffix = "_C";
-  }
-
-  const clean = raw.replace(/(_P|_Rev\.|_C)$/i, '');
-  return `${clean}${suffix}`;
+  return raw;
 }
 
 function updateDocNumberPreview() {
   const previewEl = document.getElementById('doc-number-preview');
   if (previewEl) {
     const formatted = getFormattedDocNumber();
-    previewEl.textContent = (docState.number && docState.number.trim()) ? `(Codice: ${formatted})` : '';
+    previewEl.textContent = (docState.number && docState.number.trim()) ? `(N°: ${formatted})` : '';
   }
 }
 
-function formatItalianDate(isoDate) {
+// Formatta la data in formato esteso italiano (es. 28 marzo 2026)
+function formatLongItalianDate(isoDate) {
   if (!isoDate) return "";
-  const parts = isoDate.split('-');
-  if (parts.length === 3) {
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  try {
+    const d = new Date(isoDate + "T00:00:00");
+    if (isNaN(d.getTime())) return isoDate;
+    return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch (e) {
+    return isoDate;
   }
-  return isoDate;
 }
 
 // ==========================================================================
@@ -391,6 +386,15 @@ function initSettingsUI() {
   document.getElementById('set-company-address').value = companySettings.address || '';
   document.getElementById('set-company-taxid').value = companySettings.taxId || '';
   document.getElementById('set-company-contacts').value = companySettings.contacts || '';
+
+  const cityInput = document.getElementById('set-company-city');
+  if (cityInput) cityInput.value = companySettings.city || 'Trevignano';
+
+  const addr2Input = document.getElementById('set-company-address2');
+  if (addr2Input) addr2Input.value = companySettings.address2 || '';
+
+  const emailInput = document.getElementById('set-company-email');
+  if (emailInput) emailInput.value = companySettings.email || '';
 
   updateLogoPreviewUI();
   renderSettingsCategoriesList();
@@ -564,7 +568,7 @@ function renderSettingsCategoriesList() {
                 <div class="settings-supplier-body">
                   <div class="form-group" style="max-width: 320px; margin-bottom: 12px;">
                     <label>Rinomina Fornitore</label>
-                    <input type="text" value="${escapeHtml(supp.name)}" oninput="updateSupplierName('${escapeHtml(catName)}', ${sIdx}, this.value)">
+                    <input type="text" value="${escapeHtml(supp.name)}" oninput="updateSupplierName('${escapeHtml(catName)}',${sIdx}, this.value)">
                   </div>
                   <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
                     Elenco Modelli di ${escapeHtml(supp.name)}:
@@ -685,6 +689,15 @@ function saveSettingsFromUI() {
   companySettings.address = document.getElementById('set-company-address').value;
   companySettings.taxId = document.getElementById('set-company-taxid').value;
   companySettings.contacts = document.getElementById('set-company-contacts').value;
+
+  const cityInput = document.getElementById('set-company-city');
+  if (cityInput) companySettings.city = cityInput.value.trim() || 'Trevignano';
+
+  const addr2Input = document.getElementById('set-company-address2');
+  if (addr2Input) companySettings.address2 = addr2Input.value.trim();
+
+  const emailInput = document.getElementById('set-company-email');
+  if (emailInput) companySettings.email = emailInput.value.trim();
 
   persistSettings();
   alert("Tutte le impostazioni aziendali, logo e cataloghi sono stati salvati correttamente!");
@@ -1251,8 +1264,7 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
-//    - Pagina 1: Layout a blocco unitario con Data a sinistra e Numero a destra
-//    - Validità offerta nascosta in automatico se Tipo Documento = CONTRATTO
+//    - Pagina 1: Modello identico all'immagine reale
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1271,8 +1283,18 @@ function prepareAndPrint() {
   const tax = subtotal * (docState.taxRate / 100);
   const total = subtotal + tax;
   const isContract = docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO");
+  const isRevision = docState.type === "REVISIONE" || docState.type.includes("REVISIONE");
   const formattedDocNum = getFormattedDocNumber();
-  const formattedDate = formatItalianDate(docState.date);
+
+  // Città e Data in formato esteso italiano (es. Trevignano, lì 28 marzo 2026)
+  const city = (companySettings.city || "Trevignano").trim();
+  const dateFormattedLong = formatLongItalianDate(docState.date);
+  const cityDateText = city ? `${city}, lì &nbsp; ${dateFormattedLong}` : dateFormattedLong;
+
+  // Etichetta del box documento (Offerta n. / Contratto n. / Revisione n.)
+  let boxLabel = "Offerta n.";
+  if (isContract) boxLabel = "Contratto n.";
+  else if (isRevision) boxLabel = "Revisione n.";
 
   const totalPages = docState.categories.length + 3;
 
@@ -1281,61 +1303,59 @@ function prepareAndPrint() {
     validityText = `validità offerta ${validityText}`;
   }
 
-  // PAGINA 1: NUOVA TESTATA UNITARIA CON DATA A SINISTRA E NUMERO A DESTRA
+  // PAGINA 1: MODELLO FEDELE AL CAMPIONE REALE
   const page1 = document.createElement('div');
   page1.className = "sheet p1-sheet";
   page1.innerHTML = `
-    <!-- BLOCCO SUPERIORE UNITARIO (In-flow naturale in cima al foglio) -->
-    <div class="p1-top-container">
-      <div class="p1-header-brand">
-        ${companySettings.logo ? `
-          <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo Aziendale">
-        ` : `
-          <div class="p-company">
-            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div>${escapeHtml(companySettings.address)}</div>
-            ${companySettings.taxId ? `<div>${escapeHtml(companySettings.taxId)}</div>` : ''}
-            <div>${escapeHtml(companySettings.contacts)}</div>
-          </div>
-        `}
-      </div>
-
-      <div class="p1-sub-header">
-        <div class="p1-doc-date"><strong>Data:</strong> ${escapeHtml(formattedDate)}</div>
-        <div class="p1-doc-number-box">
-          <strong>Numero:</strong> ${escapeHtml(formattedDocNum)}
-        </div>
-      </div>
+    <!-- 1. LOGO / NOME IN ALTO A SINISTRA (SENZA LINEA NERA SOTTO) -->
+    <div class="p1-header-logo">
+      ${companySettings.logo ? `
+        <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">
+      ` : `
+        <div class="p1-company-fallback">${escapeHtml(companySettings.name || '3 ESSE SERRAMENTI')}</div>
+      `}
     </div>
 
-    <!-- DATI CONTATTO CLIENTE: CENTRATI A METÀ PAGINA SENZA BORDO -->
-    <div class="p1-client-center">
-      <div class="p1-client-name">Sig. ${escapeHtml(docState.client.name) || '____________________'}</div>
-      <div class="p1-client-address">via ${escapeHtml(docState.client.residence) || '____________________'}</div>
-      ${docState.client.taxId ? `<div class="p1-client-tax">C.F. / P.IVA: ${escapeHtml(docState.client.taxId)}</div>` : ''}
-      ${docState.client.phone ? `<div class="p1-client-line"><strong>tel:</strong> ${escapeHtml(docState.client.phone)}</div>` : ''}
-      ${docState.client.email ? `<div class="p1-client-line"><strong>e mail:</strong> ${escapeHtml(docState.client.email)}</div>` : ''}
+    <!-- 2. RIGA: DATA A SINISTRA E BOX OFFERTA A DESTRA -->
+    <div class="p1-date-doc-row">
+      <div class="p1-date-left">${cityDateText}</div>
+      <table class="p1-box-offerta">
+        <tr>
+          <td class="p1-box-label">${boxLabel}</td>
+          <td class="p1-box-number">${escapeHtml(formattedDocNum)}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 3. CORPO CENTRALE: DATI CLIENTE E CANTIERE CENTRATI -->
+    <div class="p1-middle-section">
+      <div class="p1-client-name">${escapeHtml(docState.client.name) || 'CLIENTE'}</div>
+      <div class="p1-client-address">${escapeHtml(docState.client.residence) || ''}</div>
+      ${docState.client.phone ? `<div class="p1-client-line">tel: ${escapeHtml(docState.client.phone)}</div>` : ''}
+      <div class="p1-client-line">e mail: ${escapeHtml(docState.client.email || '')}</div>
+
       ${(!docState.sameSite && docState.siteAddress) ? `
-        <div class="p1-site-info"><strong>Cantiere sito in:</strong> ${escapeHtml(docState.siteAddress)}</div>
+        <div class="p1-site-block">
+          <div class="p1-site-title">Cantiere sito in:</div>
+          <div class="p1-site-address">${escapeHtml(docState.siteAddress)}</div>
+        </div>
       ` : ''}
     </div>
 
-    <!-- TITOLO E VALIDITÀ: A CIRCA 3/4 DI ALTEZZA (Senza validità se Contratto) -->
-    <div class="p1-title-bottom">
-      <div class="p1-main-title">${escapeHtml(docState.type)}</div>
+    <!-- 4. TITOLO E VALIDITÀ A 3/4 ALTEZZA -->
+    <div class="p1-title-section">
+      <div class="p1-doc-title">${escapeHtml(docState.type)}</div>
       ${!isContract && validityText ? `
         <div class="p1-validity-text">${escapeHtml(validityText)}</div>
       ` : ''}
     </div>
 
-    <!-- PIÈ DI PAGINA: DATI DITTA A SINISTRA E PAGINA 1 DI X A DESTRA -->
-    <div class="p1-footer">
-      <div class="p1-footer-company">
-        <div class="p1-footer-title">${escapeHtml(companySettings.name)}</div>
-        <div>${escapeHtml(companySettings.address)}</div>
-        <div>${escapeHtml(companySettings.contacts)}</div>
-      </div>
-      <div class="p1-footer-page">Pagina 1 di ${totalPages}</div>
+    <!-- 5. PIÈ DI PAGINA CENTRATO A 4 RIGHE -->
+    <div class="p1-footer-center">
+      <div>${escapeHtml(companySettings.name || '3 ESSE srl')} – ${escapeHtml(companySettings.address || 'Via Treviso 5 – 31040 Signoressa di Trevignano TV')}</div>
+      ${companySettings.address2 ? `<div>${escapeHtml(companySettings.address2)}</div>` : '<div>Via Feltrina 33 – 31038 Castagnole di Paese TV</div>'}
+      <div>${escapeHtml(companySettings.contacts || 'Tel. 0423 670806; cel 389 8959622')}</div>
+      <div>${escapeHtml(companySettings.email ? 'eMail: ' + companySettings.email : 'eMail: info@3esseserramenti.com; preventivi.3esse@gmail.com; tecnico.3esse@gmail.com')}</div>
     </div>
   `;
   printRoot.appendChild(page1);
