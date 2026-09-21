@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v24'; // Versione aggiornata per supporto Markdown e salvataggio condizioni JSON
+const CACHE_NAME = 'prev-app-v25'; // Versione aggiornata con Anteprima Markdown e Anteprima Documento
 const ASSETS = [
   './',
   './index.html',
