@@ -4,11 +4,11 @@
 const DEFAULT_COMPANY = {
   name: "3 ESSE SERRAMENTI",
   city: "Trevignano",
-  address: "Via Treviso 5 - 31040 Signoressa di Trevignano TV",
-  address2: "Via Feltrina 33 - 31038 Castagnole di Paese TV",
+  address: "via Treviso, 5 - 31040 Signoressa di Trevignano (TV)",
+  address2: "via Feltrina, 33 - 31038 Castagnole di Paese (TV)",
   taxId: "",
-  contacts: "Tel. 0423 670806; cel 389 8959622",
-  email: "info@3esseserramenti.com; preventivi.3esse@gmail.com; tecnico.3esse@gmail.com",
+  contacts: "Tel. 0423 670806",
+  email: "info@3esseserramenti.it \\ preventivi.3esse@gmail.com",
   logo: ""
 };
 
@@ -1265,6 +1265,7 @@ function resetDocument() {
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
 //    - Pagina 1: Modello identico all'immagine reale
+//    - Piè di pagina a due righe: Sedi (riga 1) e Tel/Email (riga 2)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1302,6 +1303,12 @@ function prepareAndPrint() {
   if (validityText && !validityText.toLowerCase().includes("validit")) {
     validityText = `validità offerta ${validityText}`;
   }
+
+  // Stringhe del piè di pagina Pagina 1
+  const sede1 = companySettings.address || "via Treviso, 5 - 31040 Signoressa di Trevignano (TV)";
+  const sede2 = companySettings.address2 || "via Feltrina, 33 - 31038 Castagnole di Paese (TV)";
+  const telInfo = companySettings.contacts || "Tel. 0423 670806";
+  const emailInfo = companySettings.email || "info@3esseserramenti.it \\ preventivi.3esse@gmail.com";
 
   // PAGINA 1: MODELLO FEDELE AL CAMPIONE REALE
   const page1 = document.createElement('div');
@@ -1350,12 +1357,10 @@ function prepareAndPrint() {
       ` : ''}
     </div>
 
-    <!-- 5. PIÈ DI PAGINA CENTRATO A 4 RIGHE -->
+    <!-- 5. PIÈ DI PAGINA CENTRATO SU 2 RIGHE ESATTE -->
     <div class="p1-footer-center">
-      <div>${escapeHtml(companySettings.name || '3 ESSE srl')} – ${escapeHtml(companySettings.address || 'Via Treviso 5 – 31040 Signoressa di Trevignano TV')}</div>
-      ${companySettings.address2 ? `<div>${escapeHtml(companySettings.address2)}</div>` : '<div>Via Feltrina 33 – 31038 Castagnole di Paese TV</div>'}
-      <div>${escapeHtml(companySettings.contacts || 'Tel. 0423 670806; cel 389 8959622')}</div>
-      <div>${escapeHtml(companySettings.email ? 'eMail: ' + companySettings.email : 'eMail: info@3esseserramenti.com; preventivi.3esse@gmail.com; tecnico.3esse@gmail.com')}</div>
+      <div>Sedi: &nbsp;${escapeHtml(sede1)} &nbsp;|&nbsp; ${escapeHtml(sede2)}</div>
+      <div>${escapeHtml(telInfo)} &nbsp;|&nbsp; E-Mail: ${escapeHtml(emailInfo)}</div>
     </div>
   `;
   printRoot.appendChild(page1);
