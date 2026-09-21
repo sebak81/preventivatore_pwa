@@ -13,6 +13,7 @@
   <header class="top-bar">
     <div style="display: flex; align-items: center; gap: 15px;">
       <h1 id="app-title">Preventivatore</h1>
+      <!-- Selettore Viste: Preventivo vs Impostazioni -->
       <nav class="nav-tabs">
         <button type="button" class="tab-btn active" id="tab-editor-btn">📝 Preventivo</button>
         <button type="button" class="tab-btn" id="tab-settings-btn">⚙️ Impostazioni</button>
@@ -234,13 +235,13 @@
       </div>
     </section>
 
-    <!-- SEZIONE TESTI LEGALI (CONDIZIONI CONTRATTUALI E PRIVACY) -->
+    <!-- SEZIONE TESTI LEGALI CON SUPPORTO MARKDOWN E SALVATAGGIO JSON DEDICATO -->
     <section class="card">
       <div class="card-title">
         <span>Testi Legali & Normativi (Condizioni e Privacy)</span>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
-        Clicca sui pulsanti sottostanti per visualizzare e modificare le clausole contrattuali e l'informativa GDPR stampate nelle pagine finali.
+        Personalizza le clausole contrattuali (con supporto Markdown completo ed esportazione su file .json dedicato) e l'informativa GDPR.
       </p>
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;">
@@ -248,13 +249,32 @@
         <button type="button" class="btn btn-secondary" id="btn-toggle-privacy">🔒 Modifica Informativa Privacy</button>
       </div>
 
-      <!-- Editor Condizioni Contrattuali -->
+      <!-- Editor Condizioni Contrattuali con Guida Markdown -->
       <div id="panel-edit-terms" style="display: none; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin-bottom: 14px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <label style="color: var(--primary); font-weight: 700; margin: 0; font-size: 0.85rem;">Testo Condizioni Contrattuali di Fornitura e Posa</label>
-          <button type="button" class="btn btn-sm btn-secondary" id="btn-reset-terms">Ripristina Predefinito</button>
+        
+        <!-- Box Guida Markdown -->
+        <div class="markdown-helper-box">
+          <div style="font-weight: 700; margin-bottom: 6px; color: var(--primary);">Supporto Markdown completo:</div>
+          <ul class="md-helper-list">
+            <li>Titoli di sezione con <code>## Titolo</code> o <code>### Titolo</code></li>
+            <li>Grassetto con <code>**testo**</code></li>
+            <li>Corsivo con <code>*testo*</code></li>
+            <li>Sottolineato con <code>__testo__</code></li>
+            <li>Elenchi puntati con <code>- elemento</code> oppure <code>* elemento</code></li>
+            <li>Elenchi numerati con <code>1. elemento</code></li>
+          </ul>
         </div>
-        <textarea id="set-legal-terms" style="min-height: 180px; font-size: 0.85rem; line-height: 1.5;"></textarea>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+          <label style="color: var(--primary); font-weight: 700; margin: 0; font-size: 0.85rem;">Testo Condizioni Contrattuali (Markdown)</label>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn btn-sm btn-primary" id="btn-export-terms-json">💾 Salva File (.json)</button>
+            <button type="button" class="btn btn-sm btn-secondary" id="btn-import-terms-json">📂 Carica File (.json)</button>
+            <button type="button" class="btn btn-sm btn-secondary" id="btn-reset-terms">Ripristina Predefinito</button>
+            <input type="file" id="terms-file-input" accept=".json" style="display: none;">
+          </div>
+        </div>
+        <textarea id="set-legal-terms" style="min-height: 220px; font-family: monospace; font-size: 0.88rem; line-height: 1.5;"></textarea>
       </div>
 
       <!-- Editor Privacy -->
@@ -284,17 +304,17 @@
       <div id="settings-categories-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
     </section>
 
-    <!-- BACKUP / SINCRONIZZAZIONE PCLOUD DELLE IMPOSTAZIONI -->
+    <!-- BACKUP / SINCRONIZZAZIONE PCLOUD DELLE IMPOSTAZIONI GENERALI -->
     <section class="card">
       <div class="card-title">
-        <span>Condivisione Impostazioni & Logo con i Colleghi (pCloud)</span>
+        <span>Condivisione Generale Impostazioni & Logo con i Colleghi (pCloud)</span>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-        Puoi esportare l'intera configurazione (inclusi testi legali personalizzati) in un file da salvare nella cartella condivisa di pCloud.
+        Esporta l'intera configurazione (dati azienda, logo, macro-categorie, fornitori e condizioni) in un archivio unico per tutti i PC aziendali.
       </p>
       <div class="btn-group">
-        <button type="button" class="btn btn-primary" id="btn-export-settings">Esporta Impostazioni (.json)</button>
-        <button type="button" class="btn btn-secondary" id="btn-import-settings">Importa Impostazioni (.json)</button>
+        <button type="button" class="btn btn-primary" id="btn-export-settings">Esporta Tutte le Impostazioni (.json)</button>
+        <button type="button" class="btn btn-secondary" id="btn-import-settings">Importa Tutte le Impostazioni (.json)</button>
         <input type="file" id="settings-file-input" accept=".json" style="display: none;">
       </div>
     </section>
