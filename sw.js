@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v21'; // Versione aggiornata per il nuovo piè di pagina a due righe
+const CACHE_NAME = 'prev-app-v22'; // Versione aggiornata per Quadro Economico e Condizioni
 const ASSETS = [
   './',
   './index.html',
