@@ -190,23 +190,13 @@ function parseMarkdown(md) {
   if (!md) return "";
   let text = String(md).replace(/\r\n/g, '\n');
   
-  // Sanitizzazione preliminare
   text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-  // Titoli
   text = text.replace(/^### (.*$)/gim, '<h4 class="md-h3">$1</h4>');
   text = text.replace(/^## (.*$)/gim, '<h3 class="md-h2">$1</h3>');
-
-  // Sottolineato (__testo__)
   text = text.replace(/__(.*?)__/g, '<u>$1</u>');
-
-  // Grassetto (**testo**)
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-  // Corsivo (*testo*)
   text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
 
-  // Parsing elenchi puntati e numerati riga per riga
   const lines = text.split('\n');
   let inUl = false;
   let inOl = false;
@@ -420,6 +410,14 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
+  // Pulsanti Anteprima
+  safeOn('btn-preview-doc', 'click', openDocumentPreview);
+  safeOn('btn-modal-close', 'click', closeDocumentPreview);
+  safeOn('btn-modal-print', 'click', () => {
+    closeDocumentPreview();
+    prepareAndPrint();
+  });
+
   // Impostazioni, Logo e Macro-Categorie
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
@@ -444,10 +442,15 @@ function setupEventListeners() {
     const p = document.getElementById('panel-edit-privacy');
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
   });
+  safeOn('btn-preview-terms', 'click', toggleTermsMarkdownPreview);
   safeOn('btn-reset-terms', 'click', () => {
     if (confirm("Vuoi ripristinare il testo standard delle condizioni contrattuali?")) {
       legalSettings.terms = DEFAULT_LEGAL.terms;
       document.getElementById('set-legal-terms').value = legalSettings.terms;
+      const prev = document.getElementById('terms-markdown-preview');
+      if (prev && prev.style.display !== 'none') {
+        prev.innerHTML = parseMarkdown(legalSettings.terms);
+      }
       persistSettings();
     }
   });
@@ -459,7 +462,6 @@ function setupEventListeners() {
     }
   });
 
-  // Esportazione / Importazione file .json dedicato per Condizioni Contrattuali
   safeOn('btn-export-terms-json', 'click', exportTermsJSON);
   safeOn('btn-import-terms-json', 'click', () => document.getElementById('terms-file-input').click());
   safeOn('terms-file-input', 'change', importTermsJSON);
@@ -590,7 +592,24 @@ function handleLogoRemove() {
   }
 }
 
-// Salvataggio / Caricamento dedicato file JSON per Condizioni Contrattuali
+// Toggle anteprima live Markdown per le Condizioni Contrattuali
+function toggleTermsMarkdownPreview() {
+  const area = document.getElementById('set-legal-terms');
+  const prev = document.getElementById('terms-markdown-preview');
+  const btn = document.getElementById('btn-preview-terms');
+  if (!prev || !area) return;
+
+  if (prev.style.display === 'none') {
+    prev.innerHTML = parseMarkdown(area.value);
+    prev.style.display = 'block';
+    if (btn) btn.textContent = '✏️ Chiudi Anteprima';
+  } else {
+    prev.style.display = 'none';
+    if (btn) btn.textContent = '👁️ Anteprima Markdown';
+  }
+}
+
+// Esportazione / Importazione file .json dedicato
 function exportTermsJSON() {
   const textToSave = document.getElementById('set-legal-terms').value;
   legalSettings.terms = textToSave;
@@ -620,6 +639,10 @@ function importTermsJSON(e) {
       if (data.terms !== undefined) {
         legalSettings.terms = data.terms;
         document.getElementById('set-legal-terms').value = data.terms;
+        const prev = document.getElementById('terms-markdown-preview');
+        if (prev && prev.style.display !== 'none') {
+          prev.innerHTML = parseMarkdown(data.terms);
+        }
         persistSettings();
         alert("File delle condizioni contrattuali caricato con successo!");
       } else {
@@ -1534,13 +1557,10 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 9. GENERAZIONE STAMPA A4 E PDF
+// 9. FUNZIONE CENTRALE PER GENERARE TUTTI I FOGLI A4
+//    (Condivisa sia dalla Stampa PDF sia dall'Anteprima a Schermo)
 // ==========================================================================
-function prepareAndPrint() {
-  const printRoot = document.getElementById('print-root');
-  if (!printRoot) return;
-  printRoot.innerHTML = "";
-
+function buildAllSheetsHTML() {
   let grandFornitura = 0;
   let grandPosa = 0;
   docState.categories.forEach(c => {
@@ -1596,66 +1616,64 @@ function prepareAndPrint() {
   const telInfo = companySettings.contacts || "Tel. 0423 670806";
   const emailInfo = companySettings.email || "info@3esseserramenti.it \\ preventivi.3esse@gmail.com";
 
-  // PAGINA 1
-  const page1 = document.createElement('div');
-  page1.className = "sheet p1-sheet";
-  page1.innerHTML = `
-    <div class="p1-header-logo">
-      ${companySettings.logo ? `
-        <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">
-      ` : `
-        <div class="p1-company-fallback">${escapeHtml(companySettings.name || '3 ESSE SERRAMENTI')}</div>
-      `}
-    </div>
+  let sheetsHTML = "";
 
-    <div class="p1-date-doc-row">
-      <div class="p1-date-left">${cityDateText}</div>
-      <table class="p1-box-offerta">
-        <tr>
-          <td class="p1-box-label">${boxLabel}</td>
-          <td class="p1-box-number">${escapeHtml(formattedDocNum)}</td>
-        </tr>
-      </table>
-    </div>
+  // 1. PAGINA 1
+  sheetsHTML += `
+    <div class="sheet p1-sheet">
+      <div class="p1-header-logo">
+        ${companySettings.logo ? `
+          <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">
+        ` : `
+          <div class="p1-company-fallback">${escapeHtml(companySettings.name || '3 ESSE SERRAMENTI')}</div>
+        `}
+      </div>
 
-    <div class="p1-middle-section">
-      <div class="p1-client-name">${escapeHtml(docState.client.name) || 'CLIENTE'}</div>
-      <div class="p1-client-address">${escapeHtml(docState.client.residence) || ''}</div>
-      ${docState.client.phone ? `<div class="p1-client-line">tel: ${escapeHtml(docState.client.phone)}</div>` : ''}
-      <div class="p1-client-line">e mail: ${escapeHtml(docState.client.email || '')}</div>
+      <div class="p1-date-doc-row">
+        <div class="p1-date-left">${cityDateText}</div>
+        <table class="p1-box-offerta">
+          <tr>
+            <td class="p1-box-label">${boxLabel}</td>
+            <td class="p1-box-number">${escapeHtml(formattedDocNum)}</td>
+          </tr>
+        </table>
+      </div>
 
-      ${(!docState.sameSite && docState.siteAddress) ? `
-        <div class="p1-site-block">
-          <div class="p1-site-title">Cantiere sito in:</div>
-          <div class="p1-site-address">${escapeHtml(docState.siteAddress)}</div>
-        </div>
-      ` : ''}
-    </div>
+      <div class="p1-middle-section">
+        <div class="p1-client-name">${escapeHtml(docState.client.name) || 'CLIENTE'}</div>
+        <div class="p1-client-address">${escapeHtml(docState.client.residence) || ''}</div>
+        ${docState.client.phone ? `<div class="p1-client-line">tel: ${escapeHtml(docState.client.phone)}</div>` : ''}
+        <div class="p1-client-line">e mail: ${escapeHtml(docState.client.email || '')}</div>
 
-    <div class="p1-title-section">
-      <div class="p1-doc-title">${escapeHtml(docState.type)}</div>
-      ${!isContract && validityText ? `
-        <div class="p1-validity-text">${escapeHtml(validityText)}</div>
-      ` : ''}
-    </div>
+        ${(!docState.sameSite && docState.siteAddress) ? `
+          <div class="p1-site-block">
+            <div class="p1-site-title">Cantiere sito in:</div>
+            <div class="p1-site-address">${escapeHtml(docState.siteAddress)}</div>
+          </div>
+        ` : ''}
+      </div>
 
-    <div class="p1-footer-center">
-      <div>Sedi: &nbsp;${escapeHtml(sede1)} &nbsp;|&nbsp; ${escapeHtml(sede2)}</div>
-      <div>${escapeHtml(telInfo)} &nbsp;|&nbsp; E-Mail: ${escapeHtml(emailInfo)}</div>
+      <div class="p1-title-section">
+        <div class="p1-doc-title">${escapeHtml(docState.type)}</div>
+        ${!isContract && validityText ? `
+          <div class="p1-validity-text">${escapeHtml(validityText)}</div>
+        ` : ''}
+      </div>
+
+      <div class="p1-footer-center">
+        <div>Sedi: &nbsp;${escapeHtml(sede1)} &nbsp;|&nbsp; ${escapeHtml(sede2)}</div>
+        <div>${escapeHtml(telInfo)} &nbsp;|&nbsp; E-Mail: ${escapeHtml(emailInfo)}</div>
+      </div>
     </div>
   `;
-  printRoot.appendChild(page1);
 
-  // PAGINE 2..N: SCHEDE CATEGORIA
+  // 2. PAGINE CATEGORIA (2..N)
   docState.categories.forEach((cat, idx) => {
-    const pageCat = document.createElement('div');
-    pageCat.className = "sheet";
     const currentPageNum = idx + 2;
     const catTotals = calculateCategoryTotals(cat);
 
     let posRows = (cat.positions || []).map(p => {
       const rowTot = (p.quantity || 0) * (p.unitPrice || 0);
-
       const hasName = (p.name || "").trim().length > 0;
       const wVal = (p.width || "").trim();
       const hVal = (p.height || "").trim();
@@ -1698,87 +1716,85 @@ function prepareAndPrint() {
       `;
     }).join('');
 
-    pageCat.innerHTML = `
-      <div>
-        <div class="p-header">
-          <div class="p-company">
-            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ${escapeHtml(formattedDocNum)}</div>
-          </div>
-          <div class="p-doc-details">
-            <div style="font-size: 1.1rem; font-weight: bold;">SCHEDA TECNICA ${idx + 1}</div>
-            <div style="font-size: 0.9rem;">Cliente: ${escapeHtml(docState.client.name)}</div>
-          </div>
-        </div>
-
-        <div style="margin: 10px 0 15px 0;">
-          <h2 style="font-size: 1.25rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
-            ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: 800; color: #1e293b;">${escapeHtml(cat.supplierName)}</span> <span style="font-size: 0.95rem; font-weight: normal;">(${escapeHtml(cat.modelName)})</span>
-          </h2>
-        </div>
-
-        ${cat.specs || cat.color || cat.glass ? `
-          <div class="p-box" style="margin-bottom: 12px; padding: 8px 12px; background: #fafafa;">
-            <div style="font-size: 0.85rem; line-height: 1.5;">
-              ${cat.specs ? `<div><strong>Caratteristiche Sistema:</strong> ${escapeHtml(cat.specs)}</div>` : ''}
-              ${cat.color ? `<div><strong>Finitura / Colore:</strong> ${escapeHtml(cat.color)}</div>` : ''}
-              ${cat.glass ? `<div><strong>Vetraggio / Accessori:</strong> ${escapeHtml(cat.glass)}</div>` : ''}
+    sheetsHTML += `
+      <div class="sheet">
+        <div>
+          <div class="p-header">
+            <div class="p-company">
+              <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+              <div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ${escapeHtml(formattedDocNum)}</div>
+            </div>
+            <div class="p-doc-details">
+              <div style="font-size: 1.1rem; font-weight: bold;">SCHEDA TECNICA ${idx + 1}</div>
+              <div style="font-size: 0.9rem;">Cliente: ${escapeHtml(docState.client.name)}</div>
             </div>
           </div>
-        ` : ''}
 
-        ${cat.description ? `
-          <div style="font-size: 0.82rem; color: #333; margin-bottom: 12px; line-height: 1.45; text-align: justify;">
-            ${escapeHtml(cat.description)}
+          <div style="margin: 10px 0 15px 0;">
+            <h2 style="font-size: 1.25rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
+              ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: 800; color: #1e293b;">${escapeHtml(cat.supplierName)}</span> <span style="font-size: 0.95rem; font-weight: normal;">(${escapeHtml(cat.modelName)})</span>
+            </h2>
           </div>
-        ` : ''}
 
-        <table class="p-table" style="margin-top: 10px;">
-          <thead>
-            <tr>
-              <th style="width: 18%;">Vano / Posizione</th>
-              <th style="width: 18%;">Misure (LxH)</th>
-              <th style="width: 36%;">Descrizione Manufatto</th>
-              <th style="width: 6%; text-align: center;">Q.tà</th>
-              <th style="width: 11%; text-align: right;">P. Unit.</th>
-              <th style="width: 11%; text-align: right;">Totale</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${posRows || '<tr><td colspan="6">Nessun manufatto inserito</td></tr>'}
-          </tbody>
-        </table>
+          ${cat.specs || cat.color || cat.glass ? `
+            <div class="p-box" style="margin-bottom: 12px; padding: 8px 12px; background: #fafafa;">
+              <div style="font-size: 0.85rem; line-height: 1.5;">
+                ${cat.specs ? `<div><strong>Caratteristiche Sistema:</strong> ${escapeHtml(cat.specs)}</div>` : ''}
+                ${cat.color ? `<div><strong>Finitura / Colore:</strong> ${escapeHtml(cat.color)}</div>` : ''}
+                ${cat.glass ? `<div><strong>Vetraggio / Accessori:</strong> ${escapeHtml(cat.glass)}</div>` : ''}
+              </div>
+            </div>
+          ` : ''}
 
-        <div style="margin-top: 15px; border: 1px solid #999; padding: 10px 14px; background: #fdfdfd;">
-          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">
-            <span>Subtotale Fornitura:</span>
-            <strong>${formatCurrency(catTotals.fornitura)}</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #ccc;">
-            <span>Posa in Opera:</span>
-            <strong>${formatCurrency(catTotals.posa)}</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
-            <span>Totale ${escapeHtml(cat.name)}:</span>
-            <span>${formatCurrency(catTotals.total)}</span>
+          ${cat.description ? `
+            <div style="font-size: 0.82rem; color: #333; margin-bottom: 12px; line-height: 1.45; text-align: justify;">
+              ${escapeHtml(cat.description)}
+            </div>
+          ` : ''}
+
+          <table class="p-table" style="margin-top: 10px;">
+            <thead>
+              <tr>
+                <th style="width: 18%;">Vano / Posizione</th>
+                <th style="width: 18%;">Misure (LxH)</th>
+                <th style="width: 36%;">Descrizione Manufatto</th>
+                <th style="width: 6%; text-align: center;">Q.tà</th>
+                <th style="width: 11%; text-align: right;">P. Unit.</th>
+                <th style="width: 11%; text-align: right;">Totale</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${posRows || '<tr><td colspan="6">Nessun manufatto inserito</td></tr>'}
+            </tbody>
+          </table>
+
+          <div style="margin-top: 15px; border: 1px solid #999; padding: 10px 14px; background: #fdfdfd;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">
+              <span>Subtotale Fornitura:</span>
+              <strong>${formatCurrency(catTotals.fornitura)}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #ccc;">
+              <span>Posa in Opera:</span>
+              <strong>${formatCurrency(catTotals.posa)}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
+              <span>Totale ${escapeHtml(cat.name)}:</span>
+              <span>${formatCurrency(catTotals.total)}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="p-footer">
-        <span>${escapeHtml(companySettings.name)}</span>
-        <span>Pagina ${currentPageNum} di ${totalPages}</span>
+        <div class="p-footer">
+          <span>${escapeHtml(companySettings.name)}</span>
+          <span>Pagina ${currentPageNum} di ${totalPages}</span>
+        </div>
       </div>
     `;
-    printRoot.appendChild(pageCat);
   });
 
-  // PAGINA TOTALI & FIRMA
+  // 3. PAGINA TOTALI & FIRMA
   const pageTotalsNum = docState.categories.length + 2;
-  const pageTotals = document.createElement('div');
-  pageTotals.className = "sheet";
-  
-  let catSummaryRows = docState.categories.map((c, i) => {
+  let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
     return `
       <tr>
@@ -1790,112 +1806,137 @@ function prepareAndPrint() {
     `;
   }).join('');
 
-  pageTotals.innerHTML = `
-    <div>
-      <div class="p-header">
-        <div class="p-company">
-          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-          <div>Quadro Economico Complessivo</div>
+  sheetsHTML += `
+    <div class="sheet">
+      <div>
+        <div class="p-header">
+          <div class="p-company">
+            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+            <div>Quadro Economico Complessivo</div>
+          </div>
+          <div class="p-doc-details">
+            <div class="p-doc-type">RIEPILOGO & FIRMA</div>
+            <div class="p-doc-meta">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
+          </div>
         </div>
-        <div class="p-doc-details">
-          <div class="p-doc-type">RIEPILOGO & FIRMA</div>
-          <div class="p-doc-meta">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
+
+        <table class="p-table">
+          <thead>
+            <tr>
+              <th>Tipologia Merceologica & Fornitore</th>
+              <th class="text-right" style="width: 120px;">Fornitura</th>
+              <th class="text-right" style="width: 120px;">Posa in Opera</th>
+              <th class="text-right" style="width: 130px;">Totale Netto</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${catSummaryRows || '<tr><td colspan="4">Nessuna categoria inserita</td></tr>'}
+            <tr style="background-color: #f9f9f9; font-size: 0.95rem;">
+              <td><strong>TOTALE NETTO FORNITURA & POSA</strong></td>
+              <td class="text-right">${formatCurrency(grandFornitura)}</td>
+              <td class="text-right">${formatCurrency(grandPosa)}</td>
+              <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
+            </tr>
+            <tr>
+              <td colspan="3">${escapeHtml(taxLabel)}</td>
+              <td class="text-right">${formatCurrency(tax)}</td>
+            </tr>
+            <tr style="background-color: #eee; font-size: 1.3rem;">
+              <td colspan="3" style="padding: 12px 10px;"><strong>TOTALE COMPLESSIVO (IVA Inclusa)</strong></td>
+              <td class="text-right" style="padding: 12px 10px; font-weight: 900; font-size: 1.35rem;">${formatCurrency(total)}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="p-box" style="margin-top: 15px;">
+          <div class="p-box-title">Condizioni di Fornitura e Pagamento</div>
+          <div><strong>Detrazione Fiscale applicabile:</strong> ${bonusPrint}</div>
+          <div><strong>Termini di Pagamento:</strong> ${escapeHtml(docState.paymentTerms)}</div>
+          <div><strong>Tempi indicativi consegna/posa:</strong> ${escapeHtml(docState.deliveryTerms)}</div>
+          ${docState.finalNotes ? `<div style="margin-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
         </div>
-      </div>
 
-      <table class="p-table">
-        <thead>
-          <tr>
-            <th>Tipologia Merceologica & Fornitore</th>
-            <th class="text-right" style="width: 120px;">Fornitura</th>
-            <th class="text-right" style="width: 120px;">Posa in Opera</th>
-            <th class="text-right" style="width: 130px;">Totale Netto</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${catSummaryRows || '<tr><td colspan="4">Nessuna categoria inserita</td></tr>'}
-          <tr style="background-color: #f9f9f9; font-size: 0.95rem;">
-            <td><strong>TOTALE NETTO FORNITURA & POSA</strong></td>
-            <td class="text-right">${formatCurrency(grandFornitura)}</td>
-            <td class="text-right">${formatCurrency(grandPosa)}</td>
-            <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
-          </tr>
-          <tr>
-            <td colspan="3">${escapeHtml(taxLabel)}</td>
-            <td class="text-right">${formatCurrency(tax)}</td>
-          </tr>
-          <tr style="background-color: #eee; font-size: 1.3rem;">
-            <td colspan="3" style="padding: 12px 10px;"><strong>TOTALE COMPLESSIVO (IVA Inclusa)</strong></td>
-            <td class="text-right" style="padding: 12px 10px; font-weight: 900; font-size: 1.35rem;">${formatCurrency(total)}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="p-box" style="margin-top: 15px;">
-        <div class="p-box-title">Condizioni di Fornitura e Pagamento</div>
-        <div><strong>Detrazione Fiscale applicabile:</strong> ${bonusPrint}</div>
-        <div><strong>Termini di Pagamento:</strong> ${escapeHtml(docState.paymentTerms)}</div>
-        <div><strong>Tempi indicativi consegna/posa:</strong> ${escapeHtml(docState.deliveryTerms)}</div>
-        ${docState.finalNotes ? `<div style="margin-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
-      </div>
-
-      <div class="p-signature-area">
-        <div class="p-sign-box" style="width: 320px;">
-          Firma per Accettazione del Committente<br><br><br>
-          ________________________________________
+        <div class="p-signature-area">
+          <div class="p-sign-box" style="width: 320px;">
+            Firma per Accettazione del Committente<br><br><br>
+            ________________________________________
+          </div>
         </div>
-      </div>
 
-      <div style="font-size: 0.75rem; color: #555; margin-top: 25px; text-align: center;">
-        ${isContract 
-          ? "La sottoscrizione costituisce formale stipula del contratto d'appalto/fornitura ai sensi dell'art. 1326 c.c." 
-          : "Il presente preventivo ha mero valore di proposta economica ed è vincolato all'accettazione entro i termini di validità indicati."}
-      </div>
-    </div>
-
-    <div class="p-footer">
-      <span>${escapeHtml(companySettings.name)}</span>
-      <span>Pagina ${pageTotalsNum} di ${totalPages}</span>
-    </div>
-  `;
-  printRoot.appendChild(pageTotals);
-
-  // ULTIMA PAGINA: CONDIZIONI IN MARKDOWN E PRIVACY
-  const pageLegal = document.createElement('div');
-  pageLegal.className = "sheet";
-  pageLegal.innerHTML = `
-    <div>
-      <div class="p-header">
-        <div class="p-company">
-          <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-          <div>Condizioni Contrattuali e Normativa Privacy</div>
+        <div style="font-size: 0.75rem; color: #555; margin-top: 25px; text-align: center;">
+          ${isContract 
+            ? "La sottoscrizione costituisce formale stipula del contratto d'appalto/fornitura ai sensi dell'art. 1326 c.c." 
+            : "Il presente preventivo ha mero valore di proposta economica ed è vincolato all'accettazione entro i termini di validità indicati."}
         </div>
       </div>
 
-      <div class="p-box">
-        <div class="p-box-title">Condizioni Generali di Fornitura e Posa</div>
-        <div class="legal-text">${parseMarkdown(legalSettings.terms || DEFAULT_LEGAL.terms)}</div>
+      <div class="p-footer">
+        <span>${escapeHtml(companySettings.name)}</span>
+        <span>Pagina ${pageTotalsNum} di ${totalPages}</span>
       </div>
-
-      <div class="p-box" style="margin-top: 20px;">
-        <div class="p-box-title">Informativa sul Trattamento dei Dati Personali (GDPR 2016/679)</div>
-        <div class="legal-text">${escapeHtml(legalSettings.privacy || DEFAULT_LEGAL.privacy)}</div>
-      </div>
-
-      <div class="p-signature-area" style="margin-top: 45px;">
-        <div class="p-sign-box" style="width: 340px;">
-          Firma per espressa approvazione clausole e Privacy<br><br><br>
-          ________________________________________
-        </div>
-      </div>
-    </div>
-
-    <div class="p-footer">
-      <span>${escapeHtml(companySettings.name)}</span>
-      <span>Pagina ${totalPages} di ${totalPages}</span>
     </div>
   `;
-  printRoot.appendChild(pageLegal);
+
+  // 4. ULTIMA PAGINA: NORMATIVA & PRIVACY (MARKDOWN)
+  sheetsHTML += `
+    <div class="sheet">
+      <div>
+        <div class="p-header">
+          <div class="p-company">
+            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+            <div>Condizioni Contrattuali e Normativa Privacy</div>
+          </div>
+        </div>
+
+        <div class="p-box">
+          <div class="p-box-title">Condizioni Generali di Fornitura e Posa</div>
+          <div class="legal-text">${parseMarkdown(legalSettings.terms || DEFAULT_LEGAL.terms)}</div>
+        </div>
+
+        <div class="p-box" style="margin-top: 20px;">
+          <div class="p-box-title">Informativa sul Trattamento dei Dati Personali (GDPR 2016/679)</div>
+          <div class="legal-text">${escapeHtml(legalSettings.privacy || DEFAULT_LEGAL.privacy)}</div>
+        </div>
+
+        <div class="p-signature-area" style="margin-top: 45px;">
+          <div class="p-sign-box" style="width: 340px;">
+            Firma per espressa approvazione clausole e Privacy<br><br><br>
+            ________________________________________
+          </div>
+        </div>
+      </div>
+
+      <div class="p-footer">
+        <span>${escapeHtml(companySettings.name)}</span>
+        <span>Pagina ${totalPages} di ${totalPages}</span>
+      </div>
+    </div>
+  `;
+
+  return sheetsHTML;
+}
+
+// ==========================================================================
+// 10. GESTIONE ANTEPRIMA A SCHERMO E STAMPA
+// ==========================================================================
+function openDocumentPreview() {
+  const modal = document.getElementById('preview-modal');
+  const modalBody = document.getElementById('modal-preview-body');
+  if (!modal || !modalBody) return;
+
+  modalBody.innerHTML = buildAllSheetsHTML();
+  modal.style.display = 'flex';
+}
+
+function closeDocumentPreview() {
+  const modal = document.getElementById('preview-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function prepareAndPrint() {
+  const printRoot = document.getElementById('print-root');
+  if (!printRoot) return;
+  printRoot.innerHTML = buildAllSheetsHTML();
 
   const originalTitle = document.title;
   document.title = "";
