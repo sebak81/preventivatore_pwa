@@ -48,7 +48,7 @@
         </div>
         <div class="form-group">
           <label>Numero Documento <span id="doc-number-preview" style="text-transform: none; color: var(--accent); font-weight: normal; margin-left: 6px;"></span></label>
-          <input type="text" id="doc-number" placeholder="es. 001-26">
+          <input type="text" id="doc-number" placeholder="es. 250-26">
         </div>
         <div class="form-group">
           <label>Data</label>
@@ -56,7 +56,7 @@
         </div>
         <div class="form-group">
           <label>Validità Offerta</label>
-          <input type="text" id="doc-validity" value="30 giorni">
+          <input type="text" id="doc-validity" value="15 giorni">
         </div>
       </div>
     </section>
@@ -69,11 +69,11 @@
       <div class="form-grid">
         <div class="form-group full">
           <label>Cognome e Nome / Ragione Sociale</label>
-          <input type="text" id="client-name" placeholder="Mario Rossi">
+          <input type="text" id="client-name" placeholder="MOSCON">
         </div>
         <div class="form-group full">
           <label>Indirizzo Residenza (Via, Civico, CAP, Città, Prov)</label>
-          <input type="text" id="client-residence" placeholder="Via Roma 10, 00100 Roma (RM)">
+          <input type="text" id="client-residence" placeholder="Villaggio Monica - Falzè di Trevignano">
         </div>
         <div class="form-group">
           <label>Codice Fiscale / P.IVA</label>
@@ -81,7 +81,7 @@
         </div>
         <div class="form-group">
           <label>Telefono</label>
-          <input type="tel" id="client-phone">
+          <input type="tel" id="client-phone" placeholder="330 786430">
         </div>
         <div class="form-group full">
           <label>Email</label>
@@ -96,7 +96,7 @@
 
       <div class="form-group full" id="site-group" style="display: none; margin-top: 10px;">
         <label>Indirizzo Cantiere (se diverso)</label>
-        <input type="text" id="site-address" placeholder="Via Cantiere 22, Milano (MI)">
+        <input type="text" id="site-address" placeholder="Villaggio Monica, Falzè di Trevignano">
       </div>
     </section>
 
@@ -173,23 +173,35 @@
           <label>Ragione Sociale / Nome Ditta</label>
           <input type="text" id="set-company-name">
         </div>
-        <div class="form-group full">
-          <label>Indirizzo Sede Legale ed Operativa</label>
-          <input type="text" id="set-company-address">
+        <div class="form-group">
+          <label>Città Documento (es. Trevignano)</label>
+          <input type="text" id="set-company-city" placeholder="Trevignano">
         </div>
         <div class="form-group">
           <label>Partita IVA / Codice Fiscale</label>
           <input type="text" id="set-company-taxid">
         </div>
+        <div class="form-group full">
+          <label>Sede 1 (Indirizzo principale)</label>
+          <input type="text" id="set-company-address" placeholder="Via Treviso 5 - 31040 Signoressa di Trevignano TV">
+        </div>
+        <div class="form-group full">
+          <label>Sede 2 (Eventuale seconda sede / showroom)</label>
+          <input type="text" id="set-company-address2" placeholder="Via Feltrina 33 - 31038 Castagnole di Paese TV">
+        </div>
         <div class="form-group">
-          <label>Recapiti (Telefono, Cellulare, Email)</label>
-          <input type="text" id="set-company-contacts">
+          <label>Recapiti Telefonici</label>
+          <input type="text" id="set-company-contacts" placeholder="Tel. 0423 670806; cel 389 8959622">
+        </div>
+        <div class="form-group">
+          <label>Indirizzi Email</label>
+          <input type="text" id="set-company-email" placeholder="info@3esseserramenti.com; preventivi.3esse@gmail.com">
         </div>
       </div>
 
       <!-- SEZIONE LOGO AZIENDALE -->
       <div class="form-group full" style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border);">
-        <label>Logo Aziendale (verrà apposto esclusivamente sulla Pagina 1)</label>
+        <label>Logo Aziendale (apposto in alto a sinistra su Pagina 1)</label>
         <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px; flex-wrap: wrap;">
           <div class="logo-preview-box" id="logo-preview-container">
             <span id="logo-placeholder-text" style="color: var(--text-muted); font-size: 0.8rem; text-align: center;">Nessun logo caricato</span>
@@ -201,7 +213,7 @@
               <button type="button" class="btn btn-danger btn-sm" id="btn-remove-logo" style="display: none;">Rimuovi Logo</button>
             </div>
             <span style="font-size: 0.75rem; color: var(--text-muted);">
-              Formati consigliati: PNG trasparente o SVG. Dimensioni ottimali: circa 300x120 px.
+              Formati consigliati: PNG trasparente o SVG.
             </span>
           </div>
           <input type="file" id="logo-file-input" accept="image/*" style="display: none;">
@@ -233,7 +245,7 @@
         <span>Condivisione Impostazioni & Logo con i Colleghi (pCloud)</span>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-        Puoi esportare l'intera configurazione (dati azienda, logo incorporato, tutte le macro-categorie, fornitori e modelli) in un file da salvare nella cartella condivisa di pCloud. Sugli altri PC basterà importarlo una volta sola.
+        Puoi esportare l'intera configurazione in un file da salvare nella cartella condivisa di pCloud. Sugli altri PC basterà importarlo una volta sola.
       </p>
       <div class="btn-group">
         <button type="button" class="btn btn-primary" id="btn-export-settings">Esporta Impostazioni (.json)</button>
