@@ -410,7 +410,7 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
-  // Pulsanti Anteprima
+  // Anteprima Documento
   safeOn('btn-preview-doc', 'click', openDocumentPreview);
   safeOn('btn-modal-close', 'click', closeDocumentPreview);
   safeOn('btn-modal-print', 'click', () => {
@@ -442,18 +442,20 @@ function setupEventListeners() {
     const p = document.getElementById('panel-edit-privacy');
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
   });
+
+  // Anteprima dinamica in tempo reale
   safeOn('btn-preview-terms', 'click', toggleTermsMarkdownPreview);
+  safeOn('set-legal-terms', 'input', updateTermsLivePreview);
+
   safeOn('btn-reset-terms', 'click', () => {
     if (confirm("Vuoi ripristinare il testo standard delle condizioni contrattuali?")) {
       legalSettings.terms = DEFAULT_LEGAL.terms;
       document.getElementById('set-legal-terms').value = legalSettings.terms;
-      const prev = document.getElementById('terms-markdown-preview');
-      if (prev && prev.style.display !== 'none') {
-        prev.innerHTML = parseMarkdown(legalSettings.terms);
-      }
+      updateTermsLivePreview();
       persistSettings();
     }
   });
+
   safeOn('btn-reset-privacy', 'click', () => {
     if (confirm("Vuoi ripristinare il testo standard dell'informativa privacy?")) {
       legalSettings.privacy = DEFAULT_LEGAL.privacy;
@@ -592,7 +594,7 @@ function handleLogoRemove() {
   }
 }
 
-// Toggle anteprima live Markdown per le Condizioni Contrattuali
+// Toggle e aggiornamento live Markdown per le Condizioni Contrattuali
 function toggleTermsMarkdownPreview() {
   const area = document.getElementById('set-legal-terms');
   const prev = document.getElementById('terms-markdown-preview');
@@ -600,12 +602,21 @@ function toggleTermsMarkdownPreview() {
   if (!prev || !area) return;
 
   if (prev.style.display === 'none') {
-    prev.innerHTML = parseMarkdown(area.value);
+    prev.innerHTML = parseMarkdown(area.value) || '<em style="color: var(--text-muted);">Nessun testo inserito...</em>';
     prev.style.display = 'block';
     if (btn) btn.textContent = '✏️ Chiudi Anteprima';
   } else {
     prev.style.display = 'none';
     if (btn) btn.textContent = '👁️ Anteprima Markdown';
+  }
+}
+
+function updateTermsLivePreview() {
+  const area = document.getElementById('set-legal-terms');
+  const prev = document.getElementById('terms-markdown-preview');
+  if (!prev || !area) return;
+  if (prev.style.display !== 'none') {
+    prev.innerHTML = parseMarkdown(area.value) || '<em style="color: var(--text-muted);">Nessun testo inserito...</em>';
   }
 }
 
@@ -639,10 +650,7 @@ function importTermsJSON(e) {
       if (data.terms !== undefined) {
         legalSettings.terms = data.terms;
         document.getElementById('set-legal-terms').value = data.terms;
-        const prev = document.getElementById('terms-markdown-preview');
-        if (prev && prev.style.display !== 'none') {
-          prev.innerHTML = parseMarkdown(data.terms);
-        }
+        updateTermsLivePreview();
         persistSettings();
         alert("File delle condizioni contrattuali caricato con successo!");
       } else {
@@ -1621,22 +1629,24 @@ function buildAllSheetsHTML() {
   // 1. PAGINA 1
   sheetsHTML += `
     <div class="sheet p1-sheet">
-      <div class="p1-header-logo">
-        ${companySettings.logo ? `
-          <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">
-        ` : `
-          <div class="p1-company-fallback">${escapeHtml(companySettings.name || '3 ESSE SERRAMENTI')}</div>
-        `}
-      </div>
+      <div class="p1-top-container">
+        <div class="p1-header-brand">
+          ${companySettings.logo ? `
+            <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">
+          ` : `
+            <div class="p1-company-fallback">${escapeHtml(companySettings.name || '3 ESSE SERRAMENTI')}</div>
+          `}
+        </div>
 
-      <div class="p1-date-doc-row">
-        <div class="p1-date-left">${cityDateText}</div>
-        <table class="p1-box-offerta">
-          <tr>
-            <td class="p1-box-label">${boxLabel}</td>
-            <td class="p1-box-number">${escapeHtml(formattedDocNum)}</td>
-          </tr>
-        </table>
+        <div class="p1-sub-header">
+          <div class="p1-doc-date">${cityDateText}</div>
+          <table class="p1-box-offerta">
+            <tr>
+              <td class="p1-box-label">${boxLabel}</td>
+              <td class="p1-box-number">${escapeHtml(formattedDocNum)}</td>
+            </tr>
+          </table>
+        </div>
       </div>
 
       <div class="p1-middle-section">
@@ -1730,7 +1740,7 @@ function buildAllSheetsHTML() {
             </div>
           </div>
 
-          <div style="margin: 10px 0 15px 0;">
+          <div style="margin-px 0 15px 0;">
             <h2 style="font-size: 1.25rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
               ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: 800; color: #1e293b;">${escapeHtml(cat.supplierName)}</span> <span style="font-size: 0.95rem; font-weight: normal;">(${escapeHtml(cat.modelName)})</span>
             </h2>
