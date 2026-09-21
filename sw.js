@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v19'; // Versione aggiornata per la posizione fissa di Data e Numero
+const CACHE_NAME = 'prev-app-v20'; // Versione aggiornata per la fedele impaginazione del modello 3 ESSE
 const ASSETS = [
   './',
   './index.html',
