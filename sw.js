@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v22'; // Versione aggiornata per Quadro Economico e Condizioni
+const CACHE_NAME = 'prev-app-v23'; // Versione aggiornata per modifiche grafiche totali e testi legali
 const ASSETS = [
   './',
   './index.html',
