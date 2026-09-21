@@ -233,7 +233,7 @@ textarea {
 
 /* Box Preview Logo nelle Impostazioni */
 .logo-preview-box {
-  width: 150px;
+  width: 160px;
   height: 75px;
   border: 2px dashed var(--border);
   border-radius: 6px;
@@ -407,7 +407,7 @@ textarea {
     background-color: white !important;
     padding: 0 !important;
     margin: 0 !important;
-    color: black !important;
+    color: #111 !important;
   }
 
   .top-bar, .container, #file-input, #settings-file-input, #logo-file-input {
@@ -423,7 +423,7 @@ textarea {
     margin: 15mm 15mm 15mm 15mm;
   }
 
-  /* Per pagine 2..N: layout flessibile con footer in fondo */
+  /* Schede Tecniche (Pagine 2..N) */
   .sheet {
     width: 100%;
     min-height: calc(297mm - 30mm);
@@ -439,7 +439,6 @@ textarea {
     page-break-after: avoid;
   }
 
-  /* TESTATA PER SCHEDE TECNICHE (PAGINE 2..N) */
   .p-header {
     display: flex;
     justify-content: space-between;
@@ -468,7 +467,7 @@ textarea {
   }
 
   /* ========================================================== */
-  /* STILI DI PAGINA 1: LAYOUT A BLOCCO FISSO                   */
+  /* MODELLO FEDELE PAGINA 1                                    */
   /* ========================================================== */
   .sheet.p1-sheet {
     display: block !important;
@@ -477,149 +476,147 @@ textarea {
     min-height: calc(297mm - 30mm) !important;
   }
 
-  /* Contenitore superiore: logo + linea + riga data/numero */
-  .p1-top-container {
-    width: 100%;
-  }
-
-  .p1-header-brand {
-    border-bottom: 2px solid #000;
-    padding-bottom: 10px;
-    min-height: 70px;
+  /* 1. Logo in alto a sinistra senza linea sotto */
+  .p1-header-logo {
     display: flex;
     align-items: center;
+    min-height: 50px;
   }
 
   .p-page1-logo-full {
-    max-height: 75px;
-    max-width: 450px;
+    max-height: 70px;
+    max-width: 380px;
     object-fit: contain;
+    object-position: left center;
   }
 
-  /* RIGA SUBITO SOTTO LA LINEA NERA: DATA A SINISTRA E NUMERO A DESTRA */
-  .p1-sub-header {
+  .p1-company-fallback {
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #111;
+  }
+
+  /* 2. Riga Data a sinistra e Tabella Box Offerta a destra */
+  .p1-date-doc-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
-    width: 100%;
+    margin-top: 25px;
   }
 
-  .p1-doc-date {
-    font-size: 1.05rem;
+  .p1-date-left {
+    font-size: 1rem;
+    color: #111;
+  }
+
+  .p1-box-offerta {
+    border-collapse: collapse;
+    border: 1px solid #222;
+  }
+
+  .p1-box-offerta td {
+    border: 1px solid #222;
+    padding: 6px 18px;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .p1-box-label {
+    font-weight: normal;
+    color: #222;
+  }
+
+  .p1-box-number {
     font-weight: 700;
-    color: #0f172a;
+    color: #111;
+    min-width: 90px;
   }
 
-  .p1-doc-number-box {
-    border: 1px solid #1e293b;
-    border-radius: 4px;
-    padding: 5px 14px;
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #0f172a;
-    background-color: #fff;
-  }
-
-  /* DATI CLIENTE A METÀ PAGINA */
-  .p1-client-center {
+  /* 3. Dati Cliente e Cantiere centrati a metà altezza */
+  .p1-middle-section {
     position: absolute;
-    top: 105mm;
+    top: 96mm;
     left: 0;
     right: 0;
     text-align: center;
   }
 
   .p1-client-name {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #0f172a;
+    font-size: 1.3rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #111;
     margin-bottom: 6px;
   }
 
   .p1-client-address {
-    font-size: 1.15rem;
-    color: #334155;
-    margin-bottom: 6px;
-  }
-
-  .p1-client-tax {
-    font-size: 0.95rem;
-    color: #64748b;
-    margin-bottom: 6px;
+    font-size: 1.05rem;
+    color: #222;
+    margin-bottom: 12px;
   }
 
   .p1-client-line {
-    font-size: 1.05rem;
-    color: #0f172a;
-    line-height: 1.5;
+    font-size: 1rem;
+    color: #222;
+    line-height: 1.45;
   }
 
-  .p1-site-info {
-    margin-top: 18px;
-    font-size: 1.05rem;
-    color: #0f172a;
+  .p1-site-block {
+    margin-top: 26px;
   }
 
-  /* TITOLO E VALIDITÀ A CIRCA 3/4 DI ALTEZZA */
-  .p1-title-bottom {
+  .p1-site-title {
+    font-size: 1rem;
+    color: #222;
+    margin-bottom: 3px;
+  }
+
+  .p1-site-address {
+    font-size: 1.05rem;
+    color: #222;
+    line-height: 1.35;
+  }
+
+  /* 4. Titolo e Validità a 3/4 altezza */
+  .p1-title-section {
     position: absolute;
-    top: 180mm;
+    top: 185mm;
     left: 0;
     right: 0;
     text-align: center;
   }
 
-  .p1-main-title {
-    font-size: 3rem;
+  .p1-doc-title {
+    font-size: 1.35rem;
     font-weight: 900;
-    letter-spacing: 8px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: #000;
-    margin-bottom: 12px;
+    margin-bottom: 24px;
   }
 
   .p1-validity-text {
-    font-size: 1.15rem;
-    font-weight: 600;
+    font-size: 0.95rem;
     text-decoration: underline;
     font-style: italic;
-    color: #334155;
+    color: #222;
   }
 
-  /* PIÈ DI PAGINA DI PAGINA 1 */
-  .p1-footer {
+  /* 5. Footer centrato sul fondo */
+  .p1-footer-center {
     position: absolute;
-    bottom: 0;
+    bottom: 4mm;
     left: 0;
     right: 0;
-    border-top: 1px solid #000;
-    padding-top: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+    text-align: center;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #333;
   }
 
-  .p1-footer-company {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    color: #334155;
-    text-align: left;
-  }
-
-  .p1-footer-title {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 2px;
-  }
-
-  .p1-footer-page {
-    font-size: 0.85rem;
-    color: #475569;
-  }
-
-  /* Schede Categorie e Tabelle */
+  /* Tabelle e Box Schede Tecniche */
   .p-box {
     border: 1px solid #888;
     padding: 10px 12px;
