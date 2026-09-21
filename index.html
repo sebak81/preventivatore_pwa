@@ -13,7 +13,6 @@
   <header class="top-bar">
     <div style="display: flex; align-items: center; gap: 15px;">
       <h1 id="app-title">Preventivatore</h1>
-      <!-- Selettore Viste: Preventivo vs Impostazioni -->
       <nav class="nav-tabs">
         <button type="button" class="tab-btn active" id="tab-editor-btn">📝 Preventivo</button>
         <button type="button" class="tab-btn" id="tab-settings-btn">⚙️ Impostazioni</button>
@@ -235,6 +234,40 @@
       </div>
     </section>
 
+    <!-- SEZIONE TESTI LEGALI (CONDIZIONI CONTRATTUALI E PRIVACY) -->
+    <section class="card">
+      <div class="card-title">
+        <span>Testi Legali & Normativi (Condizioni e Privacy)</span>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+        Clicca sui pulsanti sottostanti per visualizzare e modificare le clausole contrattuali e l'informativa GDPR stampate nelle pagine finali.
+      </p>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;">
+        <button type="button" class="btn btn-secondary" id="btn-toggle-terms">📝 Modifica Condizioni Contrattuali</button>
+        <button type="button" class="btn btn-secondary" id="btn-toggle-privacy">🔒 Modifica Informativa Privacy</button>
+      </div>
+
+      <!-- Editor Condizioni Contrattuali -->
+      <div id="panel-edit-terms" style="display: none; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label style="color: var(--primary); font-weight: 700; margin: 0; font-size: 0.85rem;">Testo Condizioni Contrattuali di Fornitura e Posa</label>
+          <button type="button" class="btn btn-sm btn-secondary" id="btn-reset-terms">Ripristina Predefinito</button>
+        </div>
+        <textarea id="set-legal-terms" style="min-height: 180px; font-size: 0.85rem; line-height: 1.5;"></textarea>
+      </div>
+
+      <!-- Editor Privacy -->
+      <div id="panel-edit-privacy" style="display: none; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label style="color: var(--primary); font-weight: 700; margin: 0; font-size: 0.85rem;">Testo Informativa Privacy (Regolamento UE 2016/679)</label>
+          <button type="button" class="btn btn-sm btn-secondary" id="btn-reset-privacy">Ripristina Predefinito</button>
+        </div>
+        <textarea id="set-legal-privacy" style="min-height: 140px; font-size: 0.85rem; line-height: 1.5;"></textarea>
+      </div>
+    </section>
+
+    <!-- GESTIONE CATALOGO: AGGIUNTA E MODIFICA MACRO-CATEGORIE -->
     <section class="card">
       <div class="card-title">
         <span>Gestione Macro-Categorie, Fornitori & Modelli</span>
@@ -251,12 +284,13 @@
       <div id="settings-categories-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
     </section>
 
+    <!-- BACKUP / SINCRONIZZAZIONE PCLOUD DELLE IMPOSTAZIONI -->
     <section class="card">
       <div class="card-title">
         <span>Condivisione Impostazioni & Logo con i Colleghi (pCloud)</span>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-        Puoi esportare l'intera configurazione in un file da salvare nella cartella condivisa di pCloud. Sugli altri PC basterà importarlo una volta sola.
+        Puoi esportare l'intera configurazione (inclusi testi legali personalizzati) in un file da salvare nella cartella condivisa di pCloud.
       </p>
       <div class="btn-group">
         <button type="button" class="btn btn-primary" id="btn-export-settings">Esporta Impostazioni (.json)</button>
