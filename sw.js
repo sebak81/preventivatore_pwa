@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v20'; // Versione aggiornata per la fedele impaginazione del modello 3 ESSE
+const CACHE_NAME = 'prev-app-v21'; // Versione aggiornata per il nuovo piè di pagina a due righe
 const ASSETS = [
   './',
   './index.html',
