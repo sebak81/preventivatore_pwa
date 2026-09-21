@@ -208,9 +208,10 @@ let docState = {
   sameSite: true,
   siteAddress: "",
   categories: [],
-  taxRate: 22,
-  taxBonus: "Bonus Casa 50%",
-  paymentTerms: "30% all'ordine come caparra confirmatoria, 40% a inizio posa, 30% a fine lavori collaudati.",
+  taxRate: "22", // "22" | "mista" | "10" | "4"
+  customTaxAmount: null, // usato per override manuale di IVA mista se desiderato
+  taxBonus: "Bonus Casa", // "nessuna" | "Eco Bonus" | "Bonus Casa"
+  paymentTerms: "50% acconto all'ordine + 50% saldo a fine posa",
   deliveryTerms: "Circa 6-8 settimane lavorative dall'avvenuto rilievo misure definitive.",
   finalNotes: ""
 };
@@ -229,7 +230,6 @@ function updateDocNumberPreview() {
   }
 }
 
-// Formatta la data in formato esteso italiano (es. 28 marzo 2026)
 function formatLongItalianDate(isoDate) {
   if (!isoDate) return "";
   try {
@@ -296,12 +296,46 @@ function setupEventListeners() {
 
   safeOn('site-address', 'input', (e) => { docState.siteAddress = e.target.value; });
 
+  // GESTIONE ALIQUOTA IVA
   safeOn('tax-rate', 'change', (e) => {
-    docState.taxRate = parseFloat(e.target.value) || 0;
+    docState.taxRate = e.target.value;
+    const mistaBox = document.getElementById('tax-mista-box');
+    if (mistaBox) {
+      mistaBox.style.display = (docState.taxRate === 'mista') ? 'flex' : 'none';
+    }
+    docState.customTaxAmount = null;
+    const mistaInput = document.getElementById('tax-mista-amount');
+    if (mistaInput) mistaInput.value = "";
     updateCalculations();
   });
-  safeOn('tax-bonus', 'input', (e) => { docState.taxBonus = e.target.value; });
-  safeOn('payment-terms', 'input', (e) => { docState.paymentTerms = e.target.value; });
+
+  safeOn('tax-mista-amount', 'input', (e) => {
+    const val = parseFloat(e.target.value);
+    docState.customTaxAmount = isNaN(val) ? null : val;
+    updateCalculations();
+  });
+
+  // GESTIONE AGEVOLAZIONE FISCALE
+  safeOn('tax-bonus', 'change', (e) => {
+    docState.taxBonus = e.target.value;
+  });
+
+  // GESTIONE CONDIZIONI DI PAGAMENTO
+  safeOn('payment-terms-select', 'change', (e) => {
+    const customInput = document.getElementById('payment-terms-custom');
+    if (e.target.value === 'custom') {
+      if (customInput) customInput.style.display = 'block';
+      docState.paymentTerms = customInput ? customInput.value : "";
+    } else {
+      if (customInput) customInput.style.display = 'none';
+      docState.paymentTerms = e.target.value;
+    }
+  });
+
+  safeOn('payment-terms-custom', 'input', (e) => {
+    docState.paymentTerms = e.target.value;
+  });
+
   safeOn('delivery-terms', 'input', (e) => { docState.deliveryTerms = e.target.value; });
   safeOn('final-notes', 'input', (e) => { docState.finalNotes = e.target.value; });
 
@@ -391,10 +425,12 @@ function initSettingsUI() {
   if (cityInput) cityInput.value = companySettings.city || 'Trevignano';
 
   const addr2Input = document.getElementById('set-company-address2');
-  if (addr2Input) addr2Input.value = companySettings.address2 || '';
+  if (addr2Input) companySettings.address2 = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
+  if (addr2Input) addr2Input.value = companySettings.address2;
 
   const emailInput = document.getElementById('set-company-email');
-  if (emailInput) emailInput.value = companySettings.email || '';
+  if (emailInput) companySettings.email = companySettings.email || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
+  if (emailInput) emailInput.value = companySettings.email;
 
   updateLogoPreviewUI();
   renderSettingsCategoriesList();
@@ -1119,6 +1155,7 @@ function calculateCategoryTotals(cat) {
   return { fornitura, posa, total: fornitura + posa };
 }
 
+// CALCOLO TOTALI ED IVA (INCLUSA IVA MISTA BENI SIGNIFICATIVI)
 function updateCalculations() {
   let grandFornitura = 0;
   let grandPosa = 0;
@@ -1130,7 +1167,35 @@ function updateCalculations() {
   });
 
   const subtotal = grandFornitura + grandPosa;
-  const tax = subtotal * (docState.taxRate / 100);
+  let tax = 0;
+  let taxLabel = "";
+
+  if (docState.taxRate === 'mista') {
+    taxLabel = "Iva mista 10% - 22%";
+    // Regola beni significativi: posa a 10%, fornitura pari alla posa a 10%, eccedenza a 22%
+    const quotaPosa = grandPosa;
+    const quotaFornitura10 = Math.min(grandFornitura, grandPosa);
+    const quotaFornitura22 = Math.max(0, grandFornitura - grandPosa);
+    const calcolata = ((quotaPosa + quotaFornitura10) * 0.10) + (quotaFornitura22 * 0.22);
+
+    if (docState.customTaxAmount !== null && docState.customTaxAmount !== undefined) {
+      tax = docState.customTaxAmount;
+    } else {
+      tax = calcolata;
+      const mistaInput = document.getElementById('tax-mista-amount');
+      if (mistaInput && !mistaInput.value) {
+        mistaInput.placeholder = `Calc: € ${calcolata.toFixed(2)}`;
+      }
+    }
+  } else {
+    const rate = parseFloat(docState.taxRate) || 0;
+    tax = subtotal * (rate / 100);
+    if (rate === 22) taxLabel = "Iva ordinaria 22%";
+    else if (rate === 10) taxLabel = "Iva agevolata 10%";
+    else if (rate === 4) taxLabel = "Iva agevolata 4%";
+    else taxLabel = `Iva (${rate}%)`;
+  }
+
   const total = subtotal + tax;
 
   const subEl = document.getElementById('lbl-subtotal');
@@ -1138,7 +1203,7 @@ function updateCalculations() {
   const totEl = document.getElementById('lbl-total');
 
   if (subEl) subEl.textContent = `${formatCurrency(subtotal)} (Fornitura: ${formatCurrency(grandFornitura)} + Posa: ${formatCurrency(grandPosa)})`;
-  if (taxEl) taxEl.textContent = `${formatCurrency(tax)} (${docState.taxRate}%)`;
+  if (taxEl) taxEl.textContent = `${formatCurrency(tax)} (${taxLabel})`;
   if (totEl) totEl.textContent = formatCurrency(total);
 }
 
@@ -1220,9 +1285,44 @@ function openFromFile(e) {
       if (siteGroupEl) siteGroupEl.style.display = docState.sameSite ? 'none' : 'block';
 
       document.getElementById('site-address').value = docState.siteAddress || '';
-      document.getElementById('tax-rate').value = docState.taxRate || 22;
-      document.getElementById('tax-bonus').value = docState.taxBonus || '';
-      document.getElementById('payment-terms').value = docState.paymentTerms || '';
+      
+      // Ripristino Aliquota IVA
+      const taxRateEl = document.getElementById('tax-rate');
+      if (taxRateEl) {
+        taxRateEl.value = docState.taxRate || "22";
+        const mistaBox = document.getElementById('tax-mista-box');
+        if (mistaBox) mistaBox.style.display = (docState.taxRate === 'mista') ? 'flex' : 'none';
+      }
+      const mistaInput = document.getElementById('tax-mista-amount');
+      if (mistaInput) mistaInput.value = docState.customTaxAmount ? docState.customTaxAmount : '';
+
+      // Ripristino Agevolazione Fiscale
+      const taxBonusEl = document.getElementById('tax-bonus');
+      if (taxBonusEl) {
+        taxBonusEl.value = docState.taxBonus || "Bonus Casa";
+      }
+
+      // Ripristino Condizioni di Pagamento
+      const paySelect = document.getElementById('payment-terms-select');
+      const payCustom = document.getElementById('payment-terms-custom');
+      const standardTerms = [
+        "da concordare",
+        "50% acconto all'ordine + 50% saldo a fine posa",
+        "30% acconto all'ordine + 70% finanziato"
+      ];
+      if (paySelect) {
+        if (standardTerms.includes(docState.paymentTerms)) {
+          paySelect.value = docState.paymentTerms;
+          if (payCustom) payCustom.style.display = 'none';
+        } else {
+          paySelect.value = 'custom';
+          if (payCustom) {
+            payCustom.style.display = 'block';
+            payCustom.value = docState.paymentTerms || '';
+          }
+        }
+      }
+
       document.getElementById('delivery-terms').value = docState.deliveryTerms || '';
       document.getElementById('final-notes').value = docState.finalNotes || '';
 
@@ -1247,6 +1347,10 @@ function resetDocument() {
   docState.siteAddress = "";
   docState.sameSite = true;
   docState.finalNotes = "";
+  docState.taxRate = "22";
+  docState.customTaxAmount = null;
+  docState.taxBonus = "Bonus Casa";
+  docState.paymentTerms = "50% acconto all'ordine + 50% saldo a fine posa";
 
   document.getElementById('doc-number').value = "";
   document.getElementById('client-name').value = "";
@@ -1256,6 +1360,20 @@ function resetDocument() {
   document.getElementById('client-email').value = "";
   document.getElementById('site-address').value = "";
   document.getElementById('final-notes').value = "";
+  
+  document.getElementById('tax-rate').value = "22";
+  const mistaBox = document.getElementById('tax-mista-box');
+  if (mistaBox) mistaBox.style.display = 'none';
+  const mistaInput = document.getElementById('tax-mista-amount');
+  if (mistaInput) mistaInput.value = "";
+
+  document.getElementById('tax-bonus').value = "Bonus Casa";
+  document.getElementById('payment-terms-select').value = "50% acconto all'ordine + 50% saldo a fine posa";
+  const payCustom = document.getElementById('payment-terms-custom');
+  if (payCustom) {
+    payCustom.style.display = 'none';
+    payCustom.value = "";
+  }
 
   renderCategoriesUI();
   updateCalculations();
@@ -1264,8 +1382,6 @@ function resetDocument() {
 
 // ==========================================================================
 // 8. GENERAZIONE STAMPA A4 E PDF
-//    - Pagina 1: Modello identico all'immagine reale
-//    - Piè di pagina a due righe: Sedi (riga 1) e Tel/Email (riga 2)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1281,18 +1397,34 @@ function prepareAndPrint() {
   });
 
   const subtotal = grandFornitura + grandPosa;
-  const tax = subtotal * (docState.taxRate / 100);
+  let tax = 0;
+  let taxLabel = "";
+
+  if (docState.taxRate === 'mista') {
+    taxLabel = "Iva mista 10% - 22%";
+    const quotaPosa = grandPosa;
+    const quotaFornitura10 = Math.min(grandFornitura, grandPosa);
+    const quotaFornitura22 = Math.max(0, grandFornitura - grandPosa);
+    const calcolata = ((quotaPosa + quotaFornitura10) * 0.10) + (quotaFornitura22 * 0.22);
+    tax = (docState.customTaxAmount !== null && docState.customTaxAmount !== undefined) ? docState.customTaxAmount : calcolata;
+  } else {
+    const rate = parseFloat(docState.taxRate) || 0;
+    tax = subtotal * (rate / 100);
+    if (rate === 22) taxLabel = "Iva ordinaria 22%";
+    else if (rate === 10) taxLabel = "Iva agevolata 10%";
+    else if (rate === 4) taxLabel = "Iva agevolata 4%";
+    else taxLabel = `Iva (${rate}%)`;
+  }
+
   const total = subtotal + tax;
   const isContract = docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO");
   const isRevision = docState.type === "REVISIONE" || docState.type.includes("REVISIONE");
   const formattedDocNum = getFormattedDocNumber();
 
-  // Città e Data in formato esteso italiano (es. Trevignano, lì 28 marzo 2026)
   const city = (companySettings.city || "Trevignano").trim();
   const dateFormattedLong = formatLongItalianDate(docState.date);
   const cityDateText = city ? `${city}, lì &nbsp; ${dateFormattedLong}` : dateFormattedLong;
 
-  // Etichetta del box documento (Offerta n. / Contratto n. / Revisione n.)
   let boxLabel = "Offerta n.";
   if (isContract) boxLabel = "Contratto n.";
   else if (isRevision) boxLabel = "Revisione n.";
@@ -1304,17 +1436,18 @@ function prepareAndPrint() {
     validityText = `validità offerta ${validityText}`;
   }
 
-  // Stringhe del piè di pagina Pagina 1
+  // Se l'agevolazione è 'nessuna', in stampa compare solo '-'
+  const bonusPrint = (!docState.taxBonus || docState.taxBonus.toLowerCase() === 'nessuna') ? '-' : escapeHtml(docState.taxBonus);
+
   const sede1 = companySettings.address || "via Treviso, 5 - 31040 Signoressa di Trevignano (TV)";
   const sede2 = companySettings.address2 || "via Feltrina, 33 - 31038 Castagnole di Paese (TV)";
   const telInfo = companySettings.contacts || "Tel. 0423 670806";
   const emailInfo = companySettings.email || "info@3esseserramenti.it \\ preventivi.3esse@gmail.com";
 
-  // PAGINA 1: MODELLO FEDELE AL CAMPIONE REALE
+  // PAGINA 1
   const page1 = document.createElement('div');
   page1.className = "sheet p1-sheet";
   page1.innerHTML = `
-    <!-- 1. LOGO / NOME IN ALTO A SINISTRA (SENZA LINEA NERA SOTTO) -->
     <div class="p1-header-logo">
       ${companySettings.logo ? `
         <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">
@@ -1323,7 +1456,6 @@ function prepareAndPrint() {
       `}
     </div>
 
-    <!-- 2. RIGA: DATA A SINISTRA E BOX OFFERTA A DESTRA -->
     <div class="p1-date-doc-row">
       <div class="p1-date-left">${cityDateText}</div>
       <table class="p1-box-offerta">
@@ -1334,7 +1466,6 @@ function prepareAndPrint() {
       </table>
     </div>
 
-    <!-- 3. CORPO CENTRALE: DATI CLIENTE E CANTIERE CENTRATI -->
     <div class="p1-middle-section">
       <div class="p1-client-name">${escapeHtml(docState.client.name) || 'CLIENTE'}</div>
       <div class="p1-client-address">${escapeHtml(docState.client.residence) || ''}</div>
@@ -1349,7 +1480,6 @@ function prepareAndPrint() {
       ` : ''}
     </div>
 
-    <!-- 4. TITOLO E VALIDITÀ A 3/4 ALTEZZA -->
     <div class="p1-title-section">
       <div class="p1-doc-title">${escapeHtml(docState.type)}</div>
       ${!isContract && validityText ? `
@@ -1357,7 +1487,6 @@ function prepareAndPrint() {
       ` : ''}
     </div>
 
-    <!-- 5. PIÈ DI PAGINA CENTRATO SU 2 RIGHE ESATTE -->
     <div class="p1-footer-center">
       <div>Sedi: &nbsp;${escapeHtml(sede1)} &nbsp;|&nbsp; ${escapeHtml(sede2)}</div>
       <div>${escapeHtml(telInfo)} &nbsp;|&nbsp; E-Mail: ${escapeHtml(emailInfo)}</div>
@@ -1540,7 +1669,7 @@ function prepareAndPrint() {
             <td class="text-right" style="font-size: 1.1rem; color: #000;"><strong>${formatCurrency(subtotal)}</strong></td>
           </tr>
           <tr>
-            <td colspan="3">IVA di legge (${docState.taxRate}%)</td>
+            <td colspan="3">${escapeHtml(taxLabel)}</td>
             <td class="text-right">${formatCurrency(tax)}</td>
           </tr>
           <tr style="background-color: #eee; font-size: 1.25rem;">
@@ -1552,7 +1681,7 @@ function prepareAndPrint() {
 
       <div class="p-box" style="margin-top: 15px;">
         <div class="p-box-title">Condizioni di Fornitura e Pagamento</div>
-        <div><strong>Detrazione Fiscale applicabile:</strong> ${escapeHtml(docState.taxBonus) || 'Nessuna'}</div>
+        <div><strong>Detrazione Fiscale applicabile:</strong> ${bonusPrint}</div>
         <div><strong>Termini di Pagamento:</strong> ${escapeHtml(docState.paymentTerms)}</div>
         <div><strong>Tempi indicativi consegna/posa:</strong> ${escapeHtml(docState.deliveryTerms)}</div>
         ${docState.finalNotes ? `<div style="margin-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
