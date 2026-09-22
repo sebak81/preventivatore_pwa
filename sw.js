@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v30'; // Rimozione pulsante anteprima a schermo
+const CACHE_NAME = 'prev-app-v31'; // Aggiornamento nomenclatura file, revisione e testi finali personalizzati
 const ASSETS = [
   './',
   './index.html',
