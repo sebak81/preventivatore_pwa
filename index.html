@@ -13,6 +13,7 @@
   <header class="top-bar">
     <div style="display: flex; align-items: center; gap: 15px;">
       <h1 id="app-title">Preventivatore</h1>
+      <!-- Selettore Viste: Preventivo vs Impostazioni -->
       <nav class="nav-tabs">
         <button type="button" class="tab-btn active" id="tab-editor-btn">📝 Preventivo</button>
         <button type="button" class="tab-btn" id="tab-settings-btn">⚙️ Impostazioni</button>
@@ -45,7 +46,7 @@
               <option value="REVISIONE">Revisione</option>
               <option value="CONTRATTO">Contratto</option>
             </select>
-            <!-- Campo N. Revisione visibile solo se tipo = REVISIONE -->
+            <!-- Campo N. Revisione affiancato al selettore -->
             <input type="number" id="doc-revision-num" min="1" step="1" value="1" placeholder="Rev." style="width: 70px; display: none; text-align: center; font-weight: bold;" title="Numero Revisione">
           </div>
         </div>
@@ -76,7 +77,7 @@
         </div>
         <div class="form-group full">
           <label>Indirizzo Residenza (Via, Civico, CAP, Città, Prov)</label>
-          <input type="text" id="client-residence" placeholder="via Roma 10, 00100 Roma (RM)">
+          <input type="text" id="client-residence" placeholder="Villaggio Monica - Falzè di Trevignano">
         </div>
         <div class="form-group">
           <label>Codice Fiscale / P.IVA</label>
@@ -84,7 +85,7 @@
         </div>
         <div class="form-group">
           <label>Telefono</label>
-          <input type="tel" id="client-phone" placeholder="340 1234567">
+          <input type="tel" id="client-phone" placeholder="330 786430">
         </div>
         <div class="form-group full">
           <label>Email</label>
@@ -99,7 +100,7 @@
 
       <div class="form-group full" id="site-group" style="display: none; margin-top: 10px;">
         <label>Indirizzo Cantiere (se diverso)</label>
-        <input type="text" id="site-address" placeholder="Via Cantiere 22, Milano (MI)">
+        <input type="text" id="site-address" placeholder="Villaggio Monica, Falzè di Trevignano">
       </div>
     </section>
 
