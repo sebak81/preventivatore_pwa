@@ -23,7 +23,6 @@
       <button class="btn btn-secondary" id="btn-new">Nuovo</button>
       <button class="btn btn-secondary" id="btn-open">Apri (.json)</button>
       <button class="btn btn-secondary" id="btn-save">Salva (.json)</button>
-      <button class="btn btn-secondary" id="btn-preview-doc">👁️ Anteprima</button>
       <button class="btn btn-primary" id="btn-print">Stampa / Salva PDF</button>
     </div>
   </header>
@@ -236,7 +235,7 @@
       </div>
     </section>
 
-    <!-- SEZIONE TESTI LEGALI CON SUPPORTO MARKDOWN E PULSANTI DEDICATI (SENZA RIPRISTINA) -->
+    <!-- SEZIONE TESTI LEGALI CON SUPPORTO MARKDOWN -->
     <section class="card">
       <div class="card-title">
         <span>Testi Legali & Normativi (Condizioni e Privacy)</span>
@@ -250,9 +249,8 @@
         <button type="button" class="btn btn-secondary" id="btn-toggle-privacy">🔒 Modifica Informativa Privacy</button>
       </div>
 
-      <!-- Editor Condizioni Contrattuali con Guida e Anteprima Markdown -->
+      <!-- Editor Condizioni Contrattuali -->
       <div id="panel-edit-terms" style="display: none; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin-bottom: 14px;">
-        
         <div class="markdown-helper-box">
           <div style="font-weight: 700; margin-bottom: 6px; color: var(--primary);">Supporto Markdown:</div>
           <ul class="md-helper-list">
@@ -278,7 +276,7 @@
         <div id="terms-markdown-preview" style="display: none; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 14px; margin-top: 10px;" class="legal-text"></div>
       </div>
 
-      <!-- Editor Privacy con Guida e Anteprima Markdown -->
+      <!-- Editor Privacy -->
       <div id="panel-edit-privacy" style="display: none; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin-bottom: 14px;">
         <div class="markdown-helper-box">
           <div style="font-weight: 700; margin-bottom: 6px; color: var(--primary);">Supporto Markdown:</div>
@@ -338,20 +336,6 @@
     </section>
 
   </main>
-
-  <!-- MODALE ANTEPRIMA DOCUMENTO COMPLETO A SCHERMO -->
-  <div id="preview-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Anteprima del Documento (Fogli A4)</h2>
-        <div style="display: flex; gap: 10px;">
-          <button type="button" class="btn btn-primary" id="btn-modal-print">🖨️ Stampa / Salva PDF</button>
-          <button type="button" class="btn btn-secondary" id="btn-modal-close">&times; Chiudi</button>
-        </div>
-      </div>
-      <div class="modal-body" id="modal-preview-body"></div>
-    </div>
-  </div>
 
   <div id="print-root"></div>
   <input type="file" id="file-input" accept=".json" style="display: none;">
