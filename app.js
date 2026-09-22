@@ -129,11 +129,80 @@ Nel caso in cui il difetto non rientri nella garanzia, verrà predisposto un pre
 ---
 ## Manuali d'Uso:
 I manuali d'uso e manutenzione dei prodotti sono disponibili sul sito internet di **3 ESSE SERRAMENTI S.r.l.** e devono essere consultati e rispettati dal Cliente ai fini della corretta conservazione della garanzia.`,
-  privacy: `Ai sensi del Regolamento UE 2016/679 (**GDPR**), La informiamo che i Suoi dati personali anagrafici e fiscali vengono raccolti e trattati esclusivamente per finalità connesse alla gestione amministrativa, contabile, fiscale e operativa del presente preventivo/contratto di fornitura.
+  privacy: `## INFORMATIVA EX ARTT. 13-14, GDPR UE/2016/679
 
-- **Finalità del trattamento:** gestione ed esecuzione della commessa, rilievo misure, fornitura e posa in opera dei manufatti, adempimento degli obblighi contrattuali e fiscali di legge.
-- **Conferimento dei dati:** il conferimento è obbligatorio per l'instaurazione e la corretta gestione del rapporto commerciale e contrattuale.
-- **Conservazione e diffusione:** i dati saranno conservati per i tempi previsti dalle vigenti disposizioni di legge e non saranno comunicati a soggetti terzi non autorizzati né diffusi.`
+Il Regolamento Europeo **UE/2016/679** (di seguito "Regolamento") stabilisce norme relative alla protezione delle persone fisiche con riguardo al trattamento dei dati personali, nonché norme relative alla libera circolazione di tali dati.
+
+In osservanza al principio di trasparenza previsto dall'art. 5 del Regolamento, **3 ESSE S.R.L.**, con sede in TREVIGNANO 31040 (TV) in Via Treviso n. 5 - Italia, in qualità di Titolare del Trattamento, Le fornisce le informazioni richieste dagli artt. 13 e 14 del Regolamento.
+---
+### Finalità del Trattamento
+Il trattamento dei Suoi dati personali sarà improntato ai principi di correttezza, liceità e trasparenza, tutelando la Sua riservatezza, i Suoi diritti ed in conformità alla policy privacy aziendale. L'azienda si impegna inoltre a trattare i Suoi dati nel rispetto del principio di "minimizzazione", ovvero acquisendo e trattando i dati limitatamente a quanto necessario rispetto alle seguenti finalità:
+- **a)** Gestione ed esecuzione degli obblighi pre-contrattuali;
+- **b)** Gestione ed esecuzione degli obblighi contrattuali;
+- **c)** Inserimento dei dati nei data base aziendali al fine di consentire il monitoraggio dell'esecuzione del contratto;
+- **d)** Gestione degli adempimenti fiscali, contabili o per dar corso a richieste dell'autorità giudiziaria;
+- **e)** Adempiere agli obblighi previsti dalla legge, dai regolamenti e dalla normativa dell'UE.
+
+La informiamo inoltre che:
+- in relazione alle finalità di cui ai punti a), b), c), il trattamento potrà essere effettuato senza il suo consenso in quanto necessario all'esecuzione del contratto di cui Lei è parte (art. 6.1 lett. b del Regolamento);
+- in relazione alle finalità di cui ai punti d) ed e), il trattamento potrà essere effettuato senza il suo consenso in quanto necessario per adempiere agli obblighi di legge (art. 6.1 lett. c del Regolamento).
+
+Il conferimento dei Suoi dati personali è obbligatorio per le finalità di cui ai punti a), b), c), d), e), ed il Suo rifiuto al conferimento dei dati determinerà l'impossibilità totale di stipula ed esecuzione del contratto.
+---
+### Modalità del Trattamento
+Il trattamento dei Suoi dati personali sarà effettuato con modalità cartacee e strumenti informatici nel rispetto delle disposizioni in materia di protezione dei dati personali e, in particolare, delle misure tecniche e organizzative adeguate di cui all'art. 32.1 del Regolamento, e con l'osservanza di ogni misura cautelativa che ne garantisca la relativa integrità, riservatezza e disponibilità.
+---
+### Fonte da cui hanno origine i dati
+Tutti i dati sono raccolti direttamente presso l'interessato e volontariamente forniti dal cliente.
+---
+### Categorie di destinatari
+I Suoi dati personali potranno essere comunicati, in stretta relazione alle finalità sopra indicate, ai seguenti soggetti o categorie di soggetti:
+- **a)** soggetti in relazione ai quali la vigente normativa prevede l'obbligo di comunicazione, in ottemperanza a quanto prescritto dalla normativa in materia fiscale e contabile;
+- **b)** istituti di credito;
+- **c)** società operanti nel settore della logistica;
+- **d)** a professionisti, al fine dello studio e risoluzione di eventuali problemi giuridici relativi alla Sua posizione contrattuale (ad es.: avvocati);
+- **e)** a professionisti (sia persone fisiche sia persone giuridiche) a cui il Titolare dovesse affidare degli incarichi per lo svolgimento di alcune attività in outsourcing (ad es.: commercialisti, consulenti).
+
+La informiamo inoltre che:
+- la comunicazione dei Suoi dati alle categorie di soggetti di cui alla lettera a) costituisce un obbligo di legge al quale il Titolare deve ottemperare;
+- la comunicazione dei Suoi dati alle categorie di soggetti di cui alle lettere b), c), d), e), è necessaria per dare esecuzione al contratto di cui Lei è parte.
+
+In relazione alle categorie di soggetti di cui alle lettere b), c), d), e), il Titolare del Trattamento si impegna ad affidarsi esclusivamente a soggetti che prestino garanzie adeguate circa la protezione dei dati, e provvederà a nominarli Responsabili del Trattamento ex art. 28 del Regolamento. L'elenco dei Responsabili del Trattamento è disponibile in azienda e potrà prenderne visione previa richiesta al Titolare del Trattamento.
+
+I Suoi dati, inoltre, verranno trattati, esclusivamente per le finalità di cui sopra, da parte del personale aziendale dipendente e/o collaboratore, appositamente autorizzato e istruito dal Titolare ai sensi dell'art. 29 del Regolamento.
+
+I Suoi dati personali non saranno oggetto di diffusione, salvo qualora richiesto da una norma di legge o di regolamento o dalla normativa comunitaria.
+---
+### Periodo di conservazione
+- **Dati identificativi, Dati di contatto, Fatture, DDT:** 10 anni a partire dal momento della risoluzione del contratto (art. 43 del D.P.R. 600/73; art. 2946 codice civile sulla prescrizione ordinaria).
+---
+### Diritti riconosciuti all'interessato
+In ogni momento potrà esercitare, nei confronti del Titolare, i Suoi diritti previsti dagli artt. 15-22 del Regolamento.
+
+In particolare, in qualsiasi momento, Lei avrà il diritto di chiedere:
+- l'accesso ai Suoi dati personali;
+- la loro rettifica in caso di inesattezza degli stessi;
+- la cancellazione;
+- la limitazione del loro trattamento.
+
+Avrà inoltre:
+- il diritto di opporsi al loro trattamento se trattati per il perseguimento di un legittimo interesse del Titolare del Trattamento, qualora ritenesse violati i propri diritti e libertà fondamentali;
+- il diritto di revocare in qualsiasi momento il Suo consenso in relazione alle finalità per le quali questo è necessario;
+- il diritto alla portabilità dei Suoi dati, ossia il diritto di ricevere in un formato strutturato, di uso comune e leggibile da dispositivo automatico, i dati personali a Lei riferibili.
+
+Potrà esercitare i propri diritti direttamente e gratuitamente contattando il Titolare del Trattamento **3 ESSE S.R.L.**, con sede in TREVIGNANO 31040 (TV) in Via Treviso n. 5 - Italia, telefonicamente al numero +39 0423/670806, o a mezzo mail all'indirizzo: info@3esseserramenti.com indicando nell'oggetto *"ESERCIZIO DEL DIRITTO IN MATERIA DI DATI PERSONALI"* specificando quale diritto richieda o per comunicazione scritta all'indirizzo del Titolare.
+
+È diritto dell'interessato proporre reclamo al Garante per la protezione dei dati personali all'indirizzo www.garanteprivacy.it
+---
+
+**Luogo e data**
+________________________________________
+
+**Nome e Cognome del cliente**
+________________________________________
+
+**Firma**
+________________________________________`
 };
 
 const DEFAULT_CATALOG = {
@@ -211,7 +280,7 @@ const DEFAULT_CATALOG = {
         name: "Pinto",
         models: [
           { id: "mod_pinto_all", name: "Alluminio Coibentato Duero/Standard", specs: "Poliuretano espanso alta densità, terminale alluminio", glass: "-", desc: "Tapparella in alluminio coibentato ad elevata stabilità dimensionale e resistenza agli sbalzi termici." },
-          { id: "mod_pinto_acc", name: "Acciaio Blindato", specs: "Lamiera di acciaio con anima in resina poliuretanica", glass: "-", desc: "Avvolgibile di sicurezza antieffrazione ad alta resistenza mechanical contro tentativi di scasso." }
+          { id: "mod_pinto_acc", name: "Acciaio Blindato", specs: "Lamiera di acciaio con anima in resina poliuretanica", glass: "-", desc: "Avvolgibile di sicurezza antieffrazione ad alta resistenza meccanica contro tentativi di scasso." }
         ]
       }
     ]
@@ -297,7 +366,7 @@ const DEFAULT_CATALOG = {
 };
 
 // ==========================================================================
-// 2. PARSER MARKDOWN
+// 2. PARSER MARKDOWN (Supporta titoli, grassetti, corsivi, linee --- e righe di compilazione ____)
 // ==========================================================================
 function parseMarkdown(md) {
   if (!md) return "";
@@ -306,7 +375,11 @@ function parseMarkdown(md) {
   text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   text = text.replace(/^### (.*$)/gim, '<h4 class="md-h3">$1</h4>');
   text = text.replace(/^## (.*$)/gim, '<h3 class="md-h2">$1</h3>');
-  text = text.replace(/__(.*?)__/g, '<u>$1</u>');
+  
+  // Sottolineato solo se tra __ c'è testo reale (non una riga di underscore!)
+  text = text.replace(/__([^_]+?)__/g, '<u>$1</u>');
+  
+  // Grassetto e corsivo
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
 
@@ -389,7 +462,6 @@ function persistSettings() {
 // 4. FETCH AUTOMATICA DA GITHUB (Condizioni & Privacy)
 // ==========================================================================
 async function fetchRemoteLegalTerms() {
-  // Fetch condizioni contrattuali
   try {
     const res = await fetch('./condizioni_contrattuali.json?t=' + Date.now());
     if (res.ok) {
@@ -406,7 +478,6 @@ async function fetchRemoteLegalTerms() {
     console.log("Uso condizioni contrattuali locali.", err);
   }
 
-  // Fetch informativa privacy
   try {
     const resPriv = await fetch('./privacy_policy.json?t=' + Date.now());
     if (resPriv.ok) {
@@ -745,7 +816,7 @@ function handleLogoRemove() {
   }
 }
 
-// ANTEPRIME LIVE MARKDOWN (CONDIZIONI & PRIVACY)
+// ANTEPRIME LIVE MARKDOWN
 function toggleTermsMarkdownPreview() {
   const area = document.getElementById('set-legal-terms');
   const prev = document.getElementById('terms-markdown-preview');
@@ -796,7 +867,7 @@ function updatePrivacyLivePreview() {
   }
 }
 
-// ESPOSTAZIONE / IMPORTAZIONE FILE JSON CONDIZIONI
+// SALVATAGGIO & CARICAMENTO FILE JSON
 function exportTermsJSON() {
   const textToSave = document.getElementById('set-legal-terms').value;
   legalSettings.terms = textToSave;
@@ -840,7 +911,6 @@ function importTermsJSON(e) {
   e.target.value = '';
 }
 
-// ESPORTAZIONE / IMPORTAZIONE FILE JSON PRIVACY
 function exportPrivacyJSON() {
   const textToSave = document.getElementById('set-legal-privacy').value;
   legalSettings.privacy = textToSave;
@@ -1786,6 +1856,7 @@ function resetDocument() {
 
 // ==========================================================================
 // 10. GENERAZIONE FOGLI HTML (STAMPA & ANTEPRIMA A SCHERMO)
+//     - Condizioni e Privacy separate su due fogli A4 distinti
 // ==========================================================================
 function buildAllSheetsHTML() {
   let grandFornitura = 0;
@@ -1829,7 +1900,8 @@ function buildAllSheetsHTML() {
   if (isContract) boxLabel = "Contratto n.";
   else if (isRevision) boxLabel = "Revisione n.";
 
-  const totalPages = docState.categories.length + 3;
+  // Fogli totali: 1 (copertina) + N categorie + 1 (totali) + 1 (condizioni) + 1 (privacy)
+  const totalPages = docState.categories.length + 4;
 
   let validityText = (docState.validity || "").trim();
   if (validityText && !validityText.toLowerCase().includes("validit")) {
@@ -1845,7 +1917,7 @@ function buildAllSheetsHTML() {
 
   let sheetsHTML = "";
 
-  // 1. PAGINA 1
+  // 1. PAGINA 1: COPERTINA
   sheetsHTML += `
     <div class="sheet p1-sheet">
       <div class="p1-top-container">
@@ -2106,38 +2178,56 @@ function buildAllSheetsHTML() {
     </div>
   `;
 
-  // 4. ULTIMA PAGINA: NORMATIVA & PRIVACY (ENTRAMBE IN FORMATO MARKDOWN)
+  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO (PAGINA DEDICATA)
+  const pageTermsNum = docState.categories.length + 3;
   sheetsHTML += `
     <div class="sheet">
       <div>
         <div class="p-header">
           <div class="p-company">
             <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div>Condizioni Contrattuali e Normativa Privacy</div>
+            <div>Condizioni Generali di Contratto</div>
+          </div>
+          <div class="p-doc-details">
+            <div style="font-size: 0.85rem;">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
           </div>
         </div>
 
         <div class="p-box">
-          <div class="p-box-title">Condizioni Generali di Fornitura e Posa</div>
           <div class="legal-text">${parseMarkdown(legalSettings.terms || DEFAULT_LEGAL.terms)}</div>
-        </div>
-
-        <div class="p-box" style="margin-top: 16px;">
-          <div class="p-box-title">Informativa sul Trattamento dei Dati Personali (GDPR 2016/679)</div>
-          <div class="legal-text">${parseMarkdown(legalSettings.privacy || DEFAULT_LEGAL.privacy)}</div>
-        </div>
-
-        <div class="p-signature-area" style="margin-top: 40px;">
-          <div class="p-sign-box" style="width: 340px;">
-            Firma per espressa approvazione clausole e Privacy<br><br><br>
-            ________________________________________
-          </div>
         </div>
       </div>
 
       <div class="p-footer">
         <span>${escapeHtml(companySettings.name)}</span>
-        <span>Pagina ${totalPages} di ${totalPages}</span>
+        <span>Pagina ${pageTermsNum} di ${totalPages}</span>
+      </div>
+    </div>
+  `;
+
+  // 5. PAGINA INFORMATIVA PRIVACY GDPR (PAGINA DEDICATA CON CAMPI FIRMA)
+  const pagePrivacyNum = totalPages;
+  sheetsHTML += `
+    <div class="sheet">
+      <div>
+        <div class="p-header">
+          <div class="p-company">
+            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+            <div>Informativa Privacy e Protezione Dati</div>
+          </div>
+          <div class="p-doc-details">
+            <div style="font-size: 0.85rem;">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
+          </div>
+        </div>
+
+        <div class="p-box">
+          <div class="legal-text">${parseMarkdown(legalSettings.privacy || DEFAULT_LEGAL.privacy)}</div>
+        </div>
+      </div>
+
+      <div class="p-footer">
+        <span>${escapeHtml(companySettings.name)}</span>
+        <span>Pagina ${pagePrivacyNum} di ${totalPages}</span>
       </div>
     </div>
   `;
