@@ -478,7 +478,6 @@ textarea {
   gap: 24px;
 }
 
-/* Rendering fogli A4 dentro la modale */
 .modal-body .sheet {
   background: #ffffff !important;
   width: 210mm;
@@ -513,8 +512,8 @@ textarea {
 /* STILI MARKDOWN CONDIVISI (VIDEO & STAMPA)                  */
 /* ========================================================== */
 .legal-text {
-  font-size: 0.8rem;
-  line-height: 1.5;
+  font-size: 0.78rem;
+  line-height: 1.45;
   text-align: justify;
   color: #222;
 }
@@ -552,6 +551,12 @@ textarea {
   text-decoration: underline;
 }
 
+.legal-text hr.md-hr {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+  margin: 8px 0;
+}
+
 /* ========================================================== */
 /* SCHERMATA DI STAMPA A4 (@media print)                      */
 /* ========================================================== */
@@ -567,7 +572,7 @@ textarea {
     color: #111 !important;
   }
 
-  .top-bar, .container, #file-input, #settings-file-input, #logo-file-input, #terms-file-input, .modal-overlay {
+  .top-bar, .container, #file-input, #settings-file-input, #logo-file-input, #terms-file-input, #privacy-file-input, .modal-overlay {
     display: none !important;
   }
 
@@ -658,7 +663,6 @@ textarea {
     color: #111;
   }
 
-  /* RIGA SUBITO SOTTO LA LINEA NERA: DATA A SINISTRA E NUMERO A DESTRA */
   .p1-sub-header {
     display: flex;
     justify-content: space-between;
@@ -683,102 +687,84 @@ textarea {
     background-color: #fff;
   }
 
-  /* DATI CLIENTE A METÀ PAGINA */
-  .p1-client-center {
+  .p1-middle-section {
     position: absolute;
-    top: 105mm;
+    top: 96mm;
     left: 0;
     right: 0;
     text-align: center;
   }
 
   .p1-client-name {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #0f172a;
+    font-size: 1.3rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #111;
     margin-bottom: 6px;
   }
 
   .p1-client-address {
-    font-size: 1.15rem;
-    color: #334155;
-    margin-bottom: 6px;
-  }
-
-  .p1-client-tax {
-    font-size: 0.95rem;
-    color: #64748b;
-    margin-bottom: 6px;
+    font-size: 1.05rem;
+    color: #222;
+    margin-bottom: 12px;
   }
 
   .p1-client-line {
-    font-size: 1.05rem;
-    color: #0f172a;
-    line-height: 1.5;
+    font-size: 1rem;
+    color: #222;
+    line-height: 1.45;
   }
 
-  .p1-site-info {
-    margin-top: 18px;
-    font-size: 1.05rem;
-    color: #0f172a;
+  .p1-site-block {
+    margin-top: 26px;
   }
 
-  /* TITOLO E VALIDITÀ A CIRCA 3/4 DI ALTEZZA */
-  .p1-title-bottom {
+  .p1-site-title {
+    font-size: 1rem;
+    color: #222;
+    margin-bottom: 3px;
+  }
+
+  .p1-site-address {
+    font-size: 1.05rem;
+    color: #222;
+    line-height: 1.35;
+  }
+
+  .p1-title-section {
     position: absolute;
-    top: 180mm;
+    top: 185mm;
     left: 0;
     right: 0;
     text-align: center;
   }
 
-  .p1-main-title {
-    font-size: 3rem;
+  .p1-doc-title {
+    font-size: 1.35rem;
     font-weight: 900;
-    letter-spacing: 8px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: #000;
-    margin-bottom: 12px;
+    margin-bottom: 24px;
   }
 
   .p1-validity-text {
-    font-size: 1.15rem;
-    font-weight: 600;
+    font-size: 0.95rem;
     text-decoration: underline;
     font-style: italic;
-    color: #334155;
+    color: #222;
   }
 
-  /* PIÈ DI PAGINA DI PAGINA 1 */
-  .p1-footer {
+  .p1-footer-center {
     position: absolute;
-    bottom: 0;
+    bottom: 4mm;
     left: 0;
     right: 0;
-    border-top: 1px solid #000;
-    padding-top: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-
-  .p1-footer-company {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    color: #334155;
-    text-align: left;
-  }
-
-  .p1-footer-title {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 2px;
-  }
-
-  .p1-footer-page {
-    font-size: 0.85rem;
-    color: #475569;
+    text-align: center;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #333;
   }
 
   /* Schede Categorie e Tabelle */
@@ -839,5 +825,11 @@ textarea {
     padding-top: 8px;
     text-align: center;
     font-size: 0.85rem;
+  }
+
+  .legal-text hr.md-hr {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 6px 0;
   }
 }
