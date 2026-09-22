@@ -366,7 +366,7 @@ const DEFAULT_CATALOG = {
 };
 
 // ==========================================================================
-// 2. PARSER MARKDOWN (Supporta titoli, grassetti, corsivi, linee --- e righe di compilazione ____)
+// 2. PARSER MARKDOWN
 // ==========================================================================
 function parseMarkdown(md) {
   if (!md) return "";
@@ -867,7 +867,7 @@ function updatePrivacyLivePreview() {
   }
 }
 
-// SALVATAGGIO & CARICAMENTO FILE JSON
+// SALVATAGGIO & CARICAMENTO FILE JSON SINGOLI
 function exportTermsJSON() {
   const textToSave = document.getElementById('set-legal-terms').value;
   legalSettings.terms = textToSave;
@@ -1218,18 +1218,47 @@ function saveSettingsFromUI() {
   alert("Tutte le impostazioni aziendali, condizioni e privacy sono state salvate correttamente!");
 }
 
+// ==========================================================================
+// MASTER BACKUP COMPLETO: ESPORTAZIONE & IMPORTAZIONE TOTALE
+// Salva Anagrafica, Logo, Macro-Categorie, Fornitori, Condizioni e Privacy
+// ==========================================================================
 function exportSettingsJSON() {
+  // Sincronizza al volo i campi attualmente aperti a schermo
+  companySettings.name = document.getElementById('set-company-name').value;
+  companySettings.address = document.getElementById('set-company-address').value;
+  companySettings.taxId = document.getElementById('set-company-taxid').value;
+  companySettings.contacts = document.getElementById('set-company-contacts').value;
+
+  const cityInput = document.getElementById('set-company-city');
+  if (cityInput) companySettings.city = cityInput.value.trim() || 'Trevignano';
+
+  const addr2Input = document.getElementById('set-company-address2');
+  if (addr2Input) companySettings.address2 = addr2Input.value.trim();
+
+  const emailInput = document.getElementById('set-company-email');
+  if (emailInput) companySettings.email = emailInput.value.trim();
+
+  const termsArea = document.getElementById('set-legal-terms');
+  if (termsArea) legalSettings.terms = termsArea.value;
+
+  const privacyArea = document.getElementById('set-legal-privacy');
+  if (privacyArea) legalSettings.privacy = privacyArea.value;
+
+  persistSettings();
+
   const exportData = {
+    tipo: "backup_completo_impostazioni",
+    dataEsportazione: new Date().toISOString(),
     company: companySettings,
     legal: legalSettings,
-    catalog: catalogSettings,
-    exportedAt: new Date().toISOString()
+    catalog: catalogSettings
   };
+
   const jsonStr = JSON.stringify(exportData, null, 2);
   const blob = new Blob([jsonStr], { type: "application/json" });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `Impostazioni_Aziendali_Preventivi.json`;
+  a.download = `Impostazioni_Complete_3ESSE_${new Date().toISOString().split('T')[0]}.json`;
   a.click();
 }
 
@@ -1244,11 +1273,14 @@ function importSettingsJSON(e) {
       if (data.company) companySettings = data.company;
       if (data.legal) legalSettings = data.legal;
       if (data.catalog) catalogSettings = data.catalog;
+
       persistSettings();
       initSettingsUI();
       populateCategorySelector();
       renderCategoriesUI();
-      alert("Configurazione aziendale importata con successo!");
+      updateTermsLivePreview();
+      updatePrivacyLivePreview();
+      alert("Configurazione aziendale completa importata con successo!");
     } catch (err) {
       alert("File non valido: " + err.message);
     }
