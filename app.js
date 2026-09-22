@@ -375,11 +375,7 @@ function parseMarkdown(md) {
   text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   text = text.replace(/^### (.*$)/gim, '<h4 class="md-h3">$1</h4>');
   text = text.replace(/^## (.*$)/gim, '<h3 class="md-h2">$1</h3>');
-  
-  // Sottolineato solo se tra __ c'è testo reale (non una riga vuota di underscore)
   text = text.replace(/__([^_]+?)__/g, '<u>$1</u>');
-  
-  // Grassetto e corsivo
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
 
@@ -1167,7 +1163,7 @@ function renderSettingsCategoriesList() {
         '<div style="display: flex; align-items: center; gap: 10px;">' +
           '<span class="accordion-arrow">' + (isCatOpen ? '▼' : '▶') + '</span>' +
           '<span style="font-weight: 700; font-size: 1rem;">' + (idx + 1) + '. ' + escapeHtml(catName) + '</span>' +
-        </div>' +
+        '</div>' +
         '<div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation();">' +
           '<span class="cat-badge">' + suppliers.length + ' fornitore/i</span>' +
           '<button type="button" class="btn btn-danger btn-sm" onclick="deleteMacroCategory(\'' + escapeHtml(catName) + '\')">Elimina</button>' +
@@ -1505,7 +1501,7 @@ function renderCategoryOptionsBlock(cat) {
       '<div class="form-grid" style="margin-top: 10px;">' +
         '<div class="form-group">' +
           '<label>Specifiche Tecniche Sistema</label>' +
-          '<input type="text" value="' + escapeHtml(cat.specs) + '" placeholder="Spessore, guarnizioni, caratteristiche" oninput="updateCatField(\'' + cat.id + '\', \'specs\', this.value)">' +
+          '<input type="text" value="' + escapeHtml(cat.specs) + '" placeholder="Spessore, guarnizioni, caratteristiche" oninput="updateCatField(\'' + cat.id + '\', \'specs', this.value)">' +
         '</div>' +
         '<div class="form-group">' +
           '<label>Vetraggio / Accessori</label>' +
@@ -1941,7 +1937,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Senza template literal annidati)
+// 10. GENERAZIONE STAMPA PDF NATIVA
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -2001,7 +1997,7 @@ function prepareAndPrint() {
 
   let sheetsHTML = "";
 
-  // 1. PAGINA 1: COPERTINA (Costruzione pulita e lineare)
+  // 1. PAGINA 1: COPERTINA
   const logoHtml = companySettings.logo
     ? '<img src="' + companySettings.logo + '" class="p-page1-logo-full" alt="Logo">'
     : '<div class="p1-company-fallback">' + escapeHtml(companySettings.name || '3 ESSE SERRAMENTI') + '</div>';
@@ -2299,10 +2295,4 @@ function prepareAndPrint() {
   setTimeout(() => {
     document.title = originalTitle;
   }, 1000);
-}
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log('Service Worker Registrato'))
-    .catch((err) => console.log('Errore SW:', err));
 }
