@@ -184,7 +184,7 @@ const DEFAULT_CATALOG = {
 };
 
 // ==========================================================================
-// 2. PARSER MARKDOWN CLIENT-SIDE LEGGERO
+// 2. PARSER MARKDOWN CLIENT-SIDE
 // ==========================================================================
 function parseMarkdown(md) {
   if (!md) return "";
@@ -264,7 +264,30 @@ function persistSettings() {
 }
 
 // ==========================================================================
-// 4. STATO CENTRALE DEL PREVENTIVO
+// 4. FETCH AUTOMATICA DELLE CONDIZIONI DA GITHUB (condizioni_contrattuali.json)
+// ==========================================================================
+async function fetchRemoteLegalTerms() {
+  try {
+    // Cache-busting con timestamp per leggere subito le modifiche committate su GitHub
+    const res = await fetch('./condizioni_contrattuali.json?t=' + Date.now());
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.terms) {
+        legalSettings.terms = data.terms;
+        persistSettings();
+        const termsArea = document.getElementById('set-legal-terms');
+        if (termsArea) termsArea.value = data.terms;
+        updateTermsLivePreview();
+        console.log("Condizioni contrattuali caricate da GitHub con successo.");
+      }
+    }
+  } catch (err) {
+    console.log("File condizioni remoto non disponibile o offline; uso cache locale.", err);
+  }
+}
+
+// ==========================================================================
+// 5. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
@@ -309,7 +332,7 @@ function formatLongItalianDate(isoDate) {
 }
 
 // ==========================================================================
-// 5. INIZIALIZZAZIONE & EVENTI
+// 6. INIZIALIZZAZIONE & EVENTI
 // ==========================================================================
 function safeOn(id, event, handler) {
   const el = document.getElementById(id);
@@ -324,6 +347,8 @@ function initApp() {
   renderCategoriesUI();
   updateCalculations();
   updateDocNumberPreview();
+  // Tenta il recupero automatico delle condizioni da GitHub
+  fetchRemoteLegalTerms();
 }
 
 if (document.readyState === 'loading') {
@@ -455,7 +480,6 @@ function setupEventListeners() {
       persistSettings();
     }
   });
-
   safeOn('btn-reset-privacy', 'click', () => {
     if (confirm("Vuoi ripristinare il testo standard dell'informativa privacy?")) {
       legalSettings.privacy = DEFAULT_LEGAL.privacy;
@@ -520,7 +544,7 @@ function populateCategorySelector() {
 }
 
 // ==========================================================================
-// 6. GESTIONE IMPOSTAZIONI: LOGO, CATALOGO E TESTI LEGALI
+// 7. GESTIONE IMPOSTAZIONI: LOGO, CATALOGO E TESTI LEGALI
 // ==========================================================================
 function initSettingsUI() {
   document.getElementById('set-company-name').value = companySettings.name || '';
@@ -620,7 +644,7 @@ function updateTermsLivePreview() {
   }
 }
 
-// Esportazione / Importazione file .json dedicato
+// Esporta come "condizioni_contrattuali.json" pronto per il push/upload su GitHub
 function exportTermsJSON() {
   const textToSave = document.getElementById('set-legal-terms').value;
   legalSettings.terms = textToSave;
@@ -628,14 +652,14 @@ function exportTermsJSON() {
 
   const exportData = {
     type: "condizioni_contrattuali",
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString().split('T')[0],
     terms: textToSave
   };
   const jsonStr = JSON.stringify(exportData, null, 2);
   const blob = new Blob([jsonStr], { type: "application/json" });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `Condizioni_Contrattuali_${new Date().toISOString().split('T')[0]}.json`;
+  a.download = `condizioni_contrattuali.json`;
   a.click();
 }
 
@@ -968,7 +992,7 @@ function importSettingsJSON(e) {
 }
 
 // ==========================================================================
-// 7. GESTIONE SCHEDE PREVENTIVO: MISURE SDOPPIATE (L / H) & ARTICOLI GENERALI
+// 8. GESTIONE SCHEDE PREVENTIVO: MISURE SDOPPIATE (L / H) & ARTICOLI GENERALI
 // ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
@@ -1408,7 +1432,7 @@ function escapeHtml(str) {
 }
 
 // ==========================================================================
-// 8. SALVATAGGIO & APERTURA PREVENTIVI (pCloud)
+// 9. SALVATAGGIO & APERTURA PREVENTIVI (pCloud)
 // ==========================================================================
 async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
@@ -1565,8 +1589,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 9. FUNZIONE CENTRALE PER GENERARE TUTTI I FOGLI A4
-//    (Condivisa sia dalla Stampa PDF sia dall'Anteprima a Schermo)
+// 10. GENERAZIONE FOGLI HTML (STAMPA & ANTEPRIMA A SCHERMO)
 // ==========================================================================
 function buildAllSheetsHTML() {
   let grandFornitura = 0;
@@ -1740,7 +1763,7 @@ function buildAllSheetsHTML() {
             </div>
           </div>
 
-          <div style="margin-px 0 15px 0;">
+          <div style="margin: 10px 0 15px 0;">
             <h2 style="font-size: 1.25rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
               ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: 800; color: #1e293b;">${escapeHtml(cat.supplierName)}</span> <span style="font-size: 0.95rem; font-weight: normal;">(${escapeHtml(cat.modelName)})</span>
             </h2>
@@ -1927,7 +1950,7 @@ function buildAllSheetsHTML() {
 }
 
 // ==========================================================================
-// 10. GESTIONE ANTEPRIMA A SCHERMO E STAMPA
+// 11. GESTIONE ANTEPRIMA A SCHERMO E STAMPA
 // ==========================================================================
 function openDocumentPreview() {
   const modal = document.getElementById('preview-modal');
