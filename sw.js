@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v32'; // Sblocco eventi e allineamento interfaccia pulita
+const CACHE_NAME = 'prev-app-v33'; // Risoluzione syntax error template expression
 const ASSETS = [
   './',
   './index.html',
