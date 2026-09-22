@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v33'; // Risoluzione syntax error template expression
+const CACHE_NAME = 'prev-app-v35';
 const ASSETS = [
   './',
   './index.html',
@@ -10,10 +10,10 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
@@ -24,13 +24,25 @@ self.addEventListener('activate', (e) => {
           if (k !== CACHE_NAME) return caches.delete(k);
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
+// Strategia Network-First con fallback su cache
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
+    fetch(e.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && e.request.method === 'GET') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(e.request, responseToCache);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(e.request);
+      })
   );
 });
