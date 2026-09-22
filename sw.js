@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v31'; // Aggiornamento nomenclatura file, revisione e testi finali personalizzati
+const CACHE_NAME = 'prev-app-v32'; // Sblocco eventi e allineamento interfaccia pulita
 const ASSETS = [
   './',
   './index.html',
