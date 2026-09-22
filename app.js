@@ -1,5 +1,5 @@
 // ==========================================================================
-// 1. ANAGRAFICA AZIENDALE, TESTI LEGALI (MARKDOWN DEFINITIVI) E CATALOGO
+// 1. ANAGRAFICA AZIENDALE, TESTI LEGALI (MARKDOWN) E CATALOGO
 // ==========================================================================
 const DEFAULT_COMPANY = {
   name: "3 ESSE SERRAMENTI",
@@ -129,7 +129,11 @@ Nel caso in cui il difetto non rientri nella garanzia, verrà predisposto un pre
 ---
 ## Manuali d'Uso:
 I manuali d'uso e manutenzione dei prodotti sono disponibili sul sito internet di **3 ESSE SERRAMENTI S.r.l.** e devono essere consultati e rispettati dal Cliente ai fini della corretta conservazione della garanzia.`,
-  privacy: `Ai sensi del Regolamento UE 2016/679, La informiamo che i Suoi dati personali anagrafici e fiscali vengono raccolti e trattati esclusivamente per finalità connesse alla gestione amministrativa, contabile, fiscale e operativa del presente preventivo/contratto di fornitura. Il conferimento dei dati è obbligatorio per l'adempimento degli obblighi legali e fiscali. I dati non saranno comunicati a terzi non autorizzati né diffusi.`
+  privacy: `Ai sensi del Regolamento UE 2016/679 (**GDPR**), La informiamo che i Suoi dati personali anagrafici e fiscali vengono raccolti e trattati esclusivamente per finalità connesse alla gestione amministrativa, contabile, fiscale e operativa del presente preventivo/contratto di fornitura.
+
+- **Finalità del trattamento:** gestione ed esecuzione della commessa, rilievo misure, fornitura e posa in opera dei manufatti, adempimento degli obblighi contrattuali e fiscali di legge.
+- **Conferimento dei dati:** il conferimento è obbligatorio per l'instaurazione e la corretta gestione del rapporto commerciale e contrattuale.
+- **Conservazione e diffusione:** i dati saranno conservati per i tempi previsti dalle vigenti disposizioni di legge e non saranno comunicati a soggetti terzi non autorizzati né diffusi.`
 };
 
 const DEFAULT_CATALOG = {
@@ -207,7 +211,7 @@ const DEFAULT_CATALOG = {
         name: "Pinto",
         models: [
           { id: "mod_pinto_all", name: "Alluminio Coibentato Duero/Standard", specs: "Poliuretano espanso alta densità, terminale alluminio", glass: "-", desc: "Tapparella in alluminio coibentato ad elevata stabilità dimensionale e resistenza agli sbalzi termici." },
-          { id: "mod_pinto_acc", name: "Acciaio Blindato", specs: "Lamiera di acciaio con anima in resina poliuretanica", glass: "-", desc: "Avvolgibile di sicurezza antieffrazione ad alta resistenza meccanica contro tentativi di scasso." }
+          { id: "mod_pinto_acc", name: "Acciaio Blindato", specs: "Lamiera di acciaio con anima in resina poliuretanica", glass: "-", desc: "Avvolgibile di sicurezza antieffrazione ad alta resistenza mechanical contro tentativi di scasso." }
         ]
       }
     ]
@@ -293,7 +297,7 @@ const DEFAULT_CATALOG = {
 };
 
 // ==========================================================================
-// 2. PARSER MARKDOWN CON SUPPORTO PER LINEE DIVISORIE (---)
+// 2. PARSER MARKDOWN
 // ==========================================================================
 function parseMarkdown(md) {
   if (!md) return "";
@@ -314,7 +318,6 @@ function parseMarkdown(md) {
   for (let line of lines) {
     const trimmed = line.trim();
 
-    // Riconoscimento della linea orizzontale separatrice (---)
     if (trimmed === '---') {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (inOl) { output.push('</ol>'); inOl = false; }
@@ -383,9 +386,10 @@ function persistSettings() {
 }
 
 // ==========================================================================
-// 4. FETCH AUTOMATICA DELLE CONDIZIONI DA GITHUB (condizioni_contrattuali.json)
+// 4. FETCH AUTOMATICA DA GITHUB (Condizioni & Privacy)
 // ==========================================================================
 async function fetchRemoteLegalTerms() {
+  // Fetch condizioni contrattuali
   try {
     const res = await fetch('./condizioni_contrattuali.json?t=' + Date.now());
     if (res.ok) {
@@ -396,11 +400,27 @@ async function fetchRemoteLegalTerms() {
         const termsArea = document.getElementById('set-legal-terms');
         if (termsArea) termsArea.value = data.terms;
         updateTermsLivePreview();
-        console.log("Condizioni contrattuali caricate da GitHub.");
       }
     }
   } catch (err) {
-    console.log("Uso condizioni contrattuali memorizzate localmente.", err);
+    console.log("Uso condizioni contrattuali locali.", err);
+  }
+
+  // Fetch informativa privacy
+  try {
+    const resPriv = await fetch('./privacy_policy.json?t=' + Date.now());
+    if (resPriv.ok) {
+      const dataPriv = await resPriv.json();
+      if (dataPriv && dataPriv.privacy) {
+        legalSettings.privacy = dataPriv.privacy;
+        persistSettings();
+        const privArea = document.getElementById('set-legal-privacy');
+        if (privArea) privArea.value = dataPriv.privacy;
+        updatePrivacyLivePreview();
+      }
+    }
+  } catch (err) {
+    console.log("Uso informativa privacy locale.", err);
   }
 }
 
@@ -575,7 +595,7 @@ function setupEventListeners() {
     if (e.key === 'Enter') handleAddMacroCategory();
   });
 
-  // Gestione Editor Testi Legali
+  // Toggle editor legali
   safeOn('btn-toggle-terms', 'click', () => {
     const p = document.getElementById('panel-edit-terms');
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
@@ -585,28 +605,19 @@ function setupEventListeners() {
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
   });
 
+  // Gestione Condizioni Contrattuali (Anteprima live + Salva/Carica JSON)
   safeOn('btn-preview-terms', 'click', toggleTermsMarkdownPreview);
   safeOn('set-legal-terms', 'input', updateTermsLivePreview);
-
-  safeOn('btn-reset-terms', 'click', () => {
-    if (confirm("Vuoi ripristinare il testo standard delle condizioni contrattuali?")) {
-      legalSettings.terms = DEFAULT_LEGAL.terms;
-      document.getElementById('set-legal-terms').value = legalSettings.terms;
-      updateTermsLivePreview();
-      persistSettings();
-    }
-  });
-  safeOn('btn-reset-privacy', 'click', () => {
-    if (confirm("Vuoi ripristinare il testo standard dell'informativa privacy?")) {
-      legalSettings.privacy = DEFAULT_LEGAL.privacy;
-      document.getElementById('set-legal-privacy').value = legalSettings.privacy;
-      persistSettings();
-    }
-  });
-
   safeOn('btn-export-terms-json', 'click', exportTermsJSON);
   safeOn('btn-import-terms-json', 'click', () => document.getElementById('terms-file-input').click());
   safeOn('terms-file-input', 'change', importTermsJSON);
+
+  // Gestione Privacy (Anteprima live + Salva/Carica JSON)
+  safeOn('btn-preview-privacy', 'click', togglePrivacyMarkdownPreview);
+  safeOn('set-legal-privacy', 'input', updatePrivacyLivePreview);
+  safeOn('btn-export-privacy-json', 'click', exportPrivacyJSON);
+  safeOn('btn-import-privacy-json', 'click', () => document.getElementById('privacy-file-input').click());
+  safeOn('privacy-file-input', 'change', importPrivacyJSON);
 }
 
 function switchView(view) {
@@ -669,7 +680,7 @@ function initSettingsUI() {
   document.getElementById('set-company-contacts').value = companySettings.contacts || '';
 
   const cityInput = document.getElementById('set-company-city');
-  if (cityInput) companySettings.city = cityInput.value.trim() || 'Trevignano';
+  if (cityInput) cityInput.value = companySettings.city || 'Trevignano';
 
   const addr2Input = document.getElementById('set-company-address2');
   if (addr2Input) companySettings.address2 = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
@@ -734,6 +745,7 @@ function handleLogoRemove() {
   }
 }
 
+// ANTEPRIME LIVE MARKDOWN (CONDIZIONI & PRIVACY)
 function toggleTermsMarkdownPreview() {
   const area = document.getElementById('set-legal-terms');
   const prev = document.getElementById('terms-markdown-preview');
@@ -759,6 +771,32 @@ function updateTermsLivePreview() {
   }
 }
 
+function togglePrivacyMarkdownPreview() {
+  const area = document.getElementById('set-legal-privacy');
+  const prev = document.getElementById('privacy-markdown-preview');
+  const btn = document.getElementById('btn-preview-privacy');
+  if (!prev || !area) return;
+
+  if (prev.style.display === 'none') {
+    prev.innerHTML = parseMarkdown(area.value) || '<em style="color: var(--text-muted);">Nessun testo inserito...</em>';
+    prev.style.display = 'block';
+    if (btn) btn.textContent = '✏️ Chiudi Anteprima';
+  } else {
+    prev.style.display = 'none';
+    if (btn) btn.textContent = '👁️ Anteprima Markdown';
+  }
+}
+
+function updatePrivacyLivePreview() {
+  const area = document.getElementById('set-legal-privacy');
+  const prev = document.getElementById('privacy-markdown-preview');
+  if (!prev || !area) return;
+  if (prev.style.display !== 'none') {
+    prev.innerHTML = parseMarkdown(area.value) || '<em style="color: var(--text-muted);">Nessun testo inserito...</em>';
+  }
+}
+
+// ESPOSTAZIONE / IMPORTAZIONE FILE JSON CONDIZIONI
 function exportTermsJSON() {
   const textToSave = document.getElementById('set-legal-terms').value;
   legalSettings.terms = textToSave;
@@ -793,6 +831,50 @@ function importTermsJSON(e) {
         alert("File delle condizioni contrattuali caricato con successo!");
       } else {
         alert("Formato file non valido: il campo 'terms' non è presente.");
+      }
+    } catch (err) {
+      alert("Errore nella lettura del file JSON: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ESPORTAZIONE / IMPORTAZIONE FILE JSON PRIVACY
+function exportPrivacyJSON() {
+  const textToSave = document.getElementById('set-legal-privacy').value;
+  legalSettings.privacy = textToSave;
+  persistSettings();
+
+  const exportData = {
+    type: "informativa_privacy",
+    updatedAt: new Date().toISOString().split('T')[0],
+    privacy: textToSave
+  };
+  const jsonStr = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([jsonStr], { type: "application/json" });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `privacy_policy.json`;
+  a.click();
+}
+
+function importPrivacyJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const data = JSON.parse(event.target.result);
+      if (data.privacy !== undefined) {
+        legalSettings.privacy = data.privacy;
+        document.getElementById('set-legal-privacy').value = data.privacy;
+        updatePrivacyLivePreview();
+        persistSettings();
+        alert("File dell'informativa privacy caricato con successo!");
+      } else {
+        alert("Formato file non valido: il campo 'privacy' non è presente.");
       }
     } catch (err) {
       alert("Errore nella lettura del file JSON: " + err.message);
@@ -1063,7 +1145,7 @@ function saveSettingsFromUI() {
   if (privacyArea) legalSettings.privacy = privacyArea.value;
 
   persistSettings();
-  alert("Tutte le impostazioni aziendali, condizioni contrattuali e cataloghi sono stati salvati correttamente!");
+  alert("Tutte le impostazioni aziendali, condizioni e privacy sono state salvate correttamente!");
 }
 
 function exportSettingsJSON() {
@@ -2024,7 +2106,7 @@ function buildAllSheetsHTML() {
     </div>
   `;
 
-  // 4. ULTIMA PAGINA: CONDIZIONI IN MARKDOWN E PRIVACY
+  // 4. ULTIMA PAGINA: NORMATIVA & PRIVACY (ENTRAMBE IN FORMATO MARKDOWN)
   sheetsHTML += `
     <div class="sheet">
       <div>
@@ -2040,12 +2122,12 @@ function buildAllSheetsHTML() {
           <div class="legal-text">${parseMarkdown(legalSettings.terms || DEFAULT_LEGAL.terms)}</div>
         </div>
 
-        <div class="p-box" style="margin-top: 20px;">
+        <div class="p-box" style="margin-top: 16px;">
           <div class="p-box-title">Informativa sul Trattamento dei Dati Personali (GDPR 2016/679)</div>
-          <div class="legal-text">${escapeHtml(legalSettings.privacy || DEFAULT_LEGAL.privacy)}</div>
+          <div class="legal-text">${parseMarkdown(legalSettings.privacy || DEFAULT_LEGAL.privacy)}</div>
         </div>
 
-        <div class="p-signature-area" style="margin-top: 45px;">
+        <div class="p-signature-area" style="margin-top: 40px;">
           <div class="p-sign-box" style="width: 340px;">
             Firma per espressa approvazione clausole e Privacy<br><br><br>
             ________________________________________
