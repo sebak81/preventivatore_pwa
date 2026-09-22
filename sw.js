@@ -1,11 +1,12 @@
-const CACHE_NAME = 'prev-app-v28'; // Versione aggiornata con condizioni definitive caricate da GitHub
+const CACHE_NAME = 'prev-app-v29'; // Include privacy_policy.json e gestione privacy markdown
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './manifest.json',
-  './condizioni_contrattuali.json'
+  './condizioni_contrattuali.json',
+  './privacy_policy.json'
 ];
 
 self.addEventListener('install', (e) => {
