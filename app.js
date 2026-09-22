@@ -375,7 +375,11 @@ function parseMarkdown(md) {
   text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   text = text.replace(/^### (.*$)/gim, '<h4 class="md-h3">$1</h4>');
   text = text.replace(/^## (.*$)/gim, '<h3 class="md-h2">$1</h3>');
+  
+  // Sottolineato solo se tra __ c'è testo reale (non una riga vuota di underscore)
   text = text.replace(/__([^_]+?)__/g, '<u>$1</u>');
+  
+  // Grassetto e corsivo
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
 
@@ -400,11 +404,11 @@ function parseMarkdown(md) {
     if (ulMatch) {
       if (inOl) { output.push('</ol>'); inOl = false; }
       if (!inUl) { output.push('<ul class="md-ul">'); inUl = true; }
-      output.push(`<li>${ulMatch[1]}</li>`);
+      output.push('<li>' + ulMatch[1] + '</li>');
     } else if (olMatch) {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (!inOl) { output.push('<ol class="md-ol">'); inOl = true; }
-      output.push(`<li>${olMatch[1]}</li>`);
+      output.push('<li>' + olMatch[1] + '</li>');
     } else {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (inOl) { output.push('</ol>'); inOl = false; }
@@ -412,7 +416,7 @@ function parseMarkdown(md) {
         if (trimmed.startsWith('<h3') || trimmed.startsWith('<h4')) {
           output.push(trimmed);
         } else {
-          output.push(`<p class="md-p">${trimmed}</p>`);
+          output.push('<p class="md-p">' + trimmed + '</p>');
         }
       }
     }
@@ -434,28 +438,44 @@ let openSettingsCategories = { "Serramenti": true };
 let openSettingsSuppliers = {};
 
 function loadCompanySettings() {
-  const saved = localStorage.getItem('prev_company_settings');
-  return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_COMPANY);
+  try {
+    const saved = localStorage.getItem('prev_company_settings');
+    return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_COMPANY);
+  } catch (e) {
+    return Object.assign({}, DEFAULT_COMPANY);
+  }
 }
 
 function loadLegalSettings() {
-  const saved = localStorage.getItem('prev_legal_settings');
-  return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_LEGAL);
+  try {
+    const saved = localStorage.getItem('prev_legal_settings');
+    return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_LEGAL);
+  } catch (e) {
+    return Object.assign({}, DEFAULT_LEGAL);
+  }
 }
 
 function loadCatalogSettings() {
-  const saved = localStorage.getItem('prev_catalog_settings');
-  return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+  try {
+    const saved = localStorage.getItem('prev_catalog_settings');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+  } catch (e) {
+    return JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+  }
 }
 
 function persistSettings() {
-  localStorage.setItem('prev_company_settings', JSON.stringify(companySettings));
-  localStorage.setItem('prev_legal_settings', JSON.stringify(legalSettings));
-  localStorage.setItem('prev_catalog_settings', JSON.stringify(catalogSettings));
+  try {
+    localStorage.setItem('prev_company_settings', JSON.stringify(companySettings));
+    localStorage.setItem('prev_legal_settings', JSON.stringify(legalSettings));
+    localStorage.setItem('prev_catalog_settings', JSON.stringify(catalogSettings));
+  } catch (e) {
+    console.warn("Impossibile salvare in localStorage:", e);
+  }
 }
 
 // ==========================================================================
-// 4. FETCH AUTOMATICA PROTETTA DA GITHUB
+// 4. FETCH AUTOMATICA DA GITHUB
 // ==========================================================================
 async function fetchRemoteLegalTerms() {
   try {
@@ -519,11 +539,11 @@ function getSaveFileName() {
 
   if (docState.type === "REVISIONE" || docState.type.includes("REVISIONE")) {
     const rev = docState.revisionNum || 1;
-    return `${cleanNum}_${clientName}_Rev.${rev}.json`;
+    return cleanNum + '_' + clientName + '_Rev.' + rev + '.json';
   } else if (docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO")) {
-    return `${cleanNum}_${clientName}_CONTRATTO.json`;
+    return cleanNum + '_' + clientName + '_CONTRATTO.json';
   } else {
-    return `${cleanNum}_${clientName}.json`;
+    return cleanNum + '_' + clientName + '.json';
   }
 }
 
@@ -532,11 +552,11 @@ function getFormattedDocNumber() {
   if (!raw) return "BOZZA";
 
   if (docState.type === "REVISIONE" || docState.type.includes("REVISIONE")) {
-    return `Revisione n. ${raw}`;
+    return "Revisione n. " + raw;
   } else if (docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO")) {
-    return `Contratto n. ${raw}`;
+    return "Contratto n. " + raw;
   } else {
-    return `Offerta n. ${raw}`;
+    return "Offerta n. " + raw;
   }
 }
 
@@ -544,7 +564,7 @@ function updateDocNumberPreview() {
   const previewEl = document.getElementById('doc-number-preview');
   if (previewEl) {
     const raw = (docState.number || "").trim();
-    previewEl.textContent = raw ? `(Codice: ${raw})` : '';
+    previewEl.textContent = raw ? ("(Codice: " + raw + ")") : '';
   }
 }
 
@@ -580,7 +600,7 @@ function initApp() {
     updateDocNumberPreview();
     fetchRemoteLegalTerms();
   } catch (e) {
-    console.error("Errore critico in fase di avvio initApp:", e);
+    console.error("Errore durante l'avvio di initApp:", e);
   }
 }
 
@@ -600,7 +620,6 @@ function setupEventListeners() {
     if (revInput) {
       revInput.style.display = (docState.type === 'REVISIONE') ? 'inline-block' : 'none';
     }
-    // Quando trasformo in revisione, aggiorno automaticamente la data a quella odierna
     if (docState.type === 'REVISIONE') {
       const today = new Date().toISOString().split('T')[0];
       docState.date = today;
@@ -777,7 +796,7 @@ function populateCategorySelector() {
   keys.forEach((catName, idx) => {
     const opt = document.createElement('option');
     opt.value = catName;
-    opt.textContent = `${idx + 1}. ${catName}`;
+    opt.textContent = (idx + 1) + ". " + catName;
     sel.appendChild(opt);
   });
 
@@ -930,7 +949,7 @@ function exportTermsJSON() {
   const blob = new Blob([jsonStr], { type: "application/json" });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `condizioni_contrattuali.json`;
+  a.download = "condizioni_contrattuali.json";
   a.click();
 }
 
@@ -973,7 +992,7 @@ function exportPrivacyJSON() {
   const blob = new Blob([jsonStr], { type: "application/json" });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `privacy_policy.json`;
+  a.download = "privacy_policy.json";
   a.click();
 }
 
@@ -1014,7 +1033,7 @@ function handleAddMacroCategory() {
 
   const exists = Object.keys(catalogSettings).some(k => k.toLowerCase() === rawName.toLowerCase());
   if (exists) {
-    alert(`La macro-categoria "${rawName}" esiste già!`);
+    alert('La macro-categoria "' + rawName + '" esiste già!');
     return;
   }
 
@@ -1024,7 +1043,7 @@ function handleAddMacroCategory() {
         id: 'supp_' + Date.now(),
         name: "Fornitore Standard",
         models: [
-          { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: `Fornitura di ${rawName} realizzata a regola d'arte.` }
+          { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: "Fornitura di " + rawName + " realizzata a regola d'arte." }
         ]
       }
     ]
@@ -1035,11 +1054,11 @@ function handleAddMacroCategory() {
   persistSettings();
   renderSettingsCategoriesList();
   populateCategorySelector();
-  alert(`Macro-categoria "${rawName}" aggiunta con successo!`);
+  alert('Macro-categoria "' + rawName + '" aggiunta con successo!');
 }
 
 window.deleteMacroCategory = function(catName) {
-  if (confirm(`Vuoi davvero eliminare la macro-categoria "${catName}" e tutti i suoi fornitori e modelli?`)) {
+  if (confirm('Vuoi davvero eliminare la macro-categoria "' + catName + '" e tutti i suoi fornitori e modelli?')) {
     delete catalogSettings[catName];
     delete openSettingsCategories[catName];
     persistSettings();
@@ -1059,107 +1078,102 @@ function renderSettingsCategoriesList() {
     const isCatOpen = !!openSettingsCategories[catName];
 
     const accordionItem = document.createElement('div');
-    accordionItem.className = `settings-cat-accordion ${isCatOpen ? 'is-open' : ''}`;
+    accordionItem.className = "settings-cat-accordion" + (isCatOpen ? " is-open" : "");
 
     let suppliersHtml = "";
     if (isCatOpen) {
       if (suppliers.length === 0) {
-        suppliersHtml = `
-          <div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-            Nessun fornitore registrato per questa categoria.<br>
-            <button type="button" class="btn btn-primary btn-sm" style="margin-top: 8px;" onclick="addSupplierToCategory('${escapeHtml(catName)}')">+ Aggiungi Primo Fornitore</button>
-          </div>
-        `;
+        suppliersHtml = '<div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">' +
+          'Nessun fornitore registrato per questa categoria.<br>' +
+          '<button type="button" class="btn btn-primary btn-sm" style="margin-top: 8px;" onclick="addSupplierToCategory(\'' + escapeHtml(catName) + '\')">+ Aggiungi Primo Fornitore</button>' +
+          '</div>';
       } else {
         suppliersHtml = suppliers.map((supp, sIdx) => {
-          const suppKey = `${catName}_${sIdx}`;
+          const suppKey = catName + "_" + sIdx;
           const isSuppOpen = openSettingsSuppliers[suppKey] !== false;
           const models = supp.models || [];
 
           let modelsHtml = models.map((mod, mIdx) => {
-            return `
-              <div class="settings-model-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent);">Modello #${mIdx + 1}: ${escapeHtml(mod.name || 'Nuovo')}</span>
-                  <button type="button" class="btn-icon-del" onclick="deleteModel('${escapeHtml(catName)}', ${sIdx}, ${mIdx})" title="Elimina modello">&times;</button>
-                </div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>Nome Modello / Serie</label>
-                    <input type="text" value="${escapeHtml(mod.name)}" placeholder="es. 7 Stars, Diamante 84" oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'name', this.value)">
-                  </div>
-                  <div class="form-group">
-                    <label>Specifiche Sistema (spessore, camere, ecc.)</label>
-                    <input type="text" value="${escapeHtml(mod.specs || '')}" placeholder="es. 85 mm - 7 camere - 3 guarnizioni" oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'specs', this.value)">
-                  </div>
-                  <div class="form-group">
-                    <label>Vetraggio / Accessori Consigliati</label>
-                    <input type="text" value="${escapeHtml(mod.glass || '')}" placeholder="es. Triplo vetro 44 mm selettivo B.E." oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'glass', this.value)">
-                  </div>
-                </div>
-                <div class="form-group full" style="margin-top: 8px;">
-                  <label>Descrizione Generale Precompilata (compare nel preventivo)</label>
-                  <textarea placeholder="Descrizione tecnica e prestazionale del prodotto..." oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'desc', this.value)">${escapeHtml(mod.desc || '')}</textarea>
-                </div>
-              </div>
-            `;
+            return '<div class="settings-model-card">' +
+              '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+                '<span style="font-size: 0.85rem; font-weight: 700; color: var(--accent);">Modello #' + (mIdx + 1) + ': ' + escapeHtml(mod.name || 'Nuovo') + '</span>' +
+                '<button type="button" class="btn-icon-del" onclick="deleteModel(\'' + escapeHtml(catName) + '\', ' + sIdx + ', ' + mIdx + ')" title="Elimina modello">&times;</button>' +
+              '</div>' +
+              '<div class="form-grid">' +
+                '<div class="form-group">' +
+                  '<label>Nome Modello / Serie</label>' +
+                  '<input type="text" value="' + escapeHtml(mod.name) + '" placeholder="es. 7 Stars, Diamante 84" oninput="updateModelField(\'' + escapeHtml(catName) + '\', ' + sIdx + ', ' + mIdx + ', \'name\', this.value)">' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label>Specifiche Sistema (spessore, camere, ecc.)</label>' +
+                  '<input type="text" value="' + escapeHtml(mod.specs || '') + '" placeholder="es. 85 mm - 7 camere - 3 guarnizioni" oninput="updateModelField(\'' + escapeHtml(catName) + '\', ' + sIdx + ', ' + mIdx + ', \'specs\', this.value)">' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label>Vetraggio / Accessori Consigliati</label>' +
+                  '<input type="text" value="' + escapeHtml(mod.glass || '') + '" placeholder="es. Triplo vetro 44 mm selettivo B.E." oninput="updateModelField(\'' + escapeHtml(catName) + '\', ' + sIdx + ', ' + mIdx + ', \'glass\', this.value)">' +
+                '</div>' +
+              '</div>' +
+              '<div class="form-group full" style="margin-top: 8px;">' +
+                '<label>Descrizione Generale Precompilata (compare nel preventivo)</label>' +
+                '<textarea placeholder="Descrizione tecnica e prestazionale del prodotto..." oninput="updateModelField(\'' + escapeHtml(catName) + '\', ' + sIdx + ', ' + mIdx + ', \'desc\', this.value)">' + escapeHtml(mod.desc || '') + '</textarea>' +
+              '</div>' +
+            '</div>';
           }).join('');
 
-          return `
-            <div class="settings-supplier-box">
-              <div class="settings-supplier-head" onclick="toggleSettingsSupplier('${escapeHtml(catName)}', ${sIdx})">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="accordion-arrow" style="font-size: 0.75rem;">${isSuppOpen ? '▼' : '▶'}</span>
-                  <strong style="color: var(--primary); font-size: 0.95rem;">Fornitore: ${escapeHtml(supp.name)}</strong>
-                  <span style="font-size: 0.75rem; background: #e0f2fe; color: var(--accent); padding: 2px 7px; border-radius: 10px; font-weight: 600;">
-                    ${models.length} modello/i
-                  </span>
-                </div>
-                <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
-                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina</button>
-                </div>
-              </div>
+          let bodyContent = "";
+          if (isSuppOpen) {
+            const fallbackMsg = '<div style="font-size: 0.8rem; color: var(--text-muted); padding: 8px;">Nessun modello inserito. Clicca su "+ Aggiungi Modello" sopra.</div>';
+            bodyContent = '<div class="settings-supplier-body">' +
+              '<div class="form-group" style="max-width: 320px; margin-bottom: 12px;">' +
+                '<label>Rinomina Fornitore</label>' +
+                '<input type="text" value="' + escapeHtml(supp.name) + '" oninput="updateSupplierName(\'' + escapeHtml(catName) + '\', ' + sIdx + ', this.value)">' +
+              '</div>' +
+              '<div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">' +
+                'Elenco Modelli di ' + escapeHtml(supp.name) + ':' +
+              '</div>' +
+              '<div style="display: flex; flex-direction: column; gap: 10px;">' +
+                (modelsHtml || fallbackMsg) +
+              '</div>' +
+            '</div>';
+          }
 
-              ${isSuppOpen ? `
-                <div class="settings-supplier-body">
-                  <div class="form-group" style="max-width: 320px; margin-bottom: 12px;">
-                    <label>Rinomina Fornitore</label>
-                    <input type="text" value="${escapeHtml(supp.name)}" oninput="updateSupplierName('${escapeHtml(catName)}',${sIdx}, this.value)">
-                  </div>
-                  <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
-                    Elenco Modelli di ${escapeHtml(supp.name)}:
-                  </div>
-                  <div style="display: flex; flex-direction: column; gap: 10px;">
-                    ${modelsHtml || '<div style="font-size: 0.8rem; color: var(--text-muted); padding: 8px;">Nessun modello inserito. Clicca su "+ Aggiungi Modello" sopra.</div>'}
-                  </div>
-                </div>
-              ` : ''}
-            </div>
-          `;
+          return '<div class="settings-supplier-box">' +
+            '<div class="settings-supplier-head" onclick="toggleSettingsSupplier(\'' + escapeHtml(catName) + '\', ' + sIdx + ')">' +
+              '<div style="display: flex; align-items: center; gap: 8px;">' +
+                '<span class="accordion-arrow" style="font-size: 0.75rem;">' + (isSuppOpen ? '▼' : '▶') + '</span>' +
+                '<strong style="color: var(--primary); font-size: 0.95rem;">Fornitore: ' + escapeHtml(supp.name) + '</strong>' +
+                '<span style="font-size: 0.75rem; background: #e0f2fe; color: var(--accent); padding: 2px 7px; border-radius: 10px; font-weight: 600;">' +
+                  models.length + ' modello/i' +
+                '</span>' +
+              '</div>' +
+              '<div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">' +
+                '<button type="button" class="btn btn-secondary btn-sm" onclick="addModelToSupplier(\'' + escapeHtml(catName) + '\', ' + sIdx + ')">+ Aggiungi Modello</button>' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier(\'' + escapeHtml(catName) + '\', ' + sIdx + ')">Elimina</button>' +
+              '</div>' +
+            '</div>' +
+            bodyContent +
+          '</div>';
         }).join('');
 
-        suppliersHtml += `
-          <div style="margin-top: 10px; text-align: right;">
-            <button type="button" class="btn btn-primary btn-sm" onclick="addSupplierToCategory('${escapeHtml(catName)}')">+ Aggiungi Altro Fornitore a ${escapeHtml(catName)}</button>
-          </div>
-        `;
+        suppliersHtml += '<div style="margin-top: 10px; text-align: right;">' +
+          '<button type="button" class="btn btn-primary btn-sm" onclick="addSupplierToCategory(\'' + escapeHtml(catName) + '\')">+ Aggiungi Altro Fornitore a ' + escapeHtml(catName) + '</button>' +
+        '</div>';
       }
     }
 
-    accordionItem.innerHTML = `
-      <div class="settings-cat-header" onclick="toggleSettingsCategory('${escapeHtml(catName)}')">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="accordion-arrow">${isCatOpen ? '▼' : '▶'}</span>
-          <span style="font-weight: 700; font-size: 1rem;">${idx + 1}. ${escapeHtml(catName)}</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation();">
-          <span class="cat-badge">${suppliers.length} fornitore/i</span>
-          <button type="button" class="btn btn-danger btn-sm" onclick="deleteMacroCategory('${escapeHtml(catName)}')">Elimina</button>
-        </div>
-      </div>
-      ${isCatOpen ? `<div class="settings-cat-body">${suppliersHtml}</div>` : ''}
-    `;
+    const catBodyPart = isCatOpen ? ('<div class="settings-cat-body">' + suppliersHtml + '</div>') : '';
+
+    accordionItem.innerHTML = '<div class="settings-cat-header" onclick="toggleSettingsCategory(\'' + escapeHtml(catName) + '\')">' +
+        '<div style="display: flex; align-items: center; gap: 10px;">' +
+          '<span class="accordion-arrow">' + (isCatOpen ? '▼' : '▶') + '</span>' +
+          '<span style="font-weight: 700; font-size: 1rem;">' + (idx + 1) + '. ' + escapeHtml(catName) + '</span>' +
+        </div>' +
+        '<div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation();">' +
+          '<span class="cat-badge">' + suppliers.length + ' fornitore/i</span>' +
+          '<button type="button" class="btn btn-danger btn-sm" onclick="deleteMacroCategory(\'' + escapeHtml(catName) + '\')">Elimina</button>' +
+        '</div>' +
+      '</div>' +
+      catBodyPart;
 
     container.appendChild(accordionItem);
   });
@@ -1171,7 +1185,7 @@ window.toggleSettingsCategory = function(catName) {
 };
 
 window.toggleSettingsSupplier = function(catName, sIdx) {
-  const key = `${catName}_${sIdx}`;
+  const key = catName + "_" + sIdx;
   openSettingsSuppliers[key] = !openSettingsSuppliers[key];
   renderSettingsCategoriesList();
 };
@@ -1185,7 +1199,7 @@ window.addSupplierToCategory = function(catName) {
     id: 'supp_' + Date.now(),
     name: suppName.trim(),
     models: [
-      { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: `Fornitura di ${catName} secondo specifiche di capitolato.` }
+      { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: "Fornitura di " + catName + " secondo specifiche di capitolato." }
     ]
   };
   catalogSettings[catName].suppliers.push(newSupp);
@@ -1220,7 +1234,7 @@ window.addModelToSupplier = function(catName, sIdx) {
     glass: "",
     desc: ""
   });
-  openSettingsSuppliers[`${catName}_${sIdx}`] = true;
+  openSettingsSuppliers[catName + "_" + sIdx] = true;
   persistSettings();
   renderSettingsCategoriesList();
 };
@@ -1301,7 +1315,7 @@ function exportSettingsJSON() {
   const blob = new Blob([jsonStr], { type: "application/json" });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `Impostazioni_Complete_3ESSE_${new Date().toISOString().split('T')[0]}.json`;
+  a.download = "Impostazioni_Complete_3ESSE_" + new Date().toISOString().split('T')[0] + ".json";
   a.click();
 }
 
@@ -1396,10 +1410,9 @@ function renderCategoriesUI() {
   container.innerHTML = "";
 
   if (docState.categories.length === 0) {
-    container.innerHTML = `
-      <div style="text-align: center; color: var(--text-muted); padding: 24px; border: 2px dashed var(--border); border-radius: 8px;">
-        Nessuna categoria inserita.<br>Scegli una voce dal menu e premi <strong>+ Aggiungi Pagina Categoria</strong>.
-      </div>`;
+    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 24px; border: 2px dashed var(--border); border-radius: 8px;">' +
+      'Nessuna categoria inserita.<br>Scegli una voce dal menu e premi <strong>+ Aggiungi Pagina Categoria</strong>.' +
+      '</div>';
     return;
   }
 
@@ -1415,46 +1428,41 @@ function renderCategoriesUI() {
     const positionsTable = renderPositionsTableHtml(cat);
     const totalsCat = calculateCategoryTotals(cat);
 
-    card.innerHTML = `
-      <div class="card-title">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span><strong>Pagina ${pageNum}:</strong> ${escapeHtml(cat.name)}</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <button type="button" class="btn-order" onclick="moveCategoryUp(${index})" ${isFirst ? 'disabled' : ''} title="Sposta prima">▲ Sposta Su</button>
-          <button type="button" class="btn-order" onclick="moveCategoryDown(${index})" ${isLast ? 'disabled' : ''} title="Sposta dopo">▼ Sposta Giù</button>
-          <button type="button" class="btn btn-danger" style="margin-left: 8px;" onclick="removeCategory('${cat.id}')">Rimuovi</button>
-        </div>
-      </div>
-
-      ${selectorBlock}
-
-      <div style="margin-top: 15px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <label style="font-size: 0.85rem; font-weight: 700;">ELENCO VANI, MISURE E ARTICOLI</label>
-          <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 5px 10px;" onclick="addPosition('${cat.id}')">+ Aggiungi Riga / Vano</button>
-        </div>
-        ${positionsTable}
-      </div>
-
-      <div class="cat-summary-box">
-        <div class="cat-summary-row">
-          <span>Subtotale Fornitura:</span>
-          <strong id="cat-fornitura-${cat.id}">${formatCurrency(totalsCat.fornitura)}</strong>
-        </div>
-        <div class="cat-summary-row" style="align-items: center;">
-          <label style="margin: 0; text-transform: none; font-weight: 600;">Posa in Opera:</label>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <input type="number" step="0.01" min="0" value="${cat.installationPrice > 0 ? cat.installationPrice : ''}" placeholder="0.00" style="width: 130px; text-align: right; font-weight: bold;" oninput="updateCatInstallation('${cat.id}', this.value)">
-            <span style="font-weight: 700; color: var(--text);">€</span>
-          </div>
-        </div>
-        <div class="cat-summary-row cat-summary-total">
-          <span>Totale ${escapeHtml(cat.name)}:</span>
-          <span id="cat-total-${cat.id}">${formatCurrency(totalsCat.total)}</span>
-        </div>
-      </div>
-    `;
+    card.innerHTML = '<div class="card-title">' +
+        '<div style="display: flex; align-items: center; gap: 8px;">' +
+          '<span><strong>Pagina ' + pageNum + ':</strong> ' + escapeHtml(cat.name) + '</span>' +
+        '</div>' +
+        '<div style="display: flex; align-items: center; gap: 6px;">' +
+          '<button type="button" class="btn-order" onclick="moveCategoryUp(' + index + ')" ' + (isFirst ? 'disabled' : '') + ' title="Sposta prima">▲ Sposta Su</button>' +
+          '<button type="button" class="btn-order" onclick="moveCategoryDown(' + index + ')" ' + (isLast ? 'disabled' : '') + ' title="Sposta dopo">▼ Sposta Giù</button>' +
+          '<button type="button" class="btn btn-danger" style="margin-left: 8px;" onclick="removeCategory(\'' + cat.id + '\')">Rimuovi</button>' +
+        '</div>' +
+      '</div>' +
+      selectorBlock +
+      '<div style="margin-top: 15px;">' +
+        '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">' +
+          '<label style="font-size: 0.85rem; font-weight: 700;">ELENCO VANI, MISURE E ARTICOLI</label>' +
+          '<button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 5px 10px;" onclick="addPosition(\'' + cat.id + '\')">+ Aggiungi Riga / Vano</button>' +
+        '</div>' +
+        positionsTable +
+      '</div>' +
+      '<div class="cat-summary-box">' +
+        '<div class="cat-summary-row">' +
+          '<span>Subtotale Fornitura:</span>' +
+          '<strong id="cat-fornitura-' + cat.id + '">' + formatCurrency(totalsCat.fornitura) + '</strong>' +
+        '</div>' +
+        '<div class="cat-summary-row" style="align-items: center;">' +
+          '<label style="margin: 0; text-transform: none; font-weight: 600;">Posa in Opera:</label>' +
+          '<div style="display: flex; align-items: center; gap: 6px;">' +
+            '<input type="number" step="0.01" min="0" value="' + (cat.installationPrice > 0 ? cat.installationPrice : '') + '" placeholder="0.00" style="width: 130px; text-align: right; font-weight: bold;" oninput="updateCatInstallation(\'' + cat.id + '\', this.value)">' +
+            '<span style="font-weight: 700; color: var(--text);">€</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cat-summary-row cat-summary-total">' +
+          '<span>Totale ' + escapeHtml(cat.name) + ':</span>' +
+          '<span id="cat-total-' + cat.id + '">' + formatCurrency(totalsCat.total) + '</span>' +
+        '</div>' +
+      '</div>';
 
     container.appendChild(card);
   });
@@ -1465,54 +1473,50 @@ function renderCategoryOptionsBlock(cat) {
   const suppliers = catDef.suppliers || [];
 
   const suppOptions = suppliers.map(s => 
-    `<option value="${escapeHtml(s.name)}" ${s.name === cat.supplierName ? 'selected' : ''}>${escapeHtml(s.name)}</option>`
+    '<option value="' + escapeHtml(s.name) + '" ' + (s.name === cat.supplierName ? 'selected' : '') + '>' + escapeHtml(s.name) + '</option>'
   ).join('');
 
   const currentSupp = suppliers.find(s => s.name === cat.supplierName) || suppliers[0];
   const models = currentSupp ? (currentSupp.models || []) : [];
 
   const modelOptions = models.map(m => 
-    `<option value="${escapeHtml(m.name)}" ${m.name === cat.modelName ? 'selected' : ''}>${escapeHtml(m.name)}</option>`
+    '<option value="' + escapeHtml(m.name) + '" ' + (m.name === cat.modelName ? 'selected' : '') + '>' + escapeHtml(m.name) + '</option>'
   ).join('');
 
-  return `
-    <div style="background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: 6px;">
-      <div class="form-grid">
-        <div class="form-group">
-          <label style="color: var(--accent);">Fornitore</label>
-          <select onchange="onCatSupplierChange('${cat.id}', this.value)">
-            ${suppOptions || '<option value="">Nessun Fornitore</option>'}
-          </select>
-        </div>
-        <div class="form-group">
-          <label style="color: var(--accent);">Modello / Serie</label>
-          <select onchange="onCatModelChange('${cat.id}', this.value)">
-            ${modelOptions || '<option value="">Nessun Modello</option>'}
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Finitura / Colore</label>
-          <input type="text" value="${escapeHtml(cat.color)}" placeholder="es. Bianco 9010 / Noce" oninput="updateCatField('${cat.id}', 'color', this.value)">
-        </div>
-      </div>
-
-      <div class="form-grid" style="margin-top: 10px;">
-        <div class="form-group">
-          <label>Specifiche Tecniche Sistema</label>
-          <input type="text" value="${escapeHtml(cat.specs)}" placeholder="Spessore, guarnizioni, caratteristiche" oninput="updateCatField('${cat.id}', 'specs', this.value)">
-        </div>
-        <div class="form-group">
-          <label>Vetraggio / Accessori</label>
-          <input type="text" value="${escapeHtml(cat.glass)}" placeholder="Tipologia vetro o accessori" oninput="updateCatField('${cat.id}', 'glass', this.value)">
-        </div>
-      </div>
-
-      <div class="form-group full" style="margin-top: 10px;">
-        <label>Descrizione Generale del Manufatto (Precompilata, modificabile)</label>
-        <textarea oninput="updateCatField('${cat.id}', 'description', this.value)">${escapeHtml(cat.description)}</textarea>
-      </div>
-    </div>
-  `;
+  return '<div style="background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: 6px;">' +
+      '<div class="form-grid">' +
+        '<div class="form-group">' +
+          '<label style="color: var(--accent);">Fornitore</label>' +
+          '<select onchange="onCatSupplierChange(\'' + cat.id + '\', this.value)">' +
+            (suppOptions || '<option value="">Nessun Fornitore</option>') +
+          '</select>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label style="color: var(--accent);">Modello / Serie</label>' +
+          '<select onchange="onCatModelChange(\'' + cat.id + '\', this.value)">' +
+            (modelOptions || '<option value="">Nessun Modello</option>') +
+          '</select>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>Finitura / Colore</label>' +
+          '<input type="text" value="' + escapeHtml(cat.color) + '" placeholder="es. Bianco 9010 / Noce" oninput="updateCatField(\'' + cat.id + '\', \'color\', this.value)">' +
+        '</div>' +
+      '</div>' +
+      '<div class="form-grid" style="margin-top: 10px;">' +
+        '<div class="form-group">' +
+          '<label>Specifiche Tecniche Sistema</label>' +
+          '<input type="text" value="' + escapeHtml(cat.specs) + '" placeholder="Spessore, guarnizioni, caratteristiche" oninput="updateCatField(\'' + cat.id + '\', \'specs\', this.value)">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>Vetraggio / Accessori</label>' +
+          '<input type="text" value="' + escapeHtml(cat.glass) + '" placeholder="Tipologia vetro o accessori" oninput="updateCatField(\'' + cat.id + '\', \'glass\', this.value)">' +
+        '</div>' +
+      '</div>' +
+      '<div class="form-group full" style="margin-top: 10px;">' +
+        '<label>Descrizione Generale del Manufatto (Precompilata, modificabile)</label>' +
+        '<textarea oninput="updateCatField(\'' + cat.id + '\', \'description\', this.value)">' + escapeHtml(cat.description) + '</textarea>' +
+      '</div>' +
+    '</div>';
 }
 
 window.onCatSupplierChange = function(catId, suppName) {
@@ -1562,7 +1566,7 @@ window.onCatModelChange = function(catId, modelName) {
 
 function renderPositionsTableHtml(cat) {
   if (cat.positions.length === 0) {
-    return `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 10px;">Nessuna riga inserita.</div>`;
+    return '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 10px;">Nessuna riga inserita.</div>';
   }
 
   const rows = cat.positions.map((pos) => {
@@ -1579,59 +1583,55 @@ function renderPositionsTableHtml(cat) {
       }
     }
 
-    return `
-      <tr>
-        <td style="width: 18%;">
-          <input type="text" value="${escapeHtml(pos.name)}" placeholder="es. Pos. 1 (vuoto x art. gen.)" oninput="updatePosField('${cat.id}', '${pos.id}', 'name', this.value)">
-        </td>
-        <td style="width: 20%;">
-          <div style="display: flex; align-items: center; gap: 4px;">
-            <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">L.</span>
-            <input type="text" value="${escapeHtml(w)}" placeholder="mm" style="text-align: center; padding: 5px 4px;" oninput="updatePosField('${cat.id}', '${pos.id}', 'width', this.value)">
-            <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">X</span>
-            <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">H.</span>
-            <input type="text" value="${escapeHtml(h)}" placeholder="mm" style="text-align: center; padding: 5px 4px;" oninput="updatePosField('${cat.id}', '${pos.id}', 'height', this.value)">
-          </div>
-        </td>
-        <td style="width: 30%;">
-          <input type="text" value="${escapeHtml(pos.description)}" placeholder="Descrizione o articolo libero" oninput="updatePosField('${cat.id}', '${pos.id}', 'description', this.value)">
-        </td>
-        <td style="width: 7%;">
-          <input type="number" min="1" step="1" value="${pos.quantity || 1}" style="text-align: center;" oninput="updatePosField('${cat.id}', '${pos.id}', 'quantity', this.value)">
-        </td>
-        <td style="width: 12%;">
-          <input type="number" step="any" min="0" value="${pos.unitPrice > 0 ? pos.unitPrice : ''}" placeholder="0.00" style="text-align: right;" oninput="updatePosField('${cat.id}', '${pos.id}', 'unitPrice', this.value)">
-        </td>
-        <td id="pos-total-${pos.id}" style="width: 9%; text-align: right; font-weight: bold; padding: 8px;">
-          ${formatCurrency(rowTotal)}
-        </td>
-        <td style="width: 4%; text-align: center;">
-          <button type="button" class="btn-icon-del" onclick="removePosition('${cat.id}', '${pos.id}')" title="Elimina riga">&times;</button>
-        </td>
-      </tr>
-    `;
+    return '<tr>' +
+      '<td style="width: 18%;">' +
+        '<input type="text" value="' + escapeHtml(pos.name) + '" placeholder="es. Pos. 1 (vuoto x art. gen.)" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'name\', this.value)">' +
+      '</td>' +
+      '<td style="width: 20%;">' +
+        '<div style="display: flex; align-items: center; gap: 4px;">' +
+          '<span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">L.</span>' +
+          '<input type="text" value="' + escapeHtml(w) + '" placeholder="mm" style="text-align: center; padding: 5px 4px;" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'width\', this.value)">' +
+          '<span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">X</span>' +
+          '<span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted);">H.</span>' +
+          '<input type="text" value="' + escapeHtml(h) + '" placeholder="mm" style="text-align: center; padding: 5px 4px;" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'height\', this.value)">' +
+        '</div>' +
+      '</td>' +
+      '<td style="width: 30%;">' +
+        '<input type="text" value="' + escapeHtml(pos.description) + '" placeholder="Descrizione o articolo libero" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'description\', this.value)">' +
+      '</td>' +
+      '<td style="width: 7%;">' +
+        '<input type="number" min="1" step="1" value="' + (pos.quantity || 1) + '" style="text-align: center;" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'quantity\', this.value)">' +
+      '</td>' +
+      '<td style="width: 12%;">' +
+        '<input type="number" step="any" min="0" value="' + (pos.unitPrice > 0 ? pos.unitPrice : '') + '" placeholder="0.00" style="text-align: right;" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'unitPrice\', this.value)">' +
+      '</td>' +
+      '<td id="pos-total-' + pos.id + '" style="width: 9%; text-align: right; font-weight: bold; padding: 8px;">' +
+        formatCurrency(rowTotal) +
+      '</td>' +
+      '<td style="width: 4%; text-align: center;">' +
+        '<button type="button" class="btn-icon-del" onclick="removePosition(\'' + cat.id + '\', \'' + pos.id + '\')" title="Elimina riga">&times;</button>' +
+      '</td>' +
+    '</tr>';
   }).join('');
 
-  return `
-    <div style="overflow-x: auto;">
-      <table class="editor-pos-table">
-        <thead>
-          <tr>
-            <th>Posizione / Vano</th>
-            <th style="text-align: center;">Misure (L x H)</th>
-            <th>Descrizione Specifica</th>
-            <th style="text-align: center;">Q.tà</th>
-            <th style="text-align: right;">Prezzo Unit. (€)</th>
-            <th style="text-align: right;">Totale (€)</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-    </div>
-  `;
+  return '<div style="overflow-x: auto;">' +
+    '<table class="editor-pos-table">' +
+      '<thead>' +
+        '<tr>' +
+          '<th>Posizione / Vano</th>' +
+          '<th style="text-align: center;">Misure (L x H)</th>' +
+          '<th>Descrizione Specifica</th>' +
+          '<th style="text-align: center;">Q.tà</th>' +
+          '<th style="text-align: right;">Prezzo Unit. (€)</th>' +
+          '<th style="text-align: right;">Totale (€)</th>' +
+          '<th></th>' +
+        '</tr>' +
+      '</thead>' +
+      '<tbody>' +
+        rows +
+      '</tbody>' +
+    '</table>' +
+  '</div>';
 }
 
 window.addPosition = function(catId) {
@@ -1640,7 +1640,7 @@ window.addPosition = function(catId) {
   const nextNum = cat.positions.length + 1;
   cat.positions.push({
     id: 'pos_' + Date.now(),
-    name: `Pos. ${nextNum}`,
+    name: 'Pos. ' + nextNum,
     width: "",
     height: "",
     description: "",
@@ -1675,7 +1675,7 @@ window.updatePosField = function(catId, posId, field, val) {
 
   if (field === 'quantity' || field === 'unitPrice') {
     const rowTot = (pos.quantity || 0) * (pos.unitPrice || 0);
-    const rowTotEl = document.getElementById(`pos-total-${pos.id}`);
+    const rowTotEl = document.getElementById("pos-total-" + pos.id);
     if (rowTotEl) {
       rowTotEl.textContent = formatCurrency(rowTot);
     }
@@ -1686,8 +1686,8 @@ window.updatePosField = function(catId, posId, field, val) {
 
 function updateCatSummaryDOM(cat) {
   const totalsCat = calculateCategoryTotals(cat);
-  const fornituraEl = document.getElementById(`cat-fornitura-${cat.id}`);
-  const totalEl = document.getElementById(`cat-total-${cat.id}`);
+  const fornituraEl = document.getElementById("cat-fornitura-" + cat.id);
+  const totalEl = document.getElementById("cat-total-" + cat.id);
   if (fornituraEl) fornituraEl.textContent = formatCurrency(totalsCat.fornitura);
   if (totalEl) totalEl.textContent = formatCurrency(totalsCat.total);
 }
@@ -1738,7 +1738,7 @@ function updateCalculations() {
       tax = calcolata;
       const mistaInput = document.getElementById('tax-mista-amount');
       if (mistaInput && !mistaInput.value) {
-        mistaInput.placeholder = `Calc: € ${calcolata.toFixed(2)}`;
+        mistaInput.placeholder = "Calc: € " + calcolata.toFixed(2);
       }
     }
   } else {
@@ -1747,7 +1747,7 @@ function updateCalculations() {
     if (rate === 22) taxLabel = "Iva ordinaria 22%";
     else if (rate === 10) taxLabel = "Iva agevolata 10%";
     else if (rate === 4) taxLabel = "Iva agevolata 4%";
-    else taxLabel = `Iva (${rate}%)`;
+    else taxLabel = "Iva (" + rate + "%)";
   }
 
   const total = subtotal + tax;
@@ -1756,8 +1756,8 @@ function updateCalculations() {
   const taxEl = document.getElementById('lbl-tax');
   const totEl = document.getElementById('lbl-total');
 
-  if (subEl) subEl.textContent = `${formatCurrency(subtotal)} (Fornitura: ${formatCurrency(grandFornitura)} + Posa: ${formatCurrency(grandPosa)})`;
-  if (taxEl) taxEl.textContent = `${formatCurrency(tax)} (${taxLabel})`;
+  if (subEl) subEl.textContent = formatCurrency(subtotal) + " (Fornitura: " + formatCurrency(grandFornitura) + " + Posa: " + formatCurrency(grandPosa) + ")";
+  if (taxEl) taxEl.textContent = formatCurrency(tax) + " (" + taxLabel + ")";
   if (totEl) totEl.textContent = formatCurrency(total);
 }
 
@@ -1773,7 +1773,7 @@ function escapeHtml(str) {
 }
 
 // ==========================================================================
-// 10. SALVATAGGIO CON NOMENCLATURA PERSONALIZZATA (.json)
+// 9. SALVATAGGIO CON NOMENCLATURA PERSONALIZZATA (.json)
 // ==========================================================================
 async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
@@ -1941,7 +1941,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 11. GENERAZIONE STAMPA PDF NATIVA
+// 10. GENERAZIONE STAMPA PDF NATIVA (Senza template literal annidati)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1973,7 +1973,7 @@ function prepareAndPrint() {
     if (rate === 22) taxLabel = "Iva ordinaria 22%";
     else if (rate === 10) taxLabel = "Iva agevolata 10%";
     else if (rate === 4) taxLabel = "Iva agevolata 4%";
-    else taxLabel = `Iva (${rate}%)`;
+    else taxLabel = "Iva (" + rate + "%)";
   }
 
   const total = subtotal + tax;
@@ -1983,13 +1983,13 @@ function prepareAndPrint() {
 
   const city = (companySettings.city || "Trevignano").trim();
   const dateFormattedLong = formatLongItalianDate(docState.date);
-  const cityDateText = city ? `${city}, lì &nbsp; ${dateFormattedLong}` : dateFormattedLong;
+  const cityDateText = city ? (city + ", lì &nbsp; " + dateFormattedLong) : dateFormattedLong;
 
   const totalPages = docState.categories.length + 4;
 
   let validityText = (docState.validity || "").trim();
   if (validityText && !validityText.toLowerCase().includes("validit")) {
-    validityText = `validità offerta ${validityText}`;
+    validityText = "validità offerta " + validityText;
   }
 
   const bonusPrint = (!docState.taxBonus || docState.taxBonus.toLowerCase() === 'nessuna') ? '-' : escapeHtml(docState.taxBonus);
@@ -2001,60 +2001,51 @@ function prepareAndPrint() {
 
   let sheetsHTML = "";
 
-  // 1. PAGINA 1: COPERTINA
-  sheetsHTML += `
-    <div class="sheet p1-sheet">
-      <div class="p1-top-container">
-        <div class="p1-header-brand">
-          ${companySettings.logo ? `
-            <img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">
-          ` : `
-            <div class="p1-company-fallback">${escapeHtml(companySettings.name || '3 ESSE SERRAMENTI')}</div>
-          `}
-        </div>
+  // 1. PAGINA 1: COPERTINA (Costruzione pulita e lineare)
+  const logoHtml = companySettings.logo
+    ? '<img src="' + companySettings.logo + '" class="p-page1-logo-full" alt="Logo">'
+    : '<div class="p1-company-fallback">' + escapeHtml(companySettings.name || '3 ESSE SERRAMENTI') + '</div>';
 
-        <div class="p1-sub-header">
-          <div class="p1-doc-date" style="font-weight: normal !important;">${cityDateText}</div>
-          <table class="p1-box-offerta">
-            <tr>
-              <td class="p1-box-label" style="font-weight: bold;">${formattedDocNum}</td>
-            </tr>
-          </table>
-        </div>
-      </div>
+  const clientPhoneHtml = docState.client.phone
+    ? '<div class="p1-client-line">tel: ' + escapeHtml(docState.client.phone) + '</div>'
+    : '';
 
-      <div class="p1-middle-section">
-        <div class="p1-client-name">${escapeHtml(docState.client.name) || 'CLIENTE'}</div>
-        <div class="p1-client-address">${escapeHtml(docState.client.residence) || ''}</div>
-        ${docState.client.phone ? `<div class="p1-client-line">tel: ${escapeHtml(docState.client.phone)}</div>` : ''}
-        <div class="p1-client-line">e mail: ${escapeHtml(docState.client.email || '')}</div>
+  const siteAddressHtml = (!docState.sameSite && docState.siteAddress)
+    ? '<div class="p1-site-block"><div class="p1-site-title">Cantiere sito in:</div><div class="p1-site-address">' + escapeHtml(docState.siteAddress) + '</div></div>'
+    : '';
 
-        ${(!docState.sameSite && docState.siteAddress) ? `
-          <div class="p1-site-block">
-            <div class="p1-site-title">Cantiere sito in:</div>
-            <div class="p1-site-address">${escapeHtml(docState.siteAddress)}</div>
-          </div>
-        ` : ''}
-      </div>
+  let titleSectionHtml = '<div class="p1-doc-title">' + (isRevision ? 'PREVENTIVO' : escapeHtml(docState.type)) + '</div>';
+  if (isRevision) {
+    titleSectionHtml += '<div style="font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-top: 8px; text-transform: uppercase;">revisione ' + (docState.revisionNum || 1) + ' del ' + dateFormattedLong + '</div>';
+  } else if (!isContract && validityText) {
+    titleSectionHtml += '<div class="p1-validity-text">' + escapeHtml(validityText) + '</div>';
+  }
 
-      <div class="p1-title-section">
-        <div class="p1-doc-title">${isRevision ? 'PREVENTIVO' : escapeHtml(docState.type)}</div>
-        ${isRevision ? `
-          <div style="font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-top: 8px; text-transform: uppercase;">
-            revisione ${docState.revisionNum \vert{}\vert{} 1} del${dateFormattedLong}
-          </div>
-        ` : ''}
-        ${(!isContract && !isRevision && validityText) ? `
-          <div class="p1-validity-text">${escapeHtml(validityText)}</div>
-        ` : ''}
-      </div>
-
-      <div class="p1-footer-center">
-        <div>Sedi: &nbsp;${escapeHtml(sede1)} &nbsp;|&nbsp; ${escapeHtml(sede2)}</div>
-        <div>${escapeHtml(telInfo)} &nbsp;|&nbsp; E-Mail: ${escapeHtml(emailInfo)}</div>
-      </div>
-    </div>
-  `;
+  sheetsHTML += '<div class="sheet p1-sheet">' +
+      '<div class="p1-top-container">' +
+        '<div class="p1-header-brand">' + logoHtml + '</div>' +
+        '<div class="p1-sub-header">' +
+          '<div class="p1-doc-date" style="font-weight: normal !important;">' + cityDateText + '</div>' +
+          '<table class="p1-box-offerta">' +
+            '<tr>' +
+              '<td class="p1-box-label" style="font-weight: bold;">' + formattedDocNum + '</td>' +
+            '</tr>' +
+          '</table>' +
+        '</div>' +
+      '</div>' +
+      '<div class="p1-middle-section">' +
+        '<div class="p1-client-name">' + (escapeHtml(docState.client.name) || 'CLIENTE') + '</div>' +
+        '<div class="p1-client-address">' + (escapeHtml(docState.client.residence) || '') + '</div>' +
+        clientPhoneHtml +
+        '<div class="p1-client-line">e mail: ' + escapeHtml(docState.client.email || '') + '</div>' +
+        siteAddressHtml +
+      '</div>' +
+      '<div class="p1-title-section">' + titleSectionHtml + '</div>' +
+      '<div class="p1-footer-center">' +
+        '<div>Sedi: &nbsp;' + escapeHtml(sede1) + ' &nbsp;|&nbsp; ' + escapeHtml(sede2) + '</div>' +
+        '<div>' + escapeHtml(telInfo) + ' &nbsp;|&nbsp; E-Mail: ' + escapeHtml(emailInfo) + '</div>' +
+      '</div>' +
+    '</div>';
 
   // 2. PAGINE CATEGORIA (2..N)
   docState.categories.forEach((cat, idx) => {
@@ -2070,258 +2061,233 @@ function prepareAndPrint() {
       const hasMeasures = wVal.length > 0 || hVal.length > 0 || oldMeasures.length > 0;
 
       if (!hasName && !hasMeasures) {
-        return `
-          <tr>
-            <td colspan="3" style="font-size: 0.85rem; font-weight: 500; padding-left: 10px;">
-              ${escapeHtml(p.description) || 'Articolo / Lavorazione specifica'}
-            </td>
-            <td style="text-align: center;">${p.quantity}</td>
-            <td style="text-align: right;">${formatCurrency(p.unitPrice)}</td>
-            <td style="text-align: right; font-weight: bold;">${formatCurrency(rowTot)}</td>
-          </tr>
-        `;
+        return '<tr>' +
+            '<td colspan="3" style="font-size: 0.85rem; font-weight: 500; padding-left: 10px;">' +
+              (escapeHtml(p.description) || 'Articolo / Lavorazione specifica') +
+            '</td>' +
+            '<td style="text-align: center;">' + p.quantity + '</td>' +
+            '<td style="text-align: right;">' + formatCurrency(p.unitPrice) + '</td>' +
+            '<td style="text-align: right; font-weight: bold;">' + formatCurrency(rowTot) + '</td>' +
+          '</tr>';
       }
 
       let measuresFormatted = "-";
       if (wVal && hVal) {
-        measuresFormatted = `L. ${escapeHtml(wVal)} X H. ${escapeHtml(hVal)}`;
+        measuresFormatted = "L. " + escapeHtml(wVal) + " X H. " + escapeHtml(hVal);
       } else if (wVal) {
-        measuresFormatted = `L. ${escapeHtml(wVal)}`;
+        measuresFormatted = "L. " + escapeHtml(wVal);
       } else if (hVal) {
-        measuresFormatted = `H. ${escapeHtml(hVal)}`;
+        measuresFormatted = "H. " + escapeHtml(hVal);
       } else if (oldMeasures) {
         measuresFormatted = escapeHtml(oldMeasures);
       }
 
-      return `
-        <tr>
-          <td><strong>${escapeHtml(p.name || '')}</strong></td>
-          <td style="white-space: nowrap; font-size: 0.82rem;">${measuresFormatted}</td>
-          <td style="font-size: 0.85rem;">${escapeHtml(p.description)}</td>
-          <td style="text-align: center;">${p.quantity}</td>
-          <td style="text-align: right;">${formatCurrency(p.unitPrice)}</td>
-          <td style="text-align: right; font-weight: bold;">${formatCurrency(rowTot)}</td>
-        </tr>
-      `;
+      return '<tr>' +
+          '<td><strong>' + escapeHtml(p.name || '') + '</strong></td>' +
+          '<td style="white-space: nowrap; font-size: 0.82rem;">' + measuresFormatted + '</td>' +
+          '<td style="font-size: 0.85rem;">' + escapeHtml(p.description) + '</td>' +
+          '<td style="text-align: center;">' + p.quantity + '</td>' +
+          '<td style="text-align: right;">' + formatCurrency(p.unitPrice) + '</td>' +
+          '<td style="text-align: right; font-weight: bold;">' + formatCurrency(rowTot) + '</td>' +
+        '</tr>';
     }).join('');
 
-    sheetsHTML += `
-      <div class="sheet">
-        <div>
-          <div class="p-header">
-            <div class="p-company">
-              <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-              <div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ${escapeHtml(formattedDocNum)}</div>
-            </div>
-            <div class="p-doc-details">
-              <div style="font-size: 1.1rem; font-weight: bold;">SCHEDA TECNICA ${idx + 1}</div>
-              <div style="font-size: 0.9rem;">Cliente: ${escapeHtml(docState.client.name)}</div>
-            </div>
-          </div>
+    let specsBoxHtml = '';
+    if (cat.specs || cat.color || cat.glass) {
+      let lines = '';
+      if (cat.specs) lines += '<div><strong>Caratteristiche Sistema:</strong> ' + escapeHtml(cat.specs) + '</div>';
+      if (cat.color) lines += '<div><strong>Finitura / Colore:</strong> ' + escapeHtml(cat.color) + '</div>';
+      if (cat.glass) lines += '<div><strong>Vetraggio / Accessori:</strong> ' + escapeHtml(cat.glass) + '</div>';
+      specsBoxHtml = '<div class="p-box" style="margin-bottom: 12px; padding: 8px 12px; background: #fafafa;"><div style="font-size: 0.85rem; line-height: 1.5;">' + lines + '</div></div>';
+    }
 
-          <div style="margin-top: 10px; margin-bottom: 15px;">
-            <h2 style="font-size: 1.25rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
-              ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: 800; color: #1e293b;">${escapeHtml(cat.supplierName)}</span> <span style="font-size: 0.95rem; font-weight: normal;">(${escapeHtml(cat.modelName)})</span>
-            </h2>
-          </div>
+    let descHtml = cat.description
+      ? '<div style="font-size: 0.82rem; color: #333; margin-bottom: 12px; line-height: 1.45; text-align: justify;">' + escapeHtml(cat.description) + '</div>'
+      : '';
 
-          ${cat.specs || cat.color || cat.glass ? `
-            <div class="p-box" style="margin-bottom: 12px; padding: 8px 12px; background: #fafafa;">
-              <div style="font-size: 0.85rem; line-height: 1.5;">
-                ${cat.specs ? `<div><strong>Caratteristiche Sistema:</strong> ${escapeHtml(cat.specs)}</div>` : ''}
-                ${cat.color ? `<div><strong>Finitura / Colore:</strong> ${escapeHtml(cat.color)}</div>` : ''}
-                ${cat.glass ? `<div><strong>Vetraggio / Accessori:</strong> ${escapeHtml(cat.glass)}</div>` : ''}
-              </div>
-            </div>
-          ` : ''}
-
-          ${cat.description ? `
-            <div style="font-size: 0.82rem; color: #333; margin-bottom: 12px; line-height: 1.45; text-align: justify;">
-              ${escapeHtml(cat.description)}
-            </div>
-          ` : ''}
-
-          <table class="p-table" style="margin-top: 10px;">
-            <thead>
-              <tr>
-                <th style="width: 18%;">Vano / Posizione</th>
-                <th style="width: 18%;">Misure (LxH)</th>
-                <th style="width: 36%;">Descrizione Manufatto</th>
-                <th style="width: 6%; text-align: center;">Q.tà</th>
-                <th style="width: 11%; text-align: right;">P. Unit.</th>
-                <th style="width: 11%; text-align: right;">Totale</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${posRows || '<tr><td colspan="6">Nessun manufatto inserito</td></tr>'}
-            </tbody>
-          </table>
-
-          <div style="margin-top: 15px; border: 1px solid #999; padding: 10px 14px; background: #fdfdfd;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">
-              <span>Subtotale Fornitura:</span>
-              <strong>${formatCurrency(catTotals.fornitura)}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #ccc;">
-              <span>Posa in Opera:</span>
-              <strong>${formatCurrency(catTotals.posa)}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
-              <span>Totale ${escapeHtml(cat.name)}:</span>
-              <span>${formatCurrency(catTotals.total)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="p-footer">
-          <span>${escapeHtml(companySettings.name)}</span>
-          <span>Pagina ${currentPageNum} di ${totalPages}</span>
-        </div>
-      </div>
-    `;
+    sheetsHTML += '<div class="sheet">' +
+        '<div>' +
+          '<div class="p-header">' +
+            '<div class="p-company">' +
+              '<div class="p-company-title">' + escapeHtml(companySettings.name) + '</div>' +
+              '<div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ' + escapeHtml(formattedDocNum) + '</div>' +
+            '</div>' +
+            '<div class="p-doc-details">' +
+              '<div style="font-size: 1.1rem; font-weight: bold;">SCHEDA TECNICA ' + (idx + 1) + '</div>' +
+              '<div style="font-size: 0.9rem;">Cliente: ' + escapeHtml(docState.client.name) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="margin-top: 10px; margin-bottom: 15px;">' +
+            '<h2 style="font-size: 1.25rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">' +
+              escapeHtml(cat.name) + ' — <span style="font-size: 1.05rem; font-weight: 800; color: #1e293b;">' + escapeHtml(cat.supplierName) + '</span> <span style="font-size: 0.95rem; font-weight: normal;">(' + escapeHtml(cat.modelName) + ')</span>' +
+            '</h2>' +
+          '</div>' +
+          specsBoxHtml +
+          descHtml +
+          '<table class="p-table" style="margin-top: 10px;">' +
+            '<thead>' +
+              '<tr>' +
+                '<th style="width: 18%;">Vano / Posizione</th>' +
+                '<th style="width: 18%;">Misure (LxH)</th>' +
+                '<th style="width: 36%;">Descrizione Manufatto</th>' +
+                '<th style="width: 6%; text-align: center;">Q.tà</th>' +
+                '<th style="width: 11%; text-align: right;">P. Unit.</th>' +
+                '<th style="width: 11%; text-align: right;">Totale</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody>' +
+              (posRows || '<tr><td colspan="6">Nessun manufatto inserito</td></tr>') +
+            '</tbody>' +
+          '</table>' +
+          '<div style="margin-top: 15px; border: 1px solid #999; padding: 10px 14px; background: #fdfdfd;">' +
+            '<div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">' +
+              '<span>Subtotale Fornitura:</span>' +
+              '<strong>' + formatCurrency(catTotals.fornitura) + '</strong>' +
+            '</div>' +
+            '<div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #ccc;">' +
+              '<span>Posa in Opera:</span>' +
+              '<strong>' + formatCurrency(catTotals.posa) + '</strong>' +
+            '</div>' +
+            '<div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">' +
+              '<span>Totale ' + escapeHtml(cat.name) + ':</span>' +
+              '<span>' + formatCurrency(catTotals.total) + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="p-footer">' +
+          '<span>' + escapeHtml(companySettings.name) + '</span>' +
+          '<span>Pagina ' + currentPageNum + ' di ' + totalPages + '</span>' +
+        '</div>' +
+      '</div>';
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Con cella vuota e blocchi clausole esclusioni)
+  // 3. PAGINA TOTALI & FIRMA
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
-    return `
-      <tr>
-        <td><strong>${escapeHtml(c.name)}</strong> - ${escapeHtml(c.supplierName)} (${escapeHtml(c.modelName)})</td>
-        <td class="text-right">${formatCurrency(t.fornitura)}</td>
-        <td class="text-right">${formatCurrency(t.posa)}</td>
-        <td class="text-right"><strong>${formatCurrency(t.total)}</strong></td>
-      </tr>
-    `;
+    return '<tr>' +
+      '<td><strong>' + escapeHtml(c.name) + '</strong> - ' + escapeHtml(c.supplierName) + ' (' + escapeHtml(c.modelName) + ')</td>' +
+      '<td class="text-right">' + formatCurrency(t.fornitura) + '</td>' +
+      '<td class="text-right">' + formatCurrency(t.posa) + '</td>' +
+      '<td class="text-right"><strong>' + formatCurrency(t.total) + '</strong></td>' +
+    '</tr>';
   }).join('');
 
-  sheetsHTML += `
-    <div class="sheet">
-      <div>
-        <div class="p-header">
-          <div class="p-company">
-            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div>Quadro Economico Complessivo</div>
-          </div>
-          <div class="p-doc-details">
-            <div class="p-doc-type">RIEPILOGO & FIRMA</div>
-            <div class="p-doc-meta">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
-          </div>
-        </div>
+  let finalNotesHtml = docState.finalNotes
+    ? '<div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>Note:</strong> ' + escapeHtml(docState.finalNotes) + '</div>'
+    : '';
 
-        <table class="p-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th class="text-right" style="width: 120px;">Fornitura</th>
-              <th class="text-right" style="width: 120px;">Posa in Opera</th>
-              <th class="text-right" style="width: 130px;">Totale Netto</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${catSummaryRows || '<tr><td colspan="4">Nessuna categoria inserita</td></tr>'}
-            <tr style="background-color: #f9f9f9; font-size: 0.95rem;">
-              <td><strong>TOTALE NETTO FORNITURA & POSA</strong></td>
-              <td class="text-right">${formatCurrency(grandFornitura)}</td>
-              <td class="text-right">${formatCurrency(grandPosa)}</td>
-              <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
-            </tr>
-            <tr>
-              <td colspan="3">${escapeHtml(taxLabel)}</td>
-              <td class="text-right">${formatCurrency(tax)}</td>
-            </tr>
-            <tr style="background-color: #eee; font-size: 1.3rem;">
-              <td colspan="3" style="padding: 12px 10px;"><strong>TOTALE COMPLESSIVO (IVA Inclusa)</strong></td>
-              <td class="text-right" style="padding: 12px 10px; font-weight: 900; font-size: 1.35rem;">${formatCurrency(total)}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="p-box" style="margin-top: 15px;">
-          <div class="p-box-title">Condizioni di Fornitura e Pagamento</div>
-          <div><strong>Detrazione Fiscale applicabile:</strong> ${bonusPrint}</div>
-          <div><strong>Termini di Pagamento:</strong> ${escapeHtml(docState.paymentTerms)}</div>
-          <div><strong>Tempi indicativi consegna/posa:</strong> ${escapeHtml(docState.deliveryTerms)}</div>
-          ${docState.finalNotes ? `<div style="margin-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
-        </div>
-
-        <div class="p-signature-area">
-          <div class="p-sign-box" style="width: 320px;">
-            Firma per Accettazione del Committente<br><br><br>
-            ________________________________________
-          </div>
-        </div>
-
-        <!-- Sezione Esclusioni e Note Finali -->
-        <div style="margin-top: 25px; font-size: 0.8rem; line-height: 1.5; color: #111;">
-          <div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>
-          <div><strong>SONO ESCLUSI DAL PREVENTIVO:</strong> pulizia dei serramenti a fine posa, eventuali piattaforme e/o ponteggi, opere murarie, opere di collegamenti elettrici, quant'altro non espressamente specificato nel preventivo.</div>
-          <div style="margin-top: 10px; font-weight: 800;">
-            IL PREVENTIVO PUO' ESSERE SOGGETTO A VARIAZIONI IN BASE ALLE MISURE RILEVATE IN FASE DI SOPRALLUOGO ESECUTIVO.
-          </div>
-        </div>
-      </div>
-
-      <div class="p-footer">
-        <span>${escapeHtml(companySettings.name)}</span>
-        <span>Pagina ${pageTotalsNum} di ${totalPages}</span>
-      </div>
-    </div>
-  `;
+  sheetsHTML += '<div class="sheet">' +
+      '<div>' +
+        '<div class="p-header">' +
+          '<div class="p-company">' +
+            '<div class="p-company-title">' + escapeHtml(companySettings.name) + '</div>' +
+            '<div>Quadro Economico Complessivo</div>' +
+          '</div>' +
+          '<div class="p-doc-details">' +
+            '<div class="p-doc-type">RIEPILOGO & FIRMA</div>' +
+            '<div class="p-doc-meta">Rif. Doc N°: ' + escapeHtml(formattedDocNum) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<table class="p-table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th></th>' +
+              '<th class="text-right" style="width: 120px;">Fornitura</th>' +
+              '<th class="text-right" style="width: 120px;">Posa in Opera</th>' +
+              '<th class="text-right" style="width: 130px;">Totale Netto</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            (catSummaryRows || '<tr><td colspan="4">Nessuna categoria inserita</td></tr>') +
+            '<tr style="background-color: #f9f9f9; font-size: 0.95rem;">' +
+              '<td><strong>TOTALE NETTO FORNITURA & POSA</strong></td>' +
+              '<td class="text-right">' + formatCurrency(grandFornitura) + '</td>' +
+              '<td class="text-right">' + formatCurrency(grandPosa) + '</td>' +
+              '<td class="text-right"><strong>' + formatCurrency(subtotal) + '</strong></td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td colspan="3">' + escapeHtml(taxLabel) + '</td>' +
+              '<td class="text-right">' + formatCurrency(tax) + '</td>' +
+            '</tr>' +
+            '<tr style="background-color: #eee; font-size: 1.3rem;">' +
+              '<td colspan="3" style="padding: 12px 10px;"><strong>TOTALE COMPLESSIVO (IVA Inclusa)</strong></td>' +
+              '<td class="text-right" style="padding: 12px 10px; font-weight: 900; font-size: 1.35rem;">' + formatCurrency(total) + '</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<div class="p-box" style="margin-top: 15px;">' +
+          '<div class="p-box-title">Condizioni di Fornitura e Pagamento</div>' +
+          '<div><strong>Detrazione Fiscale applicabile:</strong> ' + bonusPrint + '</div>' +
+          '<div><strong>Termini di Pagamento:</strong> ' + escapeHtml(docState.paymentTerms) + '</div>' +
+          '<div><strong>Tempi indicativi consegna/posa:</strong> ' + escapeHtml(docState.deliveryTerms) + '</div>' +
+          finalNotesHtml +
+        '</div>' +
+        '<div class="p-signature-area">' +
+          '<div class="p-sign-box" style="width: 320px;">' +
+            'Firma per Accettazione del Committente<br><br><br>' +
+            '________________________________________' +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top: 25px; font-size: 0.8rem; line-height: 1.5; color: #111;">' +
+          '<div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>' +
+          '<div><strong>SONO ESCLUSI DAL PREVENTIVO:</strong> pulizia dei serramenti a fine posa, eventuali piattaforme e/o ponteggi, opere murarie, opere di collegamenti elettrici, quant\'altro non espressamente specificato nel preventivo.</div>' +
+          '<div style="margin-top: 10px; font-weight: 800;">' +
+            'IL PREVENTIVO PUO\' ESSERE SOGGETTO A VARIAZIONI IN BASE ALLE MISURE RILEVATE IN FASE DI SOPRALLUOGO ESECUTIVO.' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="p-footer">' +
+        '<span>' + escapeHtml(companySettings.name) + '</span>' +
+        '<span>Pagina ' + pageTotalsNum + ' di ' + totalPages + '</span>' +
+      '</div>' +
+    '</div>';
 
   // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO
   const pageTermsNum = docState.categories.length + 3;
-  sheetsHTML += `
-    <div class="sheet">
-      <div>
-        <div class="p-header">
-          <div class="p-company">
-            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div>Condizioni Generali di Contratto</div>
-          </div>
-          <div class="p-doc-details">
-            <div style="font-size: 0.85rem;">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
-          </div>
-        </div>
-
-        <div class="p-box">
-          <div class="legal-text">${parseMarkdown(legalSettings.terms || DEFAULT_LEGAL.terms)}</div>
-        </div>
-      </div>
-
-      <div class="p-footer">
-        <span>${escapeHtml(companySettings.name)}</span>
-        <span>Pagina ${pageTermsNum} di ${totalPages}</span>
-      </div>
-    </div>
-  `;
+  sheetsHTML += '<div class="sheet">' +
+      '<div>' +
+        '<div class="p-header">' +
+          '<div class="p-company">' +
+            '<div class="p-company-title">' + escapeHtml(companySettings.name) + '</div>' +
+            '<div>Condizioni Generali di Contratto</div>' +
+          '</div>' +
+          '<div class="p-doc-details">' +
+            '<div style="font-size: 0.85rem;">Rif. Doc N°: ' + escapeHtml(formattedDocNum) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="p-box">' +
+          '<div class="legal-text">' + parseMarkdown(legalSettings.terms || DEFAULT_LEGAL.terms) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="p-footer">' +
+        '<span>' + escapeHtml(companySettings.name) + '</span>' +
+        '<span>Pagina ' + pageTermsNum + ' di ' + totalPages + '</span>' +
+      '</div>' +
+    '</div>';
 
   // 5. PAGINA INFORMATIVA PRIVACY GDPR
   const pagePrivacyNum = totalPages;
-  sheetsHTML += `
-    <div class="sheet">
-      <div>
-        <div class="p-header">
-          <div class="p-company">
-            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div>Informativa Privacy e Protezione Dati</div>
-          </div>
-          <div class="p-doc-details">
-            <div style="font-size: 0.85rem;">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
-          </div>
-        </div>
-
-        <div class="p-box">
-          <div class="legal-text">${parseMarkdown(legalSettings.privacy || DEFAULT_LEGAL.privacy)}</div>
-        </div>
-      </div>
-
-      <div class="p-footer">
-        <span>${escapeHtml(companySettings.name)}</span>
-        <span>Pagina ${pagePrivacyNum} di ${totalPages}</span>
-      </div>
-    </div>
-  `;
+  sheetsHTML += '<div class="sheet">' +
+      '<div>' +
+        '<div class="p-header">' +
+          '<div class="p-company">' +
+            '<div class="p-company-title">' + escapeHtml(companySettings.name) + '</div>' +
+            '<div>Informativa Privacy e Protezione Dati</div>' +
+          '</div>' +
+          '<div class="p-doc-details">' +
+            '<div style="font-size: 0.85rem;">Rif. Doc N°: ' + escapeHtml(formattedDocNum) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="p-box">' +
+          '<div class="legal-text">' + parseMarkdown(legalSettings.privacy || DEFAULT_LEGAL.privacy) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="p-footer">' +
+        '<span>' + escapeHtml(companySettings.name) + '</span>' +
+        '<span>Pagina ' + pagePrivacyNum + ' di ' + totalPages + '</span>' +
+      '</div>' +
+    '</div>';
 
   printRoot.innerHTML = sheetsHTML;
 
