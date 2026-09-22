@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v35';
+const CACHE_NAME = 'prev-app-v40';
 const ASSETS = [
   './',
   './index.html',
@@ -28,7 +28,6 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Strategia Network-First con fallback su cache
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
