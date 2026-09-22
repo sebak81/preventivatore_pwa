@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v29'; // Include privacy_policy.json e gestione privacy markdown
+const CACHE_NAME = 'prev-app-v30'; // Rimozione pulsante anteprima a schermo
 const ASSETS = [
   './',
   './index.html',
