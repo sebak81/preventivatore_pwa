@@ -304,10 +304,11 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO
+// 5. STATO CENTRALE DEL PREVENTIVO (Con gestione Revisione X)
 // ==========================================================================
 let docState = {
-  type: "PREVENTIVO",
+  type: "PREVENTIVO", // PREVENTIVO | REVISIONE | CONTRATTO
+  revisionNum: 1,
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "15 giorni",
@@ -323,17 +324,41 @@ let docState = {
   finalNotes: ""
 };
 
+// Formattazione del Nome File in base alle regole richieste
+function getSaveFileName() {
+  const clientName = (docState.client.name || "Cliente").trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+  const rawNum = (docState.number || "").trim() || "000";
+  const cleanNum = rawNum.replace(/[^a-zA-Z0-9_.-]/g, '_');
+
+  if (docState.type === "REVISIONE" || docState.type.includes("REVISIONE")) {
+    const rev = docState.revisionNum || 1;
+    return `${cleanNum}_${clientName}_Rev.${rev}.json`;
+  } else if (docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO")) {
+    return `${cleanNum}_${clientName}_CONTRATTO.json`;
+  } else {
+    return `${cleanNum}_${clientName}.json`;
+  }
+}
+
+// Etichetta documento in alto a destra su Pagina 1
 function getFormattedDocNumber() {
   const raw = (docState.number || "").trim();
   if (!raw) return "BOZZA";
-  return raw;
+
+  if (docState.type === "REVISIONE" || docState.type.includes("REVISIONE")) {
+    return `Revisione n. ${raw}`;
+  } else if (docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO")) {
+    return `Contratto n. ${raw}`;
+  } else {
+    return `Offerta n. ${raw}`;
+  }
 }
 
 function updateDocNumberPreview() {
   const previewEl = document.getElementById('doc-number-preview');
   if (previewEl) {
-    const formatted = getFormattedDocNumber();
-    previewEl.textContent = (docState.number && docState.number.trim()) ? `(N°: ${formatted})` : '';
+    const raw = (docState.number || "").trim();
+    previewEl.textContent = raw ? `(Codice: ${raw})` : '';
   }
 }
 
@@ -379,7 +404,15 @@ function setupEventListeners() {
 
   safeOn('doc-type', 'change', (e) => { 
     docState.type = e.target.value; 
+    const revInput = document.getElementById('doc-revision-num');
+    if (revInput) {
+      revInput.style.display = (docState.type === 'REVISIONE') ? 'inline-block' : 'none';
+    }
     updateDocNumberPreview();
+  });
+
+  safeOn('doc-revision-num', 'input', (e) => {
+    docState.revisionNum = parseInt(e.target.value) || 1;
   });
 
   safeOn('doc-number', 'input', (e) => { 
@@ -476,14 +509,14 @@ function setupEventListeners() {
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
   });
 
-  // Gestione Condizioni Contrattuali (Anteprima live + Salva/Carica JSON)
+  // Gestione Condizioni Contrattuali
   safeOn('btn-preview-terms', 'click', toggleTermsMarkdownPreview);
   safeOn('set-legal-terms', 'input', updateTermsLivePreview);
   safeOn('btn-export-terms-json', 'click', exportTermsJSON);
   safeOn('btn-import-terms-json', 'click', () => document.getElementById('terms-file-input').click());
   safeOn('terms-file-input', 'change', importTermsJSON);
 
-  // Gestione Privacy (Anteprima live + Salva/Carica JSON)
+  // Gestione Privacy
   safeOn('btn-preview-privacy', 'click', togglePrivacyMarkdownPreview);
   safeOn('set-legal-privacy', 'input', updatePrivacyLivePreview);
   safeOn('btn-export-privacy-json', 'click', exportPrivacyJSON);
@@ -667,7 +700,6 @@ function updatePrivacyLivePreview() {
   }
 }
 
-// SALVATAGGIO & CARICAMENTO FILE JSON
 function exportTermsJSON() {
   const textToSave = document.getElementById('set-legal-terms').value;
   legalSettings.terms = textToSave;
@@ -1525,14 +1557,11 @@ function escapeHtml(str) {
 }
 
 // ==========================================================================
-// 10. SALVATAGGIO & APERTURA PREVENTIVI (pCloud)
+// 10. SALVATAGGIO CON NOMENCLATURA PERSONALIZZATA (.json)
 // ==========================================================================
 async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
-  const clientName = docState.client.name.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || "Cliente";
-  const formattedNum = getFormattedDocNumber();
-  const safeDocNum = formattedNum.replace(/\.+$/, '').replace(/[^a-zA-Z0-9_.-]/g, '_');
-  const fileName = `${clientName}_${safeDocNum}.json`;
+  const fileName = getSaveFileName();
 
   if ('showSaveFilePicker' in window) {
     try {
@@ -1575,6 +1604,12 @@ function openFromFile(e) {
       if (docState.type === "REVISIONE PREVENTIVO") docState.type = "REVISIONE";
 
       document.getElementById('doc-type').value = docState.type || "PREVENTIVO";
+      const revInput = document.getElementById('doc-revision-num');
+      if (revInput) {
+        revInput.style.display = (docState.type === 'REVISIONE') ? 'inline-block' : 'none';
+        revInput.value = docState.revisionNum || 1;
+      }
+
       document.getElementById('doc-number').value = docState.number || '';
       document.getElementById('doc-date').value = docState.date || '';
       document.getElementById('doc-validity').value = docState.validity || '15 giorni';
@@ -1643,6 +1678,7 @@ function openFromFile(e) {
 function resetDocument() {
   if (!confirm("Vuoi iniziare un nuovo preventivo azzerando i dati correnti?")) return;
   docState.number = "";
+  docState.revisionNum = 1;
   docState.client = { name: "", residence: "", taxId: "", phone: "", email: "" };
   docState.categories = [];
   docState.siteAddress = "";
@@ -1652,6 +1688,13 @@ function resetDocument() {
   docState.customTaxAmount = null;
   docState.taxBonus = "Bonus Casa";
   docState.paymentTerms = "50% acconto all'ordine + 50% saldo a fine posa";
+
+  document.getElementById('doc-type').value = "PREVENTIVO";
+  const revInput = document.getElementById('doc-revision-num');
+  if (revInput) {
+    revInput.style.display = 'none';
+    revInput.value = 1;
+  }
 
   document.getElementById('doc-number').value = "";
   document.getElementById('client-name').value = "";
@@ -1682,7 +1725,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 11. GENERAZIONE FOGLI HTML (STAMPA PDF NATIVA)
+// 11. GENERAZIONE STAMPA PDF NATIVA CON TUTTE LE MODIFICHE RICHIESTE
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1726,10 +1769,6 @@ function prepareAndPrint() {
   const dateFormattedLong = formatLongItalianDate(docState.date);
   const cityDateText = city ? `${city}, lì &nbsp; ${dateFormattedLong}` : dateFormattedLong;
 
-  let boxLabel = "Offerta n.";
-  if (isContract) boxLabel = "Contratto n.";
-  else if (isRevision) boxLabel = "Revisione n.";
-
   const totalPages = docState.categories.length + 4;
 
   let validityText = (docState.validity || "").trim();
@@ -1746,7 +1785,7 @@ function prepareAndPrint() {
 
   let sheetsHTML = "";
 
-  // 1. PAGINA 1: COPERTINA
+  // 1. PAGINA 1: COPERTINA (Con Revisione X del [data] e formattazione grassetto/normale)
   sheetsHTML += `
     <div class="sheet p1-sheet">
       <div class="p1-top-container">
@@ -1759,11 +1798,12 @@ function prepareAndPrint() {
         </div>
 
         <div class="p1-sub-header">
-          <div class="p1-doc-date">${cityDateText}</div>
+          <!-- Data in alto a sinistra SENZA grassetto -->
+          <div class="p1-doc-date" style="font-weight: normal !important;">${cityDateText}</div>
           <table class="p1-box-offerta">
             <tr>
-              <td class="p1-box-label">${boxLabel}</td>
-              <td class="p1-box-number">${escapeHtml(formattedDocNum)}</td>
+              <!-- Scritta Offerta/Contratto/Revisione in alto a destra CON grassetto -->
+              <td class="p1-box-label" style="font-weight: bold;">${formattedDocNum}</td>
             </tr>
           </table>
         </div>
@@ -1784,8 +1824,13 @@ function prepareAndPrint() {
       </div>
 
       <div class="p1-title-section">
-        <div class="p1-doc-title">${escapeHtml(docState.type)}</div>
-        ${!isContract && validityText ? `
+        <div class="p1-doc-title">${isRevision ? 'PREVENTIVO' : escapeHtml(docState.type)}</div>
+        ${isRevision ? `
+          <div style="font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-top: 8px; text-transform: uppercase;">
+            revisione ${docState.revisionNum \vert{}\vert{} 1} del${dateFormattedLong}
+          </div>
+        ` : ''}
+        ${(!isContract && !isRevision && validityText) ? `
           <div class="p1-validity-text">${escapeHtml(validityText)}</div>
         ` : ''}
       </div>
@@ -1922,7 +1967,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA
+  // 3. PAGINA TOTALI & FIRMA (Con celle vuote e sezioni di avviso personalizzate)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -1953,7 +1998,8 @@ function prepareAndPrint() {
         <table class="p-table">
           <thead>
             <tr>
-              <th>Tipologia Merceologica & Fornitore</th>
+              <!-- Intestazione vuota come richiesto -->
+              <th></th>
               <th class="text-right" style="width: 120px;">Fornitura</th>
               <th class="text-right" style="width: 120px;">Posa in Opera</th>
               <th class="text-right" style="width: 130px;">Totale Netto</th>
@@ -1978,12 +2024,16 @@ function prepareAndPrint() {
           </tbody>
         </table>
 
-        <div class="p-box" style="margin-top: 15px;">
-          <div class="p-box-title">Condizioni di Fornitura e Pagamento</div>
-          <div><strong>Detrazione Fiscale applicabile:</strong> ${bonusPrint}</div>
-          <div><strong>Termini di Pagamento:</strong> ${escapeHtml(docState.paymentTerms)}</div>
-          <div><strong>Tempi indicativi consegna/posa:</strong> ${escapeHtml(docState.deliveryTerms)}</div>
-          ${docState.finalNotes ? `<div style="margin-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
+        <!-- Sezione Condizioni & Note con i testi personalizzati -->
+        <div class="p-box" style="margin-top: 15px; font-size: 0.82rem; line-height: 1.5;">
+          <div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>
+          <div style="margin-top: 4px;"><strong>SONO ESCLUSI DAL PREVENTIVO:</strong> pulizia dei serramenti a fine posa, eventuali piattaforme e/o ponteggi, opere murarie, opere di collegamenti elettrici, quant'altro non espressamente specificato nel preventivo.</div>
+          
+          <div style="margin-top: 10px; border-top: 1px solid #ccc; padding-top: 8px; font-weight: 700;">
+            IL PREVENTIVO PUO' ESSERE SOGGETTO A VARIAZIONI IN BASE ALLE MISURE RILEVATE IN FASE DI SOPRALLUOGO ESECUTIVO.
+          </div>
+
+          ${docState.finalNotes ? `<div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
         </div>
 
         <div class="p-signature-area">
@@ -1991,12 +2041,6 @@ function prepareAndPrint() {
             Firma per Accettazione del Committente<br><br><br>
             ________________________________________
           </div>
-        </div>
-
-        <div style="font-size: 0.75rem; color: #555; margin-top: 25px; text-align: center;">
-          ${isContract 
-            ? "La sottoscrizione costituisce formale stipula del contratto d'appalto/fornitura ai sensi dell'art. 1326 c.c." 
-            : "Il presente preventivo ha mero valore di proposta economica ed è vincolato all'accettazione entro i termini di validità indicati."}
         </div>
       </div>
 
