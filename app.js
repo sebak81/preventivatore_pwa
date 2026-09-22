@@ -1501,7 +1501,7 @@ function renderCategoryOptionsBlock(cat) {
       '<div class="form-grid" style="margin-top: 10px;">' +
         '<div class="form-group">' +
           '<label>Specifiche Tecniche Sistema</label>' +
-          '<input type="text" value="' + escapeHtml(cat.specs) + '" placeholder="Spessore, guarnizioni, caratteristiche" oninput="updateCatField(\'' + cat.id + '\', \'specs', this.value)">' +
+          '<input type="text" value="' + escapeHtml(cat.specs) + '" placeholder="Spessore, guarnizioni, caratteristiche" oninput="updateCatField(\'' + cat.id + '\', \'specs\', this.value)">' +
         '</div>' +
         '<div class="form-group">' +
           '<label>Vetraggio / Accessori</label>' +
@@ -1593,7 +1593,7 @@ function renderPositionsTableHtml(cat) {
         '</div>' +
       '</td>' +
       '<td style="width: 30%;">' +
-        '<input type="text" value="' + escapeHtml(pos.description) + '" placeholder="Descrizione o articolo libero" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'description\', this.value)">' +
+        '<input type="text" value="' + escapeHtml(pos.description)}" placeholder="Descrizione o articolo libero" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'description\', this.value)">' +
       '</td>' +
       '<td style="width: 7%;">' +
         '<input type="number" min="1" step="1" value="' + (pos.quantity || 1) + '" style="text-align: center;" oninput="updatePosField(\'' + cat.id + '\', \'' + pos.id + '\', \'quantity\', this.value)">' +
