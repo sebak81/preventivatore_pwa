@@ -13,8 +13,196 @@ const DEFAULT_COMPANY = {
 };
 
 const DEFAULT_LEGAL = {
-  terms: `## Condizioni Contrattuali:\n\nLe presenti Condizioni Generali disciplinano la fornitura e la posa in opera dei prodotti commercializzati da **3 ESSE SERRAMENTI S.r.l.** e costituiscono parte integrante del contratto sottoscritto dal Cliente.`,
-  privacy: `## INFORMATIVA EX ARTT. 13-14, GDPR UE/2016/679\n\nIl Regolamento Europeo **UE/2016/679** (di seguito "Regolamento") stabilisce norme relative alla protezione delle persone fisiche.`
+  terms: `## Condizioni Contrattuali:
+
+Le presenti Condizioni Generali disciplinano la fornitura e la posa in opera dei prodotti commercializzati da **3 ESSE SERRAMENTI S.r.l.** e costituiscono parte integrante del contratto sottoscritto dal Cliente.
+---
+**1. Accettazione del contratto**
+La sottoscrizione del contratto comporta l'accettazione integrale delle presenti condizioni generali ed è vincolante e irrevocabile per il Cliente, fatto salvo quanto previsto dall'art. 1671 del Codice Civile. Il Cliente è invitato a verificare attentamente il contenuto del contratto prima della sottoscrizione, al fine di evitare errori, omissioni o difformità.
+---
+**2. Acconto e conferma dell'ordine**
+Salvo diverso accordo scritto, l'acconto è stabilito nel 50% dell'importo complessivo del contratto o del 30% dell’importo complessivo con pagamento con finanziamento.
+La produzione e l'ordine dei materiali potranno essere avviati esclusivamente dopo:
+- il versamento dell'acconto concordato;
+- la ricezione della relativa contabile di pagamento;
+- l'esecuzione del rilievo definitivo delle misure.
+---
+**3. Rilievo delle misure esecutive**
+Il rilievo delle misure sarà effettuato esclusivamente quando il cantiere risulterà idoneo allo svolgimento delle operazioni.
+In particolare dovranno risultare completati, ove previsti:
+- installazione dei falsi telai;
+- rasature e intonaci;
+- soglie e davanzali;
+- massetti;
+- cappotto esterno;
+- pavimentazioni finite (nel caso di porte interne);
+- ogni altra lavorazione necessaria alla definizione delle quote definitive.
+Eventuali ritardi dovuti alla mancata predisposizione del cantiere non saranno imputabili a **3 ESSE SERRAMENTI S.r.l.**
+---
+**4. Tempi di consegna**
+I termini di consegna decorrono esclusivamente dal momento in cui:
+- siano state rilevate le misure definitive;
+- siano stati definiti tutti i dettagli tecnici;
+- sia stato corrisposto l'acconto previsto.
+Le tempistiche potranno inoltre subire variazioni in funzione della disponibilità dei materiali, dei fornitori e della capacità produttiva.
+---
+**5. Reclami e pagamenti**
+Eventuali reclami, contestazioni o richieste di sistemazione non autorizzano il Cliente a sospendere, ritardare o ridurre i pagamenti pattuiti.
+Le contestazioni saranno prese in considerazione esclusivamente qualora risultino regolarmente saldate tutte le somme scadute.
+---
+**6. Condizioni di posa**
+Qualora durante il rilievo o durante i lavori vengano riscontrate problematiche strutturali o costruttive che possano compromettere il corretto funzionamento dei serramenti, **3 ESSE SERRAMENTI S.r.l.** provvederà a segnalarle tempestivamente al Cliente.
+Qualora il Cliente richieda comunque l'installazione, la società procederà, salvo casi di impossibilità tecnica o di grave rischio, declinando ogni responsabilità per eventuali anomalie derivanti dalla conformazione del vano murario o dalla necessità di adattare il serramento al foro esistente.
+---
+**7. Opere escluse**
+Salvo diversa indicazione contrattuale, sono escluse:
+- opere murarie;
+- opere di finitura;
+- tinteggiature;
+- opere da elettricista;
+- opere idrauliche;
+- ripristini murari di qualsiasi natura.
+- pulizia dei serramenti a fine posa.
+---
+**8. Sensori di allarme**
+I sensori magnetici di allarme non costituiscono dotazione standard dei serramenti.
+La loro fornitura dovrà essere espressamente richiesta in fase di preventivo e specificata nel contratto.
+Qualora i sensori vengano forniti dall'impiantista incaricato dal Cliente, dovrà essere già predisposto il relativo cablaggio.
+Qualora siano forniti da **3 ESSE SERRAMENTI S.r.l.**, il Cliente dovrà coordinare gli interventi con il proprio elettricista o installatore dell'impianto di allarme.
+Le richieste formulate successivamente alla sottoscrizione del contratto saranno contabilizzate separatamente al costo di **€ 60,00 oltre IVA per ciascun sensore**, salvo diverso preventivo.
+---
+**9. Collegamenti elettrici**
+**3 ESSE SERRAMENTI S.r.l.** non è abilitata all'esecuzione di collegamenti elettrici.
+Tutti gli allacciamenti relativi ad automazioni, motori, sensori, tapparelle motorizzate o altri dispositivi elettrici dovranno essere effettuati esclusivamente da personale qualificato incaricato dal Cliente.
+---
+**10. Impianti esistenti**
+Prima dell'inizio dei lavori il Cliente dovrà comunicare l'eventuale presenza di:
+- tubazioni idrauliche;
+- impianti gas;
+- linee elettriche;
+- impianti di allarme;
+- qualsiasi altro impianto presente nelle zone interessate dalla posa.
+In mancanza di tali segnalazioni, **3 ESSE SERRAMENTI S.r.l.** non risponderà di eventuali danni derivanti dalla presenza di impianti non individuabili.
+---
+**11. Contestazioni**
+Eventuali contestazioni relative ai prodotti forniti o installati dovranno essere comunicate **entro 7 giorni** dalla conclusione dei lavori.
+Decorso tale termine, la fornitura si intenderà accettata, salvo i casi previsti dalla garanzia di legge.
+---
+**12. Interventi successivi alla posa**
+Le richieste di registrazione, regolazione, manutenzione o verifica non riconducibili alla garanzia potranno comportare un diritto di chiamata.
+Il costo minimo dell'intervento è fissato in **€ 30,00 entro un raggio di 15 km dalla sede aziendale**; oltre tale distanza il costo sarà determinato in funzione della località e dell'intervento richiesto.
+---
+**13. Varianti e lavorazioni extra**
+Qualsiasi lavorazione o materiale non previsto nel contratto originario dovrà essere oggetto di nuovo preventivo e successiva accettazione.
+L'eventuale esecuzione di opere aggiuntive non comporta alcun differimento dei termini di pagamento già concordati.
+---
+### GARANZIE
+**3 ESSE SERRAMENTI S.r.l.** riconosce la garanzia prevista dalla normativa italiana per i difetti di conformità.
+Eventuali garanzie commerciali aggiuntive eventualmente offerte dai produttori saranno valide esclusivamente per i prodotti espressamente indicati e non si estenderanno automaticamente agli altri componenti.
+**La garanzia non copre:**
+- uso improprio dei prodotti;
+- mancata manutenzione;
+- normale usura;
+- danni accidentali;
+- componenti elettrici sottoposti ad utilizzi non conformi;
+- interventi effettuati da personale non autorizzato.
+Ogni richiesta di garanzia sarà valutata congiuntamente al produttore del componente interessato.
+---
+**VETRI**
+La verifica di eventuali difetti visivi dovrà essere effettuata osservando la superficie vetrata:
+- ad almeno 2 metri di distanza;
+- in posizione frontale;
+- dall'interno verso l'esterno;
+- con luce naturale diffusa;
+L'osservazione non dovrà protrarsi oltre 30 secondi.
+**Non costituiscono difetti:**
+- interferenze cromatiche;
+- riflessi multipli;
+- fenomeni di condensa;
+- imperfezioni percepibili solo da distanza ravvicinata;
+- fenomeni visibili esclusivamente in particolari condizioni di illuminazione.
+---
+## Sostituzione Materiali:
+Le richieste di sostituzione di componenti saranno preventivamente valutate e preventivate.
+Qualora l'intervento venga riconosciuto in garanzia, il Cliente sarà tenuto esclusivamente al pagamento del diritto di chiamata e della manodopera eventualmente prevista, pari a **€ 30,00/ora per operatore**, salvo diverse condizioni di garanzia del produttore.
+Nel caso in cui il difetto non rientri nella garanzia, verrà predisposto un preventivo per la sostituzione dei componenti interessati.
+---
+## Manuali d'Uso:
+I manuali d'uso e manutenzione dei prodotti sono disponibili sul sito internet di **3 ESSE SERRAMENTI S.r.l.** e devono essere consultati e rispettati dal Cliente ai fini della corretta conservazione della garanzia.`,
+  privacy: `## INFORMATIVA EX ARTT. 13-14, GDPR UE/2016/679
+
+Il Regolamento Europeo **UE/2016/679** (di seguito "Regolamento") stabilisce norme relative alla protezione delle persone fisiche con riguardo al trattamento dei dati personali, nonché norme relative alla libera circolazione di tali dati.
+
+In osservanza al principio di trasparenza previsto dall'art. 5 del Regolamento, **3 ESSE S.R.L.**, con sede in TREVIGNANO 31040 (TV) in Via Treviso n. 5 - Italia, in qualità di Titolare del Trattamento, Le fornisce le informazioni richieste dagli artt. 13 e 14 del Regolamento.
+---
+### Finalità del Trattamento
+Il trattamento dei Suoi dati personali sarà improntato ai principi di correttezza, liceità e trasparenza, tutelando la Sua riservatezza, i Suoi diritti ed in conformità alla policy privacy aziendale. L'azienda si impegna inoltre a trattare i Suoi dati nel rispetto del principio di "minimizzazione", ovvero acquisendo e trattando i dati limitatamente a quanto necessario rispetto alle seguenti finalità:
+- **a)** Gestione ed esecuzione degli obblighi pre-contrattuali;
+- **b)** Gestione ed esecuzione degli obblighi contrattuali;
+- **c)** Inserimento dei dati nei data base aziendali al fine di consentire il monitoraggio dell'esecuzione del contratto;
+- **d)** Gestione degli adempimenti fiscali, contabili o per dar corso a richieste dell'autorità giudiziaria;
+- **e)** Adempiere agli obblighi previsti dalla legge, dai regolamenti e dalla normativa dell'UE.
+
+La informiamo inoltre che:
+- in relazione alle finalità di cui ai punti a), b), c), il trattamento potrà essere effettuato senza il suo consenso in quanto necessario all'esecuzione del contratto di cui Lei è parte (art. 6.1 lett. b del Regolamento);
+- in relazione alle finalità di cui ai punti d) ed e), il trattamento potrà essere effettuato senza il suo consenso in quanto necessario per adempiere agli obblighi di legge (art. 6.1 lett. c del Regolamento).
+
+Il conferimento dei Suoi dati personali è obbligatorio per le finalità di cui ai punti a), b), c), d), e), ed il Suo rifiuto al conferimento dei dati determinerà l'impossibilità totale di stipula ed esecuzione del contratto.
+---
+### Modalità del Trattamento
+Il trattamento dei Suoi dati personali sarà effettuato con modalità cartacee e strumenti informatici nel rispetto delle disposizioni in materia di protezione dei dati personali e, in particolare, delle misure tecniche e organizzative adeguate di cui all'art. 32.1 del Regolamento, e con l'osservanza di ogni misura cautelativa che ne garantisca la relativa integrità, riservatezza e disponibilità.
+---
+### Fonte da cui hanno origine i dati
+Tutti i dati sono raccolti direttamente presso l'interessato e volontariamente forniti dal cliente.
+---
+### Categorie di destinatari
+I Suoi dati personali potranno essere comunicati, in stretta relazione alle finalità sopra indicate, ai seguenti soggetti o categorie di soggetti:
+- **a)** soggetti in relazione ai quali la vigente normativa prevede l'obbligo di comunicazione, in ottemperanza a quanto prescritto dalla normativa in materia fiscale e contabile;
+- **b)** istituti di credito;
+- **c)** società operanti nel settore della logistica;
+- **d)** a professionisti, al fine dello studio e risoluzione di eventuali problemi giuridici relativi alla Sua posizione contrattuale (ad es.: avvocati);
+- **e)** a professionisti (sia persone fisiche sia persone giuridiche) a cui il Titolare dovesse affidare degli incarichi per lo svolgimento di alcune attività in outsourcing (ad es.: commercialisti, consulenti).
+
+La informiamo inoltre che:
+- la comunicazione dei Suoi dati alle categorie di soggetti di cui alla lettera a) costituisce un obbligo di legge al quale il Titolare deve ottemperare;
+- la comunicazione dei Suoi dati alle categorie di soggetti di cui alle lettere b), c), d), e), è necessaria per dare esecuzione al contratto di cui Lei è parte.
+
+In relazione alle categorie di soggetti di cui alle lettere b), c), d), e), il Titolare del Trattamento si impegna ad affidarsi esclusivamente a soggetti che prestino garanzie adeguate circa la protezione dei dati, e provvederà a nominarli Responsabili del Trattamento ex art. 28 del Regolamento. L'elenco dei Responsabili del Trattamento è disponibile in azienda e potrà prenderne visione previa richiesta al Titolare del Trattamento.
+
+I Suoi dati, inoltre, verranno trattati, esclusivamente per le finalità di cui sopra, da parte del personale aziendale dipendente e/o collaboratore, appositamente autorizzato e istruito dal Titolare ai sensi dell'art. 29 del Regolamento.
+
+I Suoi dati personali non saranno oggetto di diffusione, salvo qualora richiesto da una norma di legge o di regolamento o dalla normativa comunitaria.
+---
+### Periodo di conservazione
+- **Dati identificativi, Dati di contatto, Fatture, DDT:** 10 anni a partire dal momento della risoluzione del contratto (art. 43 del D.P.R. 600/73; art. 2946 codice civile sulla prescrizione ordinaria).
+---
+### Diritti riconosciuti all'interessato
+In ogni momento potrà esercitare, nei confronti del Titolare, i Suoi diritti previsti dagli artt. 15-22 del Regolamento.
+
+In particolare, in qualsiasi momento, Lei avrà il diritto di chiedere:
+- l'accesso ai Suoi dati personali;
+- la loro rettifica in caso di inesattezza degli stessi;
+- la cancellazione;
+- la limitazione del loro trattamento.
+
+Avrà inoltre:
+- il diritto di opporsi al loro trattamento se trattati per il perseguimento di un legittimo interesse del Titolare del Trattamento, qualora ritenesse violati i propri diritti e libertà fondamentali;
+- il diritto di revocare in qualsiasi momento il Suo consenso in relazione alle finalità per le quali questo è necessario;
+- il diritto alla portabilità dei Suoi dati, ossia il diritto di ricevere in un formato strutturato, di uso comune e leggibile da dispositivo automatico, i dati personali a Lei riferibili.
+
+Potrà esercitare i propri diritti direttamente e gratuitamente contattando il Titolare del Trattamento **3 ESSE S.R.L.**, con sede in TREVIGNANO 31040 (TV) in Via Treviso n. 5 - Italia, telefonicamente al numero +39 0423/670806, o a mezzo mail all'indirizzo: info@3esseserramenti.com indicando nell'oggetto *"ESERCIZIO DEL DIRITTO IN MATERIA DI DATI PERSONALI"* specificando quale diritto richieda o per comunicazione scritta all'indirizzo del Titolare.
+
+È diritto dell'interessato proporre reclamo al Garante per la protezione dei dati personali all'indirizzo www.garanteprivacy.it
+---
+
+**Luogo e data**
+________________________________________
+
+**Nome e Cognome del cliente**
+________________________________________
+
+**Firma**
+________________________________________`
 };
 
 const DEFAULT_CATALOG = {
@@ -267,7 +455,7 @@ function persistSettings() {
 }
 
 // ==========================================================================
-// 4. FETCH AUTOMATICA DA GITHUB (Condizioni & Privacy)
+// 4. FETCH AUTOMATICA PROTETTA DA GITHUB
 // ==========================================================================
 async function fetchRemoteLegalTerms() {
   try {
@@ -283,7 +471,7 @@ async function fetchRemoteLegalTerms() {
       }
     }
   } catch (err) {
-    console.log("Uso condizioni locali.", err);
+    console.warn("Uso condizioni contrattuali locali:", err);
   }
 
   try {
@@ -299,15 +487,15 @@ async function fetchRemoteLegalTerms() {
       }
     }
   } catch (err) {
-    console.log("Uso privacy locale.", err);
+    console.warn("Uso informativa privacy locale:", err);
   }
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con gestione Revisione X)
+// 5. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
-  type: "PREVENTIVO", // PREVENTIVO | REVISIONE | CONTRATTO
+  type: "PREVENTIVO",
   revisionNum: 1,
   number: "",
   date: new Date().toISOString().split('T')[0],
@@ -324,7 +512,6 @@ let docState = {
   finalNotes: ""
 };
 
-// Formattazione del Nome File in base alle regole richieste
 function getSaveFileName() {
   const clientName = (docState.client.name || "Cliente").trim().replace(/[^a-zA-Z0-9_-]/g, '_');
   const rawNum = (docState.number || "").trim() || "000";
@@ -340,7 +527,6 @@ function getSaveFileName() {
   }
 }
 
-// Etichetta documento in alto a destra su Pagina 1
 function getFormattedDocNumber() {
   const raw = (docState.number || "").trim();
   if (!raw) return "BOZZA";
@@ -378,18 +564,24 @@ function formatLongItalianDate(isoDate) {
 // ==========================================================================
 function safeOn(id, event, handler) {
   const el = document.getElementById(id);
-  if (el) el.addEventListener(event, handler);
+  if (el) {
+    el.addEventListener(event, handler);
+  }
 }
 
 function initApp() {
-  setupEventListeners();
-  loadDefaultState();
-  initSettingsUI();
-  populateCategorySelector();
-  renderCategoriesUI();
-  updateCalculations();
-  updateDocNumberPreview();
-  fetchRemoteLegalTerms();
+  try {
+    setupEventListeners();
+    loadDefaultState();
+    initSettingsUI();
+    populateCategorySelector();
+    renderCategoriesUI();
+    updateCalculations();
+    updateDocNumberPreview();
+    fetchRemoteLegalTerms();
+  } catch (e) {
+    console.error("Errore critico in fase di avvio initApp:", e);
+  }
 }
 
 if (document.readyState === 'loading') {
@@ -407,6 +599,13 @@ function setupEventListeners() {
     const revInput = document.getElementById('doc-revision-num');
     if (revInput) {
       revInput.style.display = (docState.type === 'REVISIONE') ? 'inline-block' : 'none';
+    }
+    // Quando trasformo in revisione, aggiorno automaticamente la data a quella odierna
+    if (docState.type === 'REVISIONE') {
+      const today = new Date().toISOString().split('T')[0];
+      docState.date = today;
+      const dateEl = document.getElementById('doc-date');
+      if (dateEl) dateEl.value = today;
     }
     updateDocNumberPreview();
   });
@@ -480,17 +679,26 @@ function setupEventListeners() {
   safeOn('btn-add-category', 'click', addCategoryFromSelector);
   safeOn('btn-print', 'click', prepareAndPrint);
   safeOn('btn-save', 'click', saveToFile);
-  safeOn('btn-open', 'click', () => document.getElementById('file-input').click());
+  safeOn('btn-open', 'click', () => {
+    const fInput = document.getElementById('file-input');
+    if (fInput) fInput.click();
+  });
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
   // Impostazioni, Logo e Macro-Categorie
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
-  safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
+  safeOn('btn-import-settings', 'click', () => {
+    const sInput = document.getElementById('settings-file-input');
+    if (sInput) sInput.click();
+  });
   safeOn('settings-file-input', 'change', importSettingsJSON);
 
-  safeOn('btn-upload-logo', 'click', () => document.getElementById('logo-file-input').click());
+  safeOn('btn-upload-logo', 'click', () => {
+    const lInput = document.getElementById('logo-file-input');
+    if (lInput) lInput.click();
+  });
   safeOn('logo-file-input', 'change', handleLogoUpload);
   safeOn('btn-remove-logo', 'click', handleLogoRemove);
 
@@ -509,18 +717,24 @@ function setupEventListeners() {
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
   });
 
-  // Gestione Condizioni Contrattuali
+  // Condizioni Contrattuali
   safeOn('btn-preview-terms', 'click', toggleTermsMarkdownPreview);
   safeOn('set-legal-terms', 'input', updateTermsLivePreview);
   safeOn('btn-export-terms-json', 'click', exportTermsJSON);
-  safeOn('btn-import-terms-json', 'click', () => document.getElementById('terms-file-input').click());
+  safeOn('btn-import-terms-json', 'click', () => {
+    const tInput = document.getElementById('terms-file-input');
+    if (tInput) tInput.click();
+  });
   safeOn('terms-file-input', 'change', importTermsJSON);
 
-  // Gestione Privacy
+  // Privacy
   safeOn('btn-preview-privacy', 'click', togglePrivacyMarkdownPreview);
   safeOn('set-legal-privacy', 'input', updatePrivacyLivePreview);
   safeOn('btn-export-privacy-json', 'click', exportPrivacyJSON);
-  safeOn('btn-import-privacy-json', 'click', () => document.getElementById('privacy-file-input').click());
+  safeOn('btn-import-privacy-json', 'click', () => {
+    const prInput = document.getElementById('privacy-file-input');
+    if (prInput) prInput.click();
+  });
   safeOn('privacy-file-input', 'change', importPrivacyJSON);
 }
 
@@ -531,18 +745,18 @@ function switchView(view) {
   const btnSet = document.getElementById('tab-settings-btn');
 
   if (view === 'editor') {
-    edView.style.display = 'flex';
-    setView.style.display = 'none';
-    btnEd.classList.add('active');
-    btnSet.classList.remove('active');
+    if (edView) edView.style.display = 'flex';
+    if (setView) setView.style.display = 'none';
+    if (btnEd) btnEd.classList.add('active');
+    if (btnSet) btnSet.classList.remove('active');
     populateCategorySelector();
     renderCategoriesUI();
     updateDocNumberPreview();
   } else {
-    edView.style.display = 'none';
-    setView.style.display = 'flex';
-    btnEd.classList.remove('active');
-    btnSet.classList.add('active');
+    if (edView) edView.style.display = 'none';
+    if (setView) setView.style.display = 'flex';
+    if (btnEd) btnEd.classList.remove('active');
+    if (btnSet) btnSet.classList.add('active');
     renderSettingsCategoriesList();
   }
 }
@@ -578,21 +792,26 @@ function populateCategorySelector() {
 // 7. GESTIONE IMPOSTAZIONI: LOGO, CATALOGO E TESTI LEGALI
 // ==========================================================================
 function initSettingsUI() {
-  document.getElementById('set-company-name').value = companySettings.name || '';
-  document.getElementById('set-company-address').value = companySettings.address || '';
-  document.getElementById('set-company-taxid').value = companySettings.taxId || '';
-  document.getElementById('set-company-contacts').value = companySettings.contacts || '';
+  const nameEl = document.getElementById('set-company-name');
+  if (nameEl) nameEl.value = companySettings.name || '';
+
+  const addrEl = document.getElementById('set-company-address');
+  if (addrEl) addrEl.value = companySettings.address || '';
+
+  const taxEl = document.getElementById('set-company-taxid');
+  if (taxEl) taxEl.value = companySettings.taxId || '';
+
+  const contEl = document.getElementById('set-company-contacts');
+  if (contEl) contEl.value = companySettings.contacts || '';
 
   const cityInput = document.getElementById('set-company-city');
-  if (cityInput) companySettings.city = cityInput.value.trim() || 'Trevignano';
+  if (cityInput) cityInput.value = companySettings.city || 'Trevignano';
 
   const addr2Input = document.getElementById('set-company-address2');
-  if (addr2Input) companySettings.address2 = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
-  if (addr2Input) addr2Input.value = companySettings.address2;
+  if (addr2Input) addr2Input.value = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
 
   const emailInput = document.getElementById('set-company-email');
-  if (emailInput) companySettings.email = companySettings.email || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
-  if (emailInput) emailInput.value = companySettings.email;
+  if (emailInput) emailInput.value = companySettings.email || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
 
   const termsArea = document.getElementById('set-legal-terms');
   if (termsArea) termsArea.value = legalSettings.terms || DEFAULT_LEGAL.terms;
@@ -610,13 +829,11 @@ function updateLogoPreviewUI() {
   const btnRemove = document.getElementById('btn-remove-logo');
 
   if (companySettings.logo) {
-    previewImg.src = companySettings.logo;
-    previewImg.style.display = 'block';
+    if (previewImg) { previewImg.src = companySettings.logo; previewImg.style.display = 'block'; }
     if (placeholder) placeholder.style.display = 'none';
     if (btnRemove) btnRemove.style.display = 'inline-flex';
   } else {
-    previewImg.src = '';
-    previewImg.style.display = 'none';
+    if (previewImg) { previewImg.src = ''; previewImg.style.display = 'none'; }
     if (placeholder) placeholder.style.display = 'block';
     if (btnRemove) btnRemove.style.display = 'none';
   }
@@ -649,7 +866,6 @@ function handleLogoRemove() {
   }
 }
 
-// ANTEPRIME LIVE MARKDOWN
 function toggleTermsMarkdownPreview() {
   const area = document.getElementById('set-legal-terms');
   const prev = document.getElementById('terms-markdown-preview');
@@ -1725,7 +1941,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 11. GENERAZIONE STAMPA PDF NATIVA CON TUTTE LE MODIFICHE RICHIESTE
+// 11. GENERAZIONE STAMPA PDF NATIVA
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1785,7 +2001,7 @@ function prepareAndPrint() {
 
   let sheetsHTML = "";
 
-  // 1. PAGINA 1: COPERTINA (Con Revisione X del [data] e formattazione grassetto/normale)
+  // 1. PAGINA 1: COPERTINA
   sheetsHTML += `
     <div class="sheet p1-sheet">
       <div class="p1-top-container">
@@ -1798,11 +2014,9 @@ function prepareAndPrint() {
         </div>
 
         <div class="p1-sub-header">
-          <!-- Data in alto a sinistra SENZA grassetto -->
           <div class="p1-doc-date" style="font-weight: normal !important;">${cityDateText}</div>
           <table class="p1-box-offerta">
             <tr>
-              <!-- Scritta Offerta/Contratto/Revisione in alto a destra CON grassetto -->
               <td class="p1-box-label" style="font-weight: bold;">${formattedDocNum}</td>
             </tr>
           </table>
@@ -1967,7 +2181,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Con celle vuote e sezioni di avviso personalizzate)
+  // 3. PAGINA TOTALI & FIRMA (Con cella vuota e blocchi clausole esclusioni)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -1998,7 +2212,6 @@ function prepareAndPrint() {
         <table class="p-table">
           <thead>
             <tr>
-              <!-- Intestazione vuota come richiesto -->
               <th></th>
               <th class="text-right" style="width: 120px;">Fornitura</th>
               <th class="text-right" style="width: 120px;">Posa in Opera</th>
@@ -2024,22 +2237,27 @@ function prepareAndPrint() {
           </tbody>
         </table>
 
-        <!-- Sezione Condizioni & Note con i testi personalizzati -->
-        <div class="p-box" style="margin-top: 15px; font-size: 0.82rem; line-height: 1.5;">
-          <div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>
-          <div style="margin-top: 4px;"><strong>SONO ESCLUSI DAL PREVENTIVO:</strong> pulizia dei serramenti a fine posa, eventuali piattaforme e/o ponteggi, opere murarie, opere di collegamenti elettrici, quant'altro non espressamente specificato nel preventivo.</div>
-          
-          <div style="margin-top: 10px; border-top: 1px solid #ccc; padding-top: 8px; font-weight: 700;">
-            IL PREVENTIVO PUO' ESSERE SOGGETTO A VARIAZIONI IN BASE ALLE MISURE RILEVATE IN FASE DI SOPRALLUOGO ESECUTIVO.
-          </div>
-
-          ${docState.finalNotes ? `<div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
+        <div class="p-box" style="margin-top: 15px;">
+          <div class="p-box-title">Condizioni di Fornitura e Pagamento</div>
+          <div><strong>Detrazione Fiscale applicabile:</strong> ${bonusPrint}</div>
+          <div><strong>Termini di Pagamento:</strong> ${escapeHtml(docState.paymentTerms)}</div>
+          <div><strong>Tempi indicativi consegna/posa:</strong> ${escapeHtml(docState.deliveryTerms)}</div>
+          ${docState.finalNotes ? `<div style="margin-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>` : ''}
         </div>
 
         <div class="p-signature-area">
           <div class="p-sign-box" style="width: 320px;">
             Firma per Accettazione del Committente<br><br><br>
             ________________________________________
+          </div>
+        </div>
+
+        <!-- Sezione Esclusioni e Note Finali -->
+        <div style="margin-top: 25px; font-size: 0.8rem; line-height: 1.5; color: #111;">
+          <div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>
+          <div><strong>SONO ESCLUSI DAL PREVENTIVO:</strong> pulizia dei serramenti a fine posa, eventuali piattaforme e/o ponteggi, opere murarie, opere di collegamenti elettrici, quant'altro non espressamente specificato nel preventivo.</div>
+          <div style="margin-top: 10px; font-weight: 800;">
+            IL PREVENTIVO PUO' ESSERE SOGGETTO A VARIAZIONI IN BASE ALLE MISURE RILEVATE IN FASE DI SOPRALLUOGO ESECUTIVO.
           </div>
         </div>
       </div>
