@@ -1,10 +1,11 @@
-const CACHE_NAME = 'prev-app-v26'; // Versione aggiornata con live preview dinamico in tempo reale
+const CACHE_NAME = 'prev-app-v28'; // Versione aggiornata con condizioni definitive caricate da GitHub
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
-  './manifest.json'
+  './manifest.json',
+  './condizioni_contrattuali.json'
 ];
 
 self.addEventListener('install', (e) => {
