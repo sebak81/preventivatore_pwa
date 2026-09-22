@@ -1,5 +1,5 @@
 // ==========================================================================
-// 1. ANAGRAFICA AZIENDALE, TESTI LEGALI (MARKDOWN) E CATALOGO
+// 1. ANAGRAFICA AZIENDALE, TESTI LEGALI (MARKDOWN DEFINITIVI) E CATALOGO
 // ==========================================================================
 const DEFAULT_COMPANY = {
   name: "3 ESSE SERRAMENTI",
@@ -13,13 +13,122 @@ const DEFAULT_COMPANY = {
 };
 
 const DEFAULT_LEGAL = {
-  terms: `## Condizioni Generali di Fornitura e Posa
+  terms: `## Condizioni Contrattuali:
 
-1. **Misure ed Esecuzione:** Tutte le misure indicate in fase di offerta si intendono indicative; le misure definitive verranno rilevate a cura del nostro personale tecnico solo ad avvenuta accettazione dell'ordine e con controtelai/opere murarie ultimate.
-2. **Tolleranze e Caratteristiche:** I manufatti sono soggetti alle tolleranze dimensionali e cromatiche previste dalle vigenti norme UNI e dalle schede tecniche dei rispettivi produttori.
-3. **Opere Murarie ed Elettriche:** Salvo diverso accordo scritto, sono escluse dalla fornitura tutte le opere murarie, di finitura intonaco, tinteggiatura, collegamenti elettrici per motorizzazioni e lo smaltimento di materiali nocivi preesistenti.
-4. **Consegna e Riservato Dominio:** I manufatti forniti rimangono di esclusiva proprietà della ditta venditrice fino al completo e integrale saldo dell'importo pattuito ai sensi dell'art. 1523 c.c. Eventuali ritardi indipendenti dalla nostra volontà non daranno diritto a risarcimento o recesso.
-5. **Foro Competente:** Per ogni controversia derivante dall'interpretazione o esecuzione del presente accordo, il foro competente esclusivo sarà quello del luogo ove ha sede legale la ditta fornitrice.`,
+Le presenti Condizioni Generali disciplinano la fornitura e la posa in opera dei prodotti commercializzati da **3 ESSE SERRAMENTI S.r.l.** e costituiscono parte integrante del contratto sottoscritto dal Cliente.
+---
+**1. Accettazione del contratto**
+La sottoscrizione del contratto comporta l'accettazione integrale delle presenti condizioni generali ed è vincolante e irrevocabile per il Cliente, fatto salvo quanto previsto dall'art. 1671 del Codice Civile. Il Cliente è invitato a verificare attentamente il contenuto del contratto prima della sottoscrizione, al fine di evitare errori, omissioni o difformità.
+---
+**2. Acconto e conferma dell'ordine**
+Salvo diverso accordo scritto, l'acconto è stabilito nel 50% dell'importo complessivo del contratto o del 30% dell’importo complessivo con pagamento con finanziamento.
+La produzione e l'ordine dei materiali potranno essere avviati esclusivamente dopo:
+- il versamento dell'acconto concordato;
+- la ricezione della relativa contabile di pagamento;
+- l'esecuzione del rilievo definitivo delle misure.
+---
+**3. Rilievo delle misure esecutive**
+Il rilievo delle misure sarà effettuato esclusivamente quando il cantiere risulterà idoneo allo svolgimento delle operazioni.
+In particolare dovranno risultare completati, ove previsti:
+- installazione dei falsi telai;
+- rasature e intonaci;
+- soglie e davanzali;
+- massetti;
+- cappotto esterno;
+- pavimentazioni finite (nel caso di porte interne);
+- ogni altra lavorazione necessaria alla definizione delle quote definitive.
+Eventuali ritardi dovuti alla mancata predisposizione del cantiere non saranno imputabili a **3 ESSE SERRAMENTI S.r.l.**
+---
+**4. Tempi di consegna**
+I termini di consegna decorrono esclusivamente dal momento in cui:
+- siano state rilevate le misure definitive;
+- siano stati definiti tutti i dettagli tecnici;
+- sia stato corrisposto l'acconto previsto.
+Le tempistiche potranno inoltre subire variazioni in funzione della disponibilità dei materiali, dei fornitori e della capacità produttiva.
+---
+**5. Reclami e pagamenti**
+Eventuali reclami, contestazioni o richieste di sistemazione non autorizzano il Cliente a sospendere, ritardare o ridurre i pagamenti pattuiti.
+Le contestazioni saranno prese in considerazione esclusivamente qualora risultino regolarmente saldate tutte le somme scadute.
+---
+**6. Condizioni di posa**
+Qualora durante il rilievo o durante i lavori vengano riscontrate problematiche strutturali o costruttive che possano compromettere il corretto funzionamento dei serramenti, **3 ESSE SERRAMENTI S.r.l.** provvederà a segnalarle tempestivamente al Cliente.
+Qualora il Cliente richieda comunque l'installazione, la società procederà, salvo casi di impossibilità tecnica o di grave rischio, declinando ogni responsabilità per eventuali anomalie derivanti dalla conformazione del vano murario o dalla necessità di adattare il serramento al foro esistente.
+---
+**7. Opere escluse**
+Salvo diversa indicazione contrattuale, sono escluse:
+- opere murarie;
+- opere di finitura;
+- tinteggiature;
+- opere da elettricista;
+- opere idrauliche;
+- ripristini murari di qualsiasi natura.
+- pulizia dei serramenti a fine posa.
+---
+**8. Sensori di allarme**
+I sensori magnetici di allarme non costituiscono dotazione standard dei serramenti.
+La loro fornitura dovrà essere espressamente richiesta in fase di preventivo e specificata nel contratto.
+Qualora i sensori vengano forniti dall'impiantista incaricato dal Cliente, dovrà essere già predisposto il relativo cablaggio.
+Qualora siano forniti da **3 ESSE SERRAMENTI S.r.l.**, il Cliente dovrà coordinare gli interventi con il proprio elettricista o installatore dell'impianto di allarme.
+Le richieste formulate successivamente alla sottoscrizione del contratto saranno contabilizzate separatamente al costo di **€ 60,00 oltre IVA per ciascun sensore**, salvo diverso preventivo.
+---
+**9. Collegamenti elettrici**
+**3 ESSE SERRAMENTI S.r.l.** non è abilitata all'esecuzione di collegamenti elettrici.
+Tutti gli allacciamenti relativi ad automazioni, motori, sensori, tapparelle motorizzate o altri dispositivi elettrici dovranno essere effettuati esclusivamente da personale qualificato incaricato dal Cliente.
+---
+**10. Impianti esistenti**
+Prima dell'inizio dei lavori il Cliente dovrà comunicare l'eventuale presenza di:
+- tubazioni idrauliche;
+- impianti gas;
+- linee elettriche;
+- impianti di allarme;
+- qualsiasi altro impianto presente nelle zone interessate dalla posa.
+In mancanza di tali segnalazioni, **3 ESSE SERRAMENTI S.r.l.** non risponderà di eventuali danni derivanti dalla presenza di impianti non individuabili.
+---
+**11. Contestazioni**
+Eventuali contestazioni relative ai prodotti forniti o installati dovranno essere comunicate **entro 7 giorni** dalla conclusione dei lavori.
+Decorso tale termine, la fornitura si intenderà accettata, salvo i casi previsti dalla garanzia di legge.
+---
+**12. Interventi successivi alla posa**
+Le richieste di registrazione, regolazione, manutenzione o verifica non riconducibili alla garanzia potranno comportare un diritto di chiamata.
+Il costo minimo dell'intervento è fissato in **€ 30,00 entro un raggio di 15 km dalla sede aziendale**; oltre tale distanza il costo sarà determinato in funzione della località e dell'intervento richiesto.
+---
+**13. Varianti e lavorazioni extra**
+Qualsiasi lavorazione o materiale non previsto nel contratto originario dovrà essere oggetto di nuovo preventivo e successiva accettazione.
+L'eventuale esecuzione di opere aggiuntive non comporta alcun differimento dei termini di pagamento già concordati.
+---
+### GARANZIE
+**3 ESSE SERRAMENTI S.r.l.** riconosce la garanzia prevista dalla normativa italiana per i difetti di conformità.
+Eventuali garanzie commerciali aggiuntive eventualmente offerte dai produttori saranno valide esclusivamente per i prodotti espressamente indicati e non si estenderanno automaticamente agli altri componenti.
+**La garanzia non copre:**
+- uso improprio dei prodotti;
+- mancata manutenzione;
+- normale usura;
+- danni accidentali;
+- componenti elettrici sottoposti ad utilizzi non conformi;
+- interventi effettuati da personale non autorizzato.
+Ogni richiesta di garanzia sarà valutata congiuntamente al produttore del componente interessato.
+---
+**VETRI**
+La verifica di eventuali difetti visivi dovrà essere effettuata osservando la superficie vetrata:
+- ad almeno 2 metri di distanza;
+- in posizione frontale;
+- dall'interno verso l'esterno;
+- con luce naturale diffusa;
+L'osservazione non dovrà protrarsi oltre 30 secondi.
+**Non costituiscono difetti:**
+- interferenze cromatiche;
+- riflessi multipli;
+- fenomeni di condensa;
+- imperfezioni percepibili solo da distanza ravvicinata;
+- fenomeni visibili esclusivamente in particolari condizioni di illuminazione.
+---
+## Sostituzione Materiali:
+Le richieste di sostituzione di componenti saranno preventivamente valutate e preventivate.
+Qualora l'intervento venga riconosciuto in garanzia, il Cliente sarà tenuto esclusivamente al pagamento del diritto di chiamata e della manodopera eventualmente prevista, pari a **€ 30,00/ora per operatore**, salvo diverse condizioni di garanzia del produttore.
+Nel caso in cui il difetto non rientri nella garanzia, verrà predisposto un preventivo per la sostituzione dei componenti interessati.
+---
+## Manuali d'Uso:
+I manuali d'uso e manutenzione dei prodotti sono disponibili sul sito internet di **3 ESSE SERRAMENTI S.r.l.** e devono essere consultati e rispettati dal Cliente ai fini della corretta conservazione della garanzia.`,
   privacy: `Ai sensi del Regolamento UE 2016/679, La informiamo che i Suoi dati personali anagrafici e fiscali vengono raccolti e trattati esclusivamente per finalità connesse alla gestione amministrativa, contabile, fiscale e operativa del presente preventivo/contratto di fornitura. Il conferimento dei dati è obbligatorio per l'adempimento degli obblighi legali e fiscali. I dati non saranno comunicati a terzi non autorizzati né diffusi.`
 };
 
@@ -184,7 +293,7 @@ const DEFAULT_CATALOG = {
 };
 
 // ==========================================================================
-// 2. PARSER MARKDOWN CLIENT-SIDE
+// 2. PARSER MARKDOWN CON SUPPORTO PER LINEE DIVISORIE (---)
 // ==========================================================================
 function parseMarkdown(md) {
   if (!md) return "";
@@ -203,6 +312,16 @@ function parseMarkdown(md) {
   const output = [];
 
   for (let line of lines) {
+    const trimmed = line.trim();
+
+    // Riconoscimento della linea orizzontale separatrice (---)
+    if (trimmed === '---') {
+      if (inUl) { output.push('</ul>'); inUl = false; }
+      if (inOl) { output.push('</ol>'); inOl = false; }
+      output.push('<hr class="md-hr">');
+      continue;
+    }
+
     const ulMatch = line.match(/^[\-\*]\s+(.*)/);
     const olMatch = line.match(/^\d+\.\s+(.*)/);
 
@@ -217,11 +336,11 @@ function parseMarkdown(md) {
     } else {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (inOl) { output.push('</ol>'); inOl = false; }
-      if (line.trim().length > 0) {
-        if (line.startsWith('<h3') || line.startsWith('<h4')) {
-          output.push(line);
+      if (trimmed.length > 0) {
+        if (trimmed.startsWith('<h3') || trimmed.startsWith('<h4')) {
+          output.push(trimmed);
         } else {
-          output.push(`<p class="md-p">${line}</p>`);
+          output.push(`<p class="md-p">${trimmed}</p>`);
         }
       }
     }
@@ -268,7 +387,6 @@ function persistSettings() {
 // ==========================================================================
 async function fetchRemoteLegalTerms() {
   try {
-    // Cache-busting con timestamp per leggere subito le modifiche committate su GitHub
     const res = await fetch('./condizioni_contrattuali.json?t=' + Date.now());
     if (res.ok) {
       const data = await res.json();
@@ -278,11 +396,11 @@ async function fetchRemoteLegalTerms() {
         const termsArea = document.getElementById('set-legal-terms');
         if (termsArea) termsArea.value = data.terms;
         updateTermsLivePreview();
-        console.log("Condizioni contrattuali caricate da GitHub con successo.");
+        console.log("Condizioni contrattuali caricate da GitHub.");
       }
     }
   } catch (err) {
-    console.log("File condizioni remoto non disponibile o offline; uso cache locale.", err);
+    console.log("Uso condizioni contrattuali memorizzate localmente.", err);
   }
 }
 
@@ -347,7 +465,6 @@ function initApp() {
   renderCategoriesUI();
   updateCalculations();
   updateDocNumberPreview();
-  // Tenta il recupero automatico delle condizioni da GitHub
   fetchRemoteLegalTerms();
 }
 
@@ -435,7 +552,7 @@ function setupEventListeners() {
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
-  // Anteprima Documento
+  // Anteprima Documento Modale
   safeOn('btn-preview-doc', 'click', openDocumentPreview);
   safeOn('btn-modal-close', 'click', closeDocumentPreview);
   safeOn('btn-modal-print', 'click', () => {
@@ -468,7 +585,6 @@ function setupEventListeners() {
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
   });
 
-  // Anteprima dinamica in tempo reale
   safeOn('btn-preview-terms', 'click', toggleTermsMarkdownPreview);
   safeOn('set-legal-terms', 'input', updateTermsLivePreview);
 
@@ -553,7 +669,7 @@ function initSettingsUI() {
   document.getElementById('set-company-contacts').value = companySettings.contacts || '';
 
   const cityInput = document.getElementById('set-company-city');
-  if (cityInput) cityInput.value = companySettings.city || 'Trevignano';
+  if (cityInput) companySettings.city = cityInput.value.trim() || 'Trevignano';
 
   const addr2Input = document.getElementById('set-company-address2');
   if (addr2Input) companySettings.address2 = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
@@ -618,7 +734,6 @@ function handleLogoRemove() {
   }
 }
 
-// Toggle e aggiornamento live Markdown per le Condizioni Contrattuali
 function toggleTermsMarkdownPreview() {
   const area = document.getElementById('set-legal-terms');
   const prev = document.getElementById('terms-markdown-preview');
@@ -644,7 +759,6 @@ function updateTermsLivePreview() {
   }
 }
 
-// Esporta come "condizioni_contrattuali.json" pronto per il push/upload su GitHub
 function exportTermsJSON() {
   const textToSave = document.getElementById('set-legal-terms').value;
   legalSettings.terms = textToSave;
@@ -1763,7 +1877,7 @@ function buildAllSheetsHTML() {
             </div>
           </div>
 
-          <div style="margin: 10px 0 15px 0;">
+          <div style="margin-top: 10px; margin-bottom: 15px;">
             <h2 style="font-size: 1.25rem; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px;">
               ${escapeHtml(cat.name)} — <span style="font-size: 1.05rem; font-weight: 800; color: #1e293b;">${escapeHtml(cat.supplierName)}</span> <span style="font-size: 0.95rem; font-weight: normal;">(${escapeHtml(cat.modelName)})</span>
             </h2>
@@ -1910,7 +2024,7 @@ function buildAllSheetsHTML() {
     </div>
   `;
 
-  // 4. ULTIMA PAGINA: NORMATIVA & PRIVACY (MARKDOWN)
+  // 4. ULTIMA PAGINA: CONDIZIONI IN MARKDOWN E PRIVACY
   sheetsHTML += `
     <div class="sheet">
       <div>
