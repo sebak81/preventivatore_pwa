@@ -246,40 +246,24 @@ let openSettingsCategories = { "Serramenti": true };
 let openSettingsSuppliers = {};
 
 function loadCompanySettings() {
-  try {
-    const saved = localStorage.getItem('prev_company_settings');
-    return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_COMPANY);
-  } catch (e) {
-    return Object.assign({}, DEFAULT_COMPANY);
-  }
+  const saved = localStorage.getItem('prev_company_settings');
+  return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_COMPANY);
 }
 
 function loadLegalSettings() {
-  try {
-    const saved = localStorage.getItem('prev_legal_settings');
-    return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_LEGAL);
-  } catch (e) {
-    return Object.assign({}, DEFAULT_LEGAL);
-  }
+  const saved = localStorage.getItem('prev_legal_settings');
+  return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_LEGAL);
 }
 
 function loadCatalogSettings() {
-  try {
-    const saved = localStorage.getItem('prev_catalog_settings');
-    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATALOG));
-  } catch (e) {
-    return JSON.parse(JSON.stringify(DEFAULT_CATALOG));
-  }
+  const saved = localStorage.getItem('prev_catalog_settings');
+  return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATALOG));
 }
 
 function persistSettings() {
-  try {
-    localStorage.setItem('prev_company_settings', JSON.stringify(companySettings));
-    localStorage.setItem('prev_legal_settings', JSON.stringify(legalSettings));
-    localStorage.setItem('prev_catalog_settings', JSON.stringify(catalogSettings));
-  } catch (e) {
-    console.warn("Impossibile salvare in localStorage:", e);
-  }
+  localStorage.setItem('prev_company_settings', JSON.stringify(companySettings));
+  localStorage.setItem('prev_legal_settings', JSON.stringify(legalSettings));
+  localStorage.setItem('prev_catalog_settings', JSON.stringify(catalogSettings));
 }
 
 // ==========================================================================
@@ -299,7 +283,7 @@ async function fetchRemoteLegalTerms() {
       }
     }
   } catch (err) {
-    console.warn("Uso condizioni contrattuali locali:", err);
+    console.log("Uso condizioni locali.", err);
   }
 
   try {
@@ -315,16 +299,17 @@ async function fetchRemoteLegalTerms() {
       }
     }
   } catch (err) {
-    console.warn("Uso informativa privacy locale:", err);
+    console.log("Uso privacy locale.", err);
   }
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con gestione Revisione X)
+// 5. STATO CENTRALE DEL PREVENTIVO (Con gestione Revisione & Inclusione Condizioni)
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
   revisionNum: 1,
+  includeTerms: true,
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "15 giorni",
@@ -340,7 +325,8 @@ let docState = {
   finalNotes: ""
 };
 
-// Generazione nome file pulito secondo le specifiche richieste
+// Generazione nome file pulito secondo le specifiche richieste:
+// [123-45 Cognome Nome] | [123-45 Cognome Nome_Rev.X] | [123-45 Cognome Nome_CONTRATTO]
 function getSaveFileName() {
   const cleanNum = (docState.number || "000").trim().replace(/[/\\?%*:|"<>]/g, '-');
   const cleanClient = (docState.client?.name || "Cliente").trim().replace(/[/\\?%*:|"<>]/g, '');
@@ -397,18 +383,14 @@ function safeOn(id, event, handler) {
 }
 
 function initApp() {
-  try {
-    setupEventListeners();
-    loadDefaultState();
-    initSettingsUI();
-    populateCategorySelector();
-    renderCategoriesUI();
-    updateCalculations();
-    updateDocNumberPreview();
-    fetchRemoteLegalTerms();
-  } catch (e) {
-    console.error("Errore durante l'avvio di initApp:", e);
-  }
+  setupEventListeners();
+  loadDefaultState();
+  initSettingsUI();
+  populateCategorySelector();
+  renderCategoriesUI();
+  updateCalculations();
+  updateDocNumberPreview();
+  fetchRemoteLegalTerms();
 }
 
 if (document.readyState === 'loading') {
@@ -423,22 +405,43 @@ function setupEventListeners() {
 
   safeOn('doc-type', 'change', (e) => { 
     docState.type = e.target.value; 
+    const isContract = docState.type === 'CONTRATTO';
+    const isRev = docState.type === 'REVISIONE';
+
     const revInput = document.getElementById('doc-revision-num');
     if (revInput) {
-      revInput.style.display = (docState.type === 'REVISIONE') ? 'inline-block' : 'none';
+      revInput.style.display = isRev ? 'inline-block' : 'none';
     }
-    // Quando trasformo un'offerta in revisione, aggiorno in automatico la data a quella odierna
-    if (docState.type === 'REVISIONE') {
+
+    // Se trasformo in revisione, aggiorno in automatico la data ad oggi
+    if (isRev) {
       const today = new Date().toISOString().split('T')[0];
       docState.date = today;
       const dateEl = document.getElementById('doc-date');
       if (dateEl) dateEl.value = today;
     }
+
+    // Se è Contratto, le condizioni contrattuali DEVONO essere stampate
+    const incTermsEl = document.getElementById('include-terms');
+    if (incTermsEl) {
+      if (isContract) {
+        incTermsEl.checked = true;
+        incTermsEl.disabled = true;
+      } else {
+        incTermsEl.disabled = false;
+        incTermsEl.checked = (docState.includeTerms !== false);
+      }
+    }
+
     updateDocNumberPreview();
   });
 
   safeOn('doc-revision-num', 'input', (e) => {
     docState.revisionNum = parseInt(e.target.value, 10) || 1;
+  });
+
+  safeOn('include-terms', 'change', (e) => {
+    docState.includeTerms = e.target.checked;
   });
 
   safeOn('doc-number', 'input', (e) => { 
@@ -506,26 +509,17 @@ function setupEventListeners() {
   safeOn('btn-add-category', 'click', addCategoryFromSelector);
   safeOn('btn-print', 'click', prepareAndPrint);
   safeOn('btn-save', 'click', saveToFile);
-  safeOn('btn-open', 'click', () => {
-    const fInput = document.getElementById('file-input');
-    if (fInput) fInput.click();
-  });
+  safeOn('btn-open', 'click', () => document.getElementById('file-input').click());
   safeOn('file-input', 'change', openFromFile);
   safeOn('btn-new', 'click', resetDocument);
 
   // Impostazioni, Logo e Macro-Categorie
   safeOn('btn-save-settings', 'click', saveSettingsFromUI);
   safeOn('btn-export-settings', 'click', exportSettingsJSON);
-  safeOn('btn-import-settings', 'click', () => {
-    const sInput = document.getElementById('settings-file-input');
-    if (sInput) sInput.click();
-  });
+  safeOn('btn-import-settings', 'click', () => document.getElementById('settings-file-input').click());
   safeOn('settings-file-input', 'change', importSettingsJSON);
 
-  safeOn('btn-upload-logo', 'click', () => {
-    const lInput = document.getElementById('logo-file-input');
-    if (lInput) lInput.click();
-  });
+  safeOn('btn-upload-logo', 'click', () => document.getElementById('logo-file-input').click());
   safeOn('logo-file-input', 'change', handleLogoUpload);
   safeOn('btn-remove-logo', 'click', handleLogoRemove);
 
@@ -544,24 +538,18 @@ function setupEventListeners() {
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
   });
 
-  // Condizioni Contrattuali
+  // Gestione Condizioni Contrattuali
   safeOn('btn-preview-terms', 'click', toggleTermsMarkdownPreview);
   safeOn('set-legal-terms', 'input', updateTermsLivePreview);
   safeOn('btn-export-terms-json', 'click', exportTermsJSON);
-  safeOn('btn-import-terms-json', 'click', () => {
-    const tInput = document.getElementById('terms-file-input');
-    if (tInput) tInput.click();
-  });
+  safeOn('btn-import-terms-json', 'click', () => document.getElementById('terms-file-input').click());
   safeOn('terms-file-input', 'change', importTermsJSON);
 
-  // Privacy
+  // Gestione Privacy
   safeOn('btn-preview-privacy', 'click', togglePrivacyMarkdownPreview);
   safeOn('set-legal-privacy', 'input', updatePrivacyLivePreview);
   safeOn('btn-export-privacy-json', 'click', exportPrivacyJSON);
-  safeOn('btn-import-privacy-json', 'click', () => {
-    const prInput = document.getElementById('privacy-file-input');
-    if (prInput) prInput.click();
-  });
+  safeOn('btn-import-privacy-json', 'click', () => document.getElementById('privacy-file-input').click());
   safeOn('privacy-file-input', 'change', importPrivacyJSON);
 }
 
@@ -572,18 +560,18 @@ function switchView(view) {
   const btnSet = document.getElementById('tab-settings-btn');
 
   if (view === 'editor') {
-    if (edView) edView.style.display = 'flex';
-    if (setView) setView.style.display = 'none';
-    if (btnEd) btnEd.classList.add('active');
-    if (btnSet) btnSet.classList.remove('active');
+    edView.style.display = 'flex';
+    setView.style.display = 'none';
+    btnEd.classList.add('active');
+    btnSet.classList.remove('active');
     populateCategorySelector();
     renderCategoriesUI();
     updateDocNumberPreview();
   } else {
-    if (edView) edView.style.display = 'none';
-    if (setView) setView.style.display = 'flex';
-    if (btnEd) btnEd.classList.remove('active');
-    if (btnSet) btnSet.classList.add('active');
+    edView.style.display = 'none';
+    setView.style.display = 'flex';
+    btnEd.classList.remove('active');
+    btnSet.classList.add('active');
     renderSettingsCategoriesList();
   }
 }
@@ -619,26 +607,21 @@ function populateCategorySelector() {
 // 7. GESTIONE IMPOSTAZIONI: LOGO, CATALOGO E TESTI LEGALI
 // ==========================================================================
 function initSettingsUI() {
-  const nameEl = document.getElementById('set-company-name');
-  if (nameEl) nameEl.value = companySettings.name || '';
-
-  const addrEl = document.getElementById('set-company-address');
-  if (addrEl) addrEl.value = companySettings.address || '';
-
-  const taxEl = document.getElementById('set-company-taxid');
-  if (taxEl) taxEl.value = companySettings.taxId || '';
-
-  const contEl = document.getElementById('set-company-contacts');
-  if (contEl) contEl.value = companySettings.contacts || '';
+  document.getElementById('set-company-name').value = companySettings.name || '';
+  document.getElementById('set-company-address').value = companySettings.address || '';
+  document.getElementById('set-company-taxid').value = companySettings.taxId || '';
+  document.getElementById('set-company-contacts').value = companySettings.contacts || '';
 
   const cityInput = document.getElementById('set-company-city');
-  if (cityInput) cityInput.value = companySettings.city || 'Trevignano';
+  if (cityInput) companySettings.city = cityInput.value.trim() || 'Trevignano';
 
   const addr2Input = document.getElementById('set-company-address2');
-  if (addr2Input) addr2Input.value = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
+  if (addr2Input) companySettings.address2 = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
+  if (addr2Input) addr2Input.value = companySettings.address2;
 
   const emailInput = document.getElementById('set-company-email');
-  if (emailInput) emailInput.value = companySettings.email || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
+  if (emailInput) companySettings.email = companySettings.email || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
+  if (emailInput) emailInput.value = companySettings.email;
 
   const termsArea = document.getElementById('set-legal-terms');
   if (termsArea) termsArea.value = legalSettings.terms || DEFAULT_LEGAL.terms;
@@ -656,11 +639,13 @@ function updateLogoPreviewUI() {
   const btnRemove = document.getElementById('btn-remove-logo');
 
   if (companySettings.logo) {
-    if (previewImg) { previewImg.src = companySettings.logo; previewImg.style.display = 'block'; }
+    previewImg.src = companySettings.logo;
+    previewImg.style.display = 'block';
     if (placeholder) placeholder.style.display = 'none';
     if (btnRemove) btnRemove.style.display = 'inline-flex';
   } else {
-    if (previewImg) { previewImg.src = ''; previewImg.style.display = 'none'; }
+    previewImg.src = '';
+    previewImg.style.display = 'none';
     if (placeholder) placeholder.style.display = 'block';
     if (btnRemove) btnRemove.style.display = 'none';
   }
@@ -1600,7 +1585,7 @@ function escapeHtml(str) {
 }
 
 // ==========================================================================
-// 9. SALVATAGGIO CON NOMENCLATURA RICHIESTA (.json)
+// 9. SALVATAGGIO CON NOMENCLATURA PERSONALIZZATA (.json)
 // ==========================================================================
 async function saveToFile() {
   const jsonStr = JSON.stringify(docState, null, 2);
@@ -1646,11 +1631,26 @@ function openFromFile(e) {
       if (docState.type === "CONFERMA D'ORDINE / CONTRATTO") docState.type = "CONTRATTO";
       if (docState.type === "REVISIONE PREVENTIVO") docState.type = "REVISIONE";
 
-      document.getElementById('doc-type').value = docState.type || "PREVENTIVO";
+      const isContract = docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO");
+      const isRev = docState.type === "REVISIONE" || docState.type.includes("REVISIONE");
+
+      document.getElementById('doc-type').value = isContract ? "CONTRATTO" : (isRev ? "REVISIONE" : "PREVENTIVO");
+      
       const revInput = document.getElementById('doc-revision-num');
       if (revInput) {
-        revInput.style.display = (docState.type === 'REVISIONE') ? 'inline-block' : 'none';
+        revInput.style.display = isRev ? 'inline-block' : 'none';
         revInput.value = docState.revisionNum || 1;
+      }
+
+      const incTermsEl = document.getElementById('include-terms');
+      if (incTermsEl) {
+        if (isContract) {
+          incTermsEl.checked = true;
+          incTermsEl.disabled = true;
+        } else {
+          incTermsEl.disabled = false;
+          incTermsEl.checked = (docState.includeTerms !== false);
+        }
       }
 
       document.getElementById('doc-number').value = docState.number || '';
@@ -1722,6 +1722,7 @@ function resetDocument() {
   if (!confirm("Vuoi iniziare un nuovo preventivo azzerando i dati correnti?")) return;
   docState.number = "";
   docState.revisionNum = 1;
+  docState.includeTerms = true;
   docState.client = { name: "", residence: "", taxId: "", phone: "", email: "" };
   docState.categories = [];
   docState.siteAddress = "";
@@ -1737,6 +1738,12 @@ function resetDocument() {
   if (revInput) {
     revInput.style.display = 'none';
     revInput.value = 1;
+  }
+
+  const incTermsEl = document.getElementById('include-terms');
+  if (incTermsEl) {
+    incTermsEl.checked = true;
+    incTermsEl.disabled = false;
   }
 
   document.getElementById('doc-number').value = "";
@@ -1768,7 +1775,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA
+// 10. GENERAZIONE STAMPA PDF NATIVA (Con scritte ancorate a fondo pagina e condizioni opzionali)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1808,11 +1815,15 @@ function prepareAndPrint() {
   const isRevision = docState.type === "REVISIONE" || docState.type.includes("REVISIONE");
   const formattedDocNum = getFormattedDocNumber();
 
+  // Se è Contratto, le condizioni si stampano SEMPRE. Se Preventivo/Revisione, dipende dal flag
+  const shouldPrintTerms = isContract || (docState.includeTerms !== false);
+
   const city = (companySettings.city || "Trevignano").trim();
   const dateFormattedLong = formatLongItalianDate(docState.date);
   const cityDateText = city ? `${city}, lì &nbsp; ${dateFormattedLong}` : dateFormattedLong;
 
-  const totalPages = docState.categories.length + 4;
+  // Calcolo totale pagine dinamico
+  const totalPages = docState.categories.length + (shouldPrintTerms ? 4 : 3);
 
   let validityText = (docState.validity || "").trim();
   if (validityText && !validityText.toLowerCase().includes("validit")) {
@@ -1828,7 +1839,7 @@ function prepareAndPrint() {
 
   let sheetsHTML = "";
 
-  // 1. PAGINA 1: COPERTINA (Lineare e senza annidamenti)
+  // 1. PAGINA 1: COPERTINA
   const logoHtml = companySettings.logo
     ? `<img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">`
     : `<div class="p1-company-fallback">${escapeHtml(companySettings.name || '3 ESSE SERRAMENTI')}</div>`;
@@ -1857,9 +1868,11 @@ function prepareAndPrint() {
         </div>
 
         <div class="p1-sub-header">
+          <!-- Data SENZA grassetto -->
           <div class="p1-doc-date" style="font-weight: normal !important;">${cityDateText}</div>
           <table class="p1-box-offerta">
             <tr>
+              <!-- Etichetta CON grassetto -->
               <td class="p1-box-label" style="font-weight: bold;">${formattedDocNum}</td>
             </tr>
           </table>
@@ -2010,7 +2023,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Cella vuota e nuova sezione clausole esclusioni)
+  // 3. PAGINA TOTALI & FIRMA (Con scritte ancorate a fondo pagina e cella vuota)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2030,6 +2043,7 @@ function prepareAndPrint() {
 
   sheetsHTML += `
     <div class="sheet">
+      <!-- PARTE SUPERIORE: QUADRO ECONOMICO E FIRMA -->
       <div>
         <div class="p-header">
           <div class="p-company">
@@ -2045,7 +2059,7 @@ function prepareAndPrint() {
         <table class="p-table">
           <thead>
             <tr>
-              <!-- Cella vuota lasciata intenzionalmente pulita -->
+              <!-- Cella vuota pulita -->
               <th></th>
               <th class="text-right" style="width: 120px;">Fornitura</th>
               <th class="text-right" style="width: 120px;">Posa in Opera</th>
@@ -2079,56 +2093,60 @@ function prepareAndPrint() {
           ${finalNotesHtml}
         </div>
 
-        <div class="p-signature-area">
+        <div class="p-signature-area" style="margin-top: 35px;">
           <div class="p-sign-box" style="width: 320px;">
             Firma per Accettazione del Committente<br><br><br>
             ________________________________________
           </div>
         </div>
+      </div>
 
-        <!-- Sezione Clausole Posa, Esclusioni e Variazioni Misure -->
-        <div style="margin-top: 25px; font-size: 0.8rem; line-height: 1.5; color: #111;">
+      <!-- PARTE INFERIORE ANCORATA A FONDO PAGINA -->
+      <div>
+        <div style="font-size: 0.78rem; line-height: 1.5; color: #111; margin-bottom: 14px;">
           <div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>
           <div><strong>SONO ESCLUSI DAL PREVENTIVO:</strong> pulizia dei serramenti a fine posa, eventuali piattaforme e/o ponteggi, opere murarie, opere di collegamenti elettrici, quant'altro non espressamente specificato nel preventivo.</div>
-          <div style="margin-top: 14px; font-weight: 800;">
+          <div style="margin-top: 10px; font-weight: 800;">
             IL PREVENTIVO PUO' ESSERE SOGGETTO A VARIAZIONI IN BASE ALLE MISURE RILEVATE IN FASE DI SOPRALLUOGO ESECUTIVO.
           </div>
         </div>
-      </div>
 
-      <div class="p-footer">
-        <span>${escapeHtml(companySettings.name)}</span>
-        <span>Pagina ${pageTotalsNum} di ${totalPages}</span>
+        <div class="p-footer">
+          <span>${escapeHtml(companySettings.name)}</span>
+          <span>Pagina ${pageTotalsNum} di ${totalPages}</span>
+        </div>
       </div>
     </div>
   `;
 
-  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO
-  const pageTermsNum = docState.categories.length + 3;
-  sheetsHTML += `
-    <div class="sheet">
-      <div>
-        <div class="p-header">
-          <div class="p-company">
-            <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-            <div>Condizioni Generali di Contratto</div>
+  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO (SELEZIONABILE O OBBLIGATORIA IN CONTRATTO)
+  if (shouldPrintTerms) {
+    const pageTermsNum = docState.categories.length + 3;
+    sheetsHTML += `
+      <div class="sheet">
+        <div>
+          <div class="p-header">
+            <div class="p-company">
+              <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
+              <div>Condizioni Generali di Contratto</div>
+            </div>
+            <div class="p-doc-details">
+              <div style="font-size: 0.85rem;">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
+            </div>
           </div>
-          <div class="p-doc-details">
-            <div style="font-size: 0.85rem;">Rif. Doc N°: ${escapeHtml(formattedDocNum)}</div>
+
+          <div class="p-box">
+            <div class="legal-text">${parseMarkdown(legalSettings.terms || DEFAULT_LEGAL.terms)}</div>
           </div>
         </div>
 
-        <div class="p-box">
-          <div class="legal-text">${parseMarkdown(legalSettings.terms || DEFAULT_LEGAL.terms)}</div>
+        <div class="p-footer">
+          <span>${escapeHtml(companySettings.name)}</span>
+          <span>Pagina ${pageTermsNum} di ${totalPages}</span>
         </div>
       </div>
-
-      <div class="p-footer">
-        <span>${escapeHtml(companySettings.name)}</span>
-        <span>Pagina ${pageTermsNum} di ${totalPages}</span>
-      </div>
-    </div>
-  `;
+    `;
+  }
 
   // 5. PAGINA INFORMATIVA PRIVACY GDPR
   const pagePrivacyNum = totalPages;
@@ -2167,4 +2185,10 @@ function prepareAndPrint() {
   setTimeout(() => {
     document.title = originalTitle;
   }, 1000);
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(() => console.log('Service Worker Registrato'))
+    .catch((err) => console.log('Errore SW:', err));
 }
