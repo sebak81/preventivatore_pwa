@@ -696,12 +696,12 @@ textarea {
   }
 
   .p1-client-name {
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     font-weight: 900;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     color: #111;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   .p1-client-address {
