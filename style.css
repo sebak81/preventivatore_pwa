@@ -705,31 +705,31 @@ textarea {
   }
 
   .p1-client-address {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
     color: #222;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .p1-client-line {
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: #222;
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
   .p1-site-block {
-    margin-top: 26px;
+    margin-top: 20px;
   }
 
   .p1-site-title {
-    font-size: 1rem;
+    font-size: 1.15rem;
     color: #222;
     margin-bottom: 3px;
   }
 
   .p1-site-address {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
     color: #222;
-    line-height: 1.35;
+    line-height: 1.4;
   }
 
   .p1-title-section {
@@ -741,16 +741,16 @@ textarea {
   }
 
   .p1-doc-title {
-    font-size: 1.35rem;
+    font-size: 1.6rem;
     font-weight: 900;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: #000;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
   }
 
   .p1-validity-text {
-    font-size: 0.95rem;
+    font-size: 1.25rem;
     text-decoration: underline;
     font-style: italic;
     color: #222;
