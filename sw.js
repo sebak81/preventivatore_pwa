@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v47';
+const CACHE_NAME = 'prev-app-v49'; // Nome predefinito PDF + Condizioni opzionali
 const ASSETS = [
   './',
   './index.html',
