@@ -320,12 +320,13 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con gestione Revisione & Inclusione Condizioni)
+// 5. STATO CENTRALE DEL PREVENTIVO (Con Scontato & Revisione)
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
   revisionNum: 1,
   includeTerms: true,
+  discountedTotal: null,
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "15 giorni",
@@ -458,6 +459,12 @@ function setupEventListeners() {
 
   safeOn('include-terms', 'change', (e) => {
     docState.includeTerms = e.target.checked;
+  });
+
+  // Gestione Input Scontato
+  safeOn('discounted-amount', 'input', (e) => {
+    const val = parseFloat(e.target.value);
+    docState.discountedTotal = (!isNaN(val) && val > 0) ? val : null;
   });
 
   safeOn('doc-number', 'input', (e) => { 
@@ -1669,6 +1676,12 @@ function openFromFile(e) {
         }
       }
 
+      // Ripristino valore Scontato
+      const discInput = document.getElementById('discounted-amount');
+      if (discInput) {
+        discInput.value = (docState.discountedTotal && docState.discountedTotal > 0) ? docState.discountedTotal : '';
+      }
+
       document.getElementById('doc-number').value = docState.number || '';
       document.getElementById('doc-date').value = docState.date || '';
       document.getElementById('doc-validity').value = docState.validity || '15 giorni';
@@ -1739,6 +1752,7 @@ function resetDocument() {
   docState.number = "";
   docState.revisionNum = 1;
   docState.includeTerms = true;
+  docState.discountedTotal = null;
   docState.client = { name: "", residence: "", taxId: "", phone: "", email: "" };
   docState.categories = [];
   docState.siteAddress = "";
@@ -1761,6 +1775,9 @@ function resetDocument() {
     incTermsEl.checked = true;
     incTermsEl.disabled = false;
   }
+
+  const discInput = document.getElementById('discounted-amount');
+  if (discInput) discInput.value = '';
 
   document.getElementById('doc-number').value = "";
   document.getElementById('client-name').value = "";
@@ -1791,7 +1808,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Con nome file PDF automatico pulito)
+// 10. GENERAZIONE STAMPA PDF NATIVA (Con sbarratura e riga SCONTATO riquadrata)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1830,6 +1847,10 @@ function prepareAndPrint() {
   const isContract = docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO");
   const isRevision = docState.type === "REVISIONE" || docState.type.includes("REVISIONE");
   const formattedDocNum = getFormattedDocNumber();
+
+  // Verifica se è presente uno sconto valido maggiore di zero
+  const hasDiscount = (docState.discountedTotal !== null && docState.discountedTotal !== undefined && parseFloat(docState.discountedTotal) > 0);
+  const discountedVal = hasDiscount ? parseFloat(docState.discountedTotal) : 0;
 
   // Le condizioni si stampano sempre per Contratto, opzionali per Preventivo/Revisione
   const shouldPrintTerms = isContract || (docState.includeTerms !== false);
@@ -1884,11 +1905,9 @@ function prepareAndPrint() {
         </div>
 
         <div class="p1-sub-header">
-          <!-- Data in alto a sinistra SENZA grassetto -->
           <div class="p1-doc-date" style="font-weight: normal !important;">${cityDateText}</div>
           <table class="p1-box-offerta">
             <tr>
-              <!-- Etichetta in alto a destra CON grassetto -->
               <td class="p1-box-label" style="font-weight: bold;">${formattedDocNum}</td>
             </tr>
           </table>
@@ -2039,7 +2058,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Con cella vuota e testi ancorati in basso a fondo pagina)
+  // 3. PAGINA TOTALI & FIRMA (Con sbarratura obliqua e riga SCONTATO riquadrata)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2059,7 +2078,7 @@ function prepareAndPrint() {
 
   sheetsHTML += `
     <div class="sheet">
-      <!-- SEZIONE SUPERIORE -->
+      <!-- PARTE SUPERIORE: QUADRO ECONOMICO E FIRMA -->
       <div>
         <div class="p-header">
           <div class="p-company">
@@ -2075,7 +2094,6 @@ function prepareAndPrint() {
         <table class="p-table">
           <thead>
             <tr>
-              <!-- Intestazione lasciata pulita e vuota -->
               <th></th>
               <th class="text-right" style="width: 120px;">Fornitura</th>
               <th class="text-right" style="width: 120px;">Posa in Opera</th>
@@ -2096,8 +2114,20 @@ function prepareAndPrint() {
             </tr>
             <tr style="background-color: #eee; font-size: 1.3rem;">
               <td colspan="3" style="padding: 12px 10px;"><strong>TOTALE COMPLESSIVO (IVA Inclusa)</strong></td>
-              <td class="text-right" style="padding: 12px 10px; font-weight: 900; font-size: 1.35rem;">${formatCurrency(total)}</td>
+              <td class="text-right" style="padding: 12px 10px; font-weight: 900; font-size: 1.35rem;">
+                ${hasDiscount ? `<span class="strike-diagonal">${formatCurrency(total)}</span>` : formatCurrency(total)}
+              </td>
             </tr>
+            ${hasDiscount ? `
+            <tr style="background-color: #fff; font-size: 1.35rem;">
+              <td colspan="3" style="padding: 11px 10px; border: 2.5px solid #000; font-weight: 900; letter-spacing: 0.5px;">
+                SCONTATO
+              </td>
+              <td class="text-right" style="padding: 11px 10px; font-weight: 900; font-size: 1.4rem; border: 2.5px solid #000;">
+                ${formatCurrency(discountedVal)}
+              </td>
+            </tr>
+            ` : ''}
           </tbody>
         </table>
 
@@ -2117,7 +2147,7 @@ function prepareAndPrint() {
         </div>
       </div>
 
-      <!-- SEZIONE INFERIORE ANCORATA A FONDO PAGINA -->
+      <!-- PARTE INFERIORE ANCORATA A FONDO PAGINA -->
       <div>
         <div style="font-size: 0.78rem; line-height: 1.5; color: #111; margin-bottom: 14px;">
           <div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>
@@ -2135,7 +2165,7 @@ function prepareAndPrint() {
     </div>
   `;
 
-  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO (SELEZIONABILE O OBBLIGATORIA IN CONTRATTO)
+  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO
   if (shouldPrintTerms) {
     const pageTermsNum = docState.categories.length + 3;
     sheetsHTML += `
@@ -2193,8 +2223,7 @@ function prepareAndPrint() {
 
   printRoot.innerHTML = sheetsHTML;
 
-  // IMPOSTA IL NOME DEL DOCUMENTO PRIMA DI STAMPARE:
-  // Il browser utilizzerà questo valore come nome predefinito del file PDF!
+  // IMPOSTA IL NOME DEL FILE PDF IN STAMPA AUTOMATICAMENTE
   const originalTitle = document.title;
   const pdfSuggestedName = getSaveFileName().replace(/\.json$/i, '');
   document.title = pdfSuggestedName;
