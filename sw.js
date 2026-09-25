@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v49'; // Nome predefinito PDF + Condizioni opzionali
+const CACHE_NAME = 'prev-app-v50'; // Implementazione Scontato con sbarratura obliqua
 const ASSETS = [
   './',
   './index.html',
