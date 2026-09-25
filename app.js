@@ -246,24 +246,40 @@ let openSettingsCategories = { "Serramenti": true };
 let openSettingsSuppliers = {};
 
 function loadCompanySettings() {
-  const saved = localStorage.getItem('prev_company_settings');
-  return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_COMPANY);
+  try {
+    const saved = localStorage.getItem('prev_company_settings');
+    return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_COMPANY);
+  } catch (e) {
+    return Object.assign({}, DEFAULT_COMPANY);
+  }
 }
 
 function loadLegalSettings() {
-  const saved = localStorage.getItem('prev_legal_settings');
-  return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_LEGAL);
+  try {
+    const saved = localStorage.getItem('prev_legal_settings');
+    return saved ? JSON.parse(saved) : Object.assign({}, DEFAULT_LEGAL);
+  } catch (e) {
+    return Object.assign({}, DEFAULT_LEGAL);
+  }
 }
 
 function loadCatalogSettings() {
-  const saved = localStorage.getItem('prev_catalog_settings');
-  return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+  try {
+    const saved = localStorage.getItem('prev_catalog_settings');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+  } catch (e) {
+    return JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+  }
 }
 
 function persistSettings() {
-  localStorage.setItem('prev_company_settings', JSON.stringify(companySettings));
-  localStorage.setItem('prev_legal_settings', JSON.stringify(legalSettings));
-  localStorage.setItem('prev_catalog_settings', JSON.stringify(catalogSettings));
+  try {
+    localStorage.setItem('prev_company_settings', JSON.stringify(companySettings));
+    localStorage.setItem('prev_legal_settings', JSON.stringify(legalSettings));
+    localStorage.setItem('prev_catalog_settings', JSON.stringify(catalogSettings));
+  } catch (e) {
+    console.warn("Impossibile salvare in localStorage:", e);
+  }
 }
 
 // ==========================================================================
@@ -283,7 +299,7 @@ async function fetchRemoteLegalTerms() {
       }
     }
   } catch (err) {
-    console.log("Uso condizioni locali.", err);
+    console.warn("Uso condizioni contrattuali locali:", err);
   }
 
   try {
@@ -299,7 +315,7 @@ async function fetchRemoteLegalTerms() {
       }
     }
   } catch (err) {
-    console.log("Uso privacy locale.", err);
+    console.warn("Uso informativa privacy locale:", err);
   }
 }
 
@@ -325,8 +341,10 @@ let docState = {
   finalNotes: ""
 };
 
-// Generazione nome file pulito secondo le specifiche richieste:
-// [123-45 Cognome Nome] | [123-45 Cognome Nome_Rev.X] | [123-45 Cognome Nome_CONTRATTO]
+// Generazione nome file pulito:
+// Preventivo: [123-45 Cognome Nome]
+// Revisione:  [123-45 Cognome Nome_Rev.X]
+// Contratto:  [123-45 Cognome Nome_CONTRATTO]
 function getSaveFileName() {
   const cleanNum = (docState.number || "000").trim().replace(/[/\\?%*:|"<>]/g, '-');
   const cleanClient = (docState.client?.name || "Cliente").trim().replace(/[/\\?%*:|"<>]/g, '');
@@ -413,7 +431,6 @@ function setupEventListeners() {
       revInput.style.display = isRev ? 'inline-block' : 'none';
     }
 
-    // Se trasformo in revisione, aggiorno in automatico la data ad oggi
     if (isRev) {
       const today = new Date().toISOString().split('T')[0];
       docState.date = today;
@@ -421,7 +438,6 @@ function setupEventListeners() {
       if (dateEl) dateEl.value = today;
     }
 
-    // Se è Contratto, le condizioni contrattuali DEVONO essere stampate
     const incTermsEl = document.getElementById('include-terms');
     if (incTermsEl) {
       if (isContract) {
@@ -538,14 +554,14 @@ function setupEventListeners() {
     if (p) p.style.display = (p.style.display === 'none') ? 'block' : 'none';
   });
 
-  // Gestione Condizioni Contrattuali
+  // Condizioni Contrattuali
   safeOn('btn-preview-terms', 'click', toggleTermsMarkdownPreview);
   safeOn('set-legal-terms', 'input', updateTermsLivePreview);
   safeOn('btn-export-terms-json', 'click', exportTermsJSON);
   safeOn('btn-import-terms-json', 'click', () => document.getElementById('terms-file-input').click());
   safeOn('terms-file-input', 'change', importTermsJSON);
 
-  // Gestione Privacy
+  // Privacy
   safeOn('btn-preview-privacy', 'click', togglePrivacyMarkdownPreview);
   safeOn('set-legal-privacy', 'input', updatePrivacyLivePreview);
   safeOn('btn-export-privacy-json', 'click', exportPrivacyJSON);
@@ -613,7 +629,7 @@ function initSettingsUI() {
   document.getElementById('set-company-contacts').value = companySettings.contacts || '';
 
   const cityInput = document.getElementById('set-company-city');
-  if (cityInput) companySettings.city = cityInput.value.trim() || 'Trevignano';
+  if (cityInput) cityInput.value = companySettings.city || 'Trevignano';
 
   const addr2Input = document.getElementById('set-company-address2');
   if (addr2Input) companySettings.address2 = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
@@ -1775,7 +1791,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Con scritte ancorate a fondo pagina e condizioni opzionali)
+// 10. GENERAZIONE STAMPA PDF NATIVA (Con nome file PDF automatico pulito)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1815,7 +1831,7 @@ function prepareAndPrint() {
   const isRevision = docState.type === "REVISIONE" || docState.type.includes("REVISIONE");
   const formattedDocNum = getFormattedDocNumber();
 
-  // Se è Contratto, le condizioni si stampano SEMPRE. Se Preventivo/Revisione, dipende dal flag
+  // Le condizioni si stampano sempre per Contratto, opzionali per Preventivo/Revisione
   const shouldPrintTerms = isContract || (docState.includeTerms !== false);
 
   const city = (companySettings.city || "Trevignano").trim();
@@ -1868,11 +1884,11 @@ function prepareAndPrint() {
         </div>
 
         <div class="p1-sub-header">
-          <!-- Data SENZA grassetto -->
+          <!-- Data in alto a sinistra SENZA grassetto -->
           <div class="p1-doc-date" style="font-weight: normal !important;">${cityDateText}</div>
           <table class="p1-box-offerta">
             <tr>
-              <!-- Etichetta CON grassetto -->
+              <!-- Etichetta in alto a destra CON grassetto -->
               <td class="p1-box-label" style="font-weight: bold;">${formattedDocNum}</td>
             </tr>
           </table>
@@ -2023,7 +2039,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Con scritte ancorate a fondo pagina e cella vuota)
+  // 3. PAGINA TOTALI & FIRMA (Con cella vuota e testi ancorati in basso a fondo pagina)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2043,7 +2059,7 @@ function prepareAndPrint() {
 
   sheetsHTML += `
     <div class="sheet">
-      <!-- PARTE SUPERIORE: QUADRO ECONOMICO E FIRMA -->
+      <!-- SEZIONE SUPERIORE -->
       <div>
         <div class="p-header">
           <div class="p-company">
@@ -2059,7 +2075,7 @@ function prepareAndPrint() {
         <table class="p-table">
           <thead>
             <tr>
-              <!-- Cella vuota pulita -->
+              <!-- Intestazione lasciata pulita e vuota -->
               <th></th>
               <th class="text-right" style="width: 120px;">Fornitura</th>
               <th class="text-right" style="width: 120px;">Posa in Opera</th>
@@ -2101,7 +2117,7 @@ function prepareAndPrint() {
         </div>
       </div>
 
-      <!-- PARTE INFERIORE ANCORATA A FONDO PAGINA -->
+      <!-- SEZIONE INFERIORE ANCORATA A FONDO PAGINA -->
       <div>
         <div style="font-size: 0.78rem; line-height: 1.5; color: #111; margin-bottom: 14px;">
           <div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>
@@ -2177,14 +2193,17 @@ function prepareAndPrint() {
 
   printRoot.innerHTML = sheetsHTML;
 
+  // IMPOSTA IL NOME DEL DOCUMENTO PRIMA DI STAMPARE:
+  // Il browser utilizzerà questo valore come nome predefinito del file PDF!
   const originalTitle = document.title;
-  document.title = "";
+  const pdfSuggestedName = getSaveFileName().replace(/\.json$/i, '');
+  document.title = pdfSuggestedName;
   
   window.print();
 
   setTimeout(() => {
     document.title = originalTitle;
-  }, 1000);
+  }, 1500);
 }
 
 if ('serviceWorker' in navigator) {
