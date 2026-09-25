@@ -175,10 +175,17 @@
         <label for="include-terms" style="font-size: 0.9rem; text-transform: none; color: var(--text); font-weight: 600;">Stampa anche Condizioni Contrattuali</label>
       </div>
 
+      <!-- BOX TOTALI CON NUOVO CAMPO SCONTATO -->
       <div style="margin-top: 20px; padding: 14px; background: #e0f2fe; border-radius: 6px; font-size: 1.05rem; text-align: right;">
         <div>Totale Fornitura & Posa: <strong id="lbl-subtotal">€ 0,00</strong></div>
         <div style="font-size: 0.95rem; color: #475569; margin: 4px 0;">Totale IVA: <span id="lbl-tax">€ 0,00</span></div>
         <div style="font-size: 1.35rem; color: var(--accent); margin-top: 6px;">Totale Complessivo: <strong id="lbl-total">€ 0,00</strong></div>
+        
+        <!-- Casella di testo Scontato sotto a Totale Complessivo -->
+        <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+          <label for="discounted-amount" style="margin: 0; font-weight: 800; font-size: 0.95rem; color: #b91c1c; text-transform: uppercase;">Scontato (€):</label>
+          <input type="number" step="0.01" min="0" id="discounted-amount" placeholder="0.00" style="width: 170px; text-align: right; font-weight: bold; font-size: 1.15rem; color: #b91c1c; border-color: #fca5a5;">
+        </div>
       </div>
     </section>
   </main>
@@ -299,7 +306,7 @@
           </ul>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: gap: 8px;">
           <label style="color: var(--primary); font-weight: 700; margin: 0; font-size: 0.85rem;">Testo Informativa Privacy (Markdown)</label>
           <div style="display: flex; gap: 6px; flex-wrap: wrap;">
             <button type="button" class="btn btn-sm btn-secondary" id="btn-preview-privacy">👁️ Anteprima Markdown</button>
