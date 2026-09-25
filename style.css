@@ -425,90 +425,6 @@ textarea {
 }
 
 /* ========================================================== */
-/* MODALE ANTEPRIMA DOCUMENTO A SCHERMO                       */
-/* ========================================================== */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(15, 23, 42, 0.75);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-}
-
-.modal-content {
-  background: #cbd5e1;
-  width: 100%;
-  max-width: 950px;
-  height: 94vh;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-}
-
-.modal-header {
-  background: var(--primary);
-  color: #fff;
-  padding: 12px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.modal-header h2 {
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-}
-
-.modal-body .sheet {
-  background: #ffffff !important;
-  width: 210mm;
-  min-height: 297mm;
-  padding: 15mm;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-  box-sizing: border-box;
-}
-
-.modal-body .sheet.p1-sheet {
-  height: 297mm !important;
-  min-height: 297mm !important;
-  padding: 15mm !important;
-}
-
-.modal-body .p1-footer {
-  position: absolute;
-  bottom: 15mm;
-  left: 15mm;
-  right: 15mm;
-}
-
-@media (max-width: 860px) {
-  .modal-body .sheet {
-    width: 100%;
-    min-height: auto;
-    padding: 15px;
-  }
-}
-
-/* ========================================================== */
 /* STILI MARKDOWN CONDIVISI (VIDEO & STAMPA)                  */
 /* ========================================================== */
 .legal-text {
@@ -557,6 +473,24 @@ textarea {
   margin: 8px 0;
 }
 
+/* RIGA OBLIQUA PER PREZZO ORIGINARIO SCONTATO */
+.strike-diagonal {
+  position: relative;
+  display: inline-block;
+  padding: 0 4px;
+}
+
+.strike-diagonal::after {
+  content: "";
+  position: absolute;
+  left: -5%;
+  top: 50%;
+  width: 110%;
+  border-top: 2.5px solid #dc2626;
+  transform: rotate(-12deg);
+  transform-origin: center;
+}
+
 /* ========================================================== */
 /* SCHERMATA DI STAMPA A4 (@media print)                      */
 /* ========================================================== */
@@ -572,7 +506,7 @@ textarea {
     color: #111 !important;
   }
 
-  .top-bar, .container, #file-input, #settings-file-input, #logo-file-input, #terms-file-input, #privacy-file-input, .modal-overlay {
+  .top-bar, .container, #file-input, #settings-file-input, #logo-file-input, #terms-file-input, #privacy-file-input {
     display: none !important;
   }
 
@@ -673,18 +607,8 @@ textarea {
 
   .p1-doc-date {
     font-size: 1.05rem;
-    font-weight: 700;
+    font-weight: normal;
     color: #0f172a;
-  }
-
-  .p1-doc-number-box {
-    border: 1px solid #1e293b;
-    border-radius: 4px;
-    padding: 5px 14px;
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #0f172a;
-    background-color: #fff;
   }
 
   .p1-middle-section {
@@ -815,7 +739,7 @@ textarea {
   }
 
   .p-signature-area {
-    margin-top: 55px;
+    margin-top: 35px;
     display: flex;
     justify-content: flex-end;
   }
@@ -831,5 +755,9 @@ textarea {
     border: 0;
     border-top: 1px solid #ccc;
     margin: 6px 0;
+  }
+
+  .strike-diagonal::after {
+    border-top: 2.5px solid #dc2626 !important;
   }
 }
