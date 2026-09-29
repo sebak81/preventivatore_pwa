@@ -299,7 +299,7 @@ async function fetchRemoteLegalTerms() {
       }
     }
   } catch (err) {
-    console.warn("Uso condizioni contrattuali locali:", err);
+    console.log("Uso condizioni locali.", err);
   }
 
   try {
@@ -315,12 +315,12 @@ async function fetchRemoteLegalTerms() {
       }
     }
   } catch (err) {
-    console.warn("Uso informativa privacy locale:", err);
+    console.log("Uso privacy locale.", err);
   }
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con Scontato & Revisione)
+// 5. STATO CENTRALE DEL PREVENTIVO (Con Sconto, Revisione & Termini)
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
@@ -461,7 +461,6 @@ function setupEventListeners() {
     docState.includeTerms = e.target.checked;
   });
 
-  // Gestione Input Scontato
   safeOn('discounted-amount', 'input', (e) => {
     const val = parseFloat(e.target.value);
     docState.discountedTotal = (!isNaN(val) && val > 0) ? val : null;
@@ -1676,7 +1675,6 @@ function openFromFile(e) {
         }
       }
 
-      // Ripristino valore Scontato
       const discInput = document.getElementById('discounted-amount');
       if (discInput) {
         discInput.value = (docState.discountedTotal && docState.discountedTotal > 0) ? docState.discountedTotal : '';
@@ -1747,12 +1745,21 @@ function openFromFile(e) {
   e.target.value = '';
 }
 
+// ==========================================================================
+// RESET DOCUMENTO: AZZERAMENTO TOTALE E AGGIORNAMENTO ALLA DATA ODIERNA
+// ==========================================================================
 function resetDocument() {
   if (!confirm("Vuoi iniziare un nuovo preventivo azzerando i dati correnti?")) return;
-  docState.number = "";
+
+  const today = new Date().toISOString().split('T')[0];
+
+  docState.type = "PREVENTIVO";
   docState.revisionNum = 1;
   docState.includeTerms = true;
   docState.discountedTotal = null;
+  docState.number = "";
+  docState.date = today;
+  docState.validity = "15 giorni";
   docState.client = { name: "", residence: "", taxId: "", phone: "", email: "" };
   docState.categories = [];
   docState.siteAddress = "";
@@ -1780,12 +1787,21 @@ function resetDocument() {
   if (discInput) discInput.value = '';
 
   document.getElementById('doc-number').value = "";
+  document.getElementById('doc-date').value = today;
+  document.getElementById('doc-validity').value = "15 giorni";
+
   document.getElementById('client-name').value = "";
   document.getElementById('client-residence').value = "";
   document.getElementById('client-taxid').value = "";
   document.getElementById('client-phone').value = "";
   document.getElementById('client-email').value = "";
+
+  const sameSiteEl = document.getElementById('same-site');
+  if (sameSiteEl) sameSiteEl.checked = true;
+  const siteGroupEl = document.getElementById('site-group');
+  if (siteGroupEl) siteGroupEl.style.display = 'none';
   document.getElementById('site-address').value = "";
+
   document.getElementById('final-notes').value = "";
   
   document.getElementById('tax-rate').value = "22";
@@ -1808,7 +1824,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Con sbarratura e riga SCONTATO riquadrata)
+// 10. GENERAZIONE STAMPA PDF NATIVA
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1824,16 +1840,24 @@ function prepareAndPrint() {
   });
 
   const subtotal = grandFornitura + grandPosa;
+
+  // Calcolo dettagliato IVA Mista (Beni Significativi)
+  const isMista = (docState.taxRate === 'mista');
+  const quotaPosa = grandPosa;
+  const quotaForn10 = Math.min(grandFornitura, grandPosa);
+  const quotaForn22 = Math.max(0, grandFornitura - grandPosa);
+
+  const ivaPosa = quotaPosa * 0.10;
+  const ivaForn10 = quotaForn10 * 0.10;
+  const ivaForn22 = quotaForn22 * 0.22;
+  const calcolataMista = ivaPosa + ivaForn10 + ivaForn22;
+
   let tax = 0;
   let taxLabel = "";
 
-  if (docState.taxRate === 'mista') {
+  if (isMista) {
     taxLabel = "Iva mista 10% - 22%";
-    const quotaPosa = grandPosa;
-    const quotaFornitura10 = Math.min(grandFornitura, grandPosa);
-    const quotaFornitura22 = Math.max(0, grandFornitura - grandPosa);
-    const calcolata = ((quotaPosa + quotaFornitura10) * 0.10) + (quotaFornitura22 * 0.22);
-    tax = (docState.customTaxAmount !== null && docState.customTaxAmount !== undefined) ? docState.customTaxAmount : calcolata;
+    tax = (docState.customTaxAmount !== null && docState.customTaxAmount !== undefined) ? docState.customTaxAmount : calcolataMista;
   } else {
     const rate = parseFloat(docState.taxRate) || 0;
     tax = subtotal * (rate / 100);
@@ -1848,18 +1872,15 @@ function prepareAndPrint() {
   const isRevision = docState.type === "REVISIONE" || docState.type.includes("REVISIONE");
   const formattedDocNum = getFormattedDocNumber();
 
-  // Verifica se è presente uno sconto valido maggiore di zero
   const hasDiscount = (docState.discountedTotal !== null && docState.discountedTotal !== undefined && parseFloat(docState.discountedTotal) > 0);
   const discountedVal = hasDiscount ? parseFloat(docState.discountedTotal) : 0;
 
-  // Le condizioni si stampano sempre per Contratto, opzionali per Preventivo/Revisione
   const shouldPrintTerms = isContract || (docState.includeTerms !== false);
 
   const city = (companySettings.city || "Trevignano").trim();
   const dateFormattedLong = formatLongItalianDate(docState.date);
   const cityDateText = city ? `${city}, lì &nbsp; ${dateFormattedLong}` : dateFormattedLong;
 
-  // Calcolo totale pagine dinamico
   const totalPages = docState.categories.length + (shouldPrintTerms ? 4 : 3);
 
   let validityText = (docState.validity || "").trim();
@@ -2058,7 +2079,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Con sbarratura obliqua e riga SCONTATO riquadrata)
+  // 3. PAGINA TOTALI & FIRMA
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2076,9 +2097,45 @@ function prepareAndPrint() {
     ? `<div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>`
     : '';
 
+  // Righe IVA: calcolo mista dettagliato oppure riga singola ordinaria/agevolata
+  let taxRowsHtml = "";
+  if (isMista) {
+    taxRowsHtml = `
+      <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
+        <td colspan="3" style="padding-left: 14px;">
+          Posa in opera = (${formatCurrency(quotaPosa)}) &times; 10%
+        </td>
+        <td class="text-right">${formatCurrency(ivaPosa)}</td>
+      </tr>
+      <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
+        <td colspan="3" style="padding-left: 14px;">
+          Parte fornitura (equiv. posa) = (${formatCurrency(quotaForn10)}) &times; 10%
+        </td>
+        <td class="text-right">${formatCurrency(ivaForn10)}</td>
+      </tr>
+      <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
+        <td colspan="3" style="padding-left: 14px;">
+          Restante valore Fornitura = (${formatCurrency(grandFornitura)} - ${formatCurrency(quotaForn10)}) &times; 22%
+        </td>
+        <td class="text-right">${formatCurrency(ivaForn22)}</td>
+      </tr>
+      <tr style="font-size: 0.88rem; font-weight: 700; background-color: #f1f5f9;">
+        <td colspan="3" style="padding-left: 14px;">Totale IVA Mista (10% + 22%)</td>
+        <td class="text-right">${formatCurrency(tax)}</td>
+      </tr>
+    `;
+  } else {
+    taxRowsHtml = `
+      <tr style="font-size: 0.88rem;">
+        <td colspan="3">${escapeHtml(taxLabel)}</td>
+        <td class="text-right">${formatCurrency(tax)}</td>
+      </tr>
+    `;
+  }
+
   sheetsHTML += `
     <div class="sheet">
-      <!-- PARTE SUPERIORE: QUADRO ECONOMICO E FIRMA -->
+      <!-- SEZIONE SUPERIORE -->
       <div>
         <div class="p-header">
           <div class="p-company">
@@ -2102,28 +2159,30 @@ function prepareAndPrint() {
           </thead>
           <tbody>
             ${catSummaryRows || '<tr><td colspan="4">Nessuna categoria inserita</td></tr>'}
-            <tr style="background-color: #f9f9f9; font-size: 0.95rem;">
+            <tr style="background-color: #f9f9f9; font-size: 0.92rem;">
               <td><strong>TOTALE NETTO FORNITURA & POSA</strong></td>
               <td class="text-right">${formatCurrency(grandFornitura)}</td>
               <td class="text-right">${formatCurrency(grandPosa)}</td>
               <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
             </tr>
-            <tr>
-              <td colspan="3">${escapeHtml(taxLabel)}</td>
-              <td class="text-right">${formatCurrency(tax)}</td>
-            </tr>
-            <tr style="background-color: #eee; font-size: 1.3rem;">
-              <td colspan="3" style="padding: 12px 10px;"><strong>TOTALE COMPLESSIVO (IVA Inclusa)</strong></td>
-              <td class="text-right" style="padding: 12px 10px; font-weight: 900; font-size: 1.35rem;">
+
+            ${taxRowsHtml}
+
+            <!-- TOTALE COMPLESSIVO CON CARATTERE ARMONIOSO E BILANCIATO -->
+            <tr style="background-color: #f1f5f9; font-size: 1.05rem;">
+              <td colspan="3" style="padding: 8px 10px; font-weight: 800;">TOTALE COMPLESSIVO (IVA Inclusa)</td>
+              <td class="text-right" style="padding: 8px 10px; font-weight: 800; font-size: 1.12rem;">
                 ${hasDiscount ? `<span class="strike-diagonal">${formatCurrency(total)}</span>` : formatCurrency(total)}
               </td>
             </tr>
+
+            <!-- RIGA SCONTATO RIQUADRATA CON BORDO MARCATO MA PROPORZIONATA -->
             ${hasDiscount ? `
-            <tr style="background-color: #fff; font-size: 1.35rem;">
-              <td colspan="3" style="padding: 11px 10px; border: 2.5px solid #000; font-weight: 900; letter-spacing: 0.5px;">
+            <tr style="background-color: #ffffff; font-size: 1.05rem;">
+              <td colspan="3" style="padding: 8px 10px; border: 2px solid #000; font-weight: 800; letter-spacing: 0.5px;">
                 SCONTATO
               </td>
-              <td class="text-right" style="padding: 11px 10px; font-weight: 900; font-size: 1.4rem; border: 2.5px solid #000;">
+              <td class="text-right" style="padding: 8px 10px; font-weight: 800; font-size: 1.15rem; border: 2px solid #000;">
                 ${formatCurrency(discountedVal)}
               </td>
             </tr>
@@ -2147,7 +2206,7 @@ function prepareAndPrint() {
         </div>
       </div>
 
-      <!-- PARTE INFERIORE ANCORATA A FONDO PAGINA -->
+      <!-- SEZIONE INFERIORE ANCORATA A FONDO PAGINA -->
       <div>
         <div style="font-size: 0.78rem; line-height: 1.5; color: #111; margin-bottom: 14px;">
           <div><strong>POSA IN OPERA E TRASPORTO:</strong> Compreso salvo diversamente specificato.</div>
@@ -2165,7 +2224,7 @@ function prepareAndPrint() {
     </div>
   `;
 
-  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO
+  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO (SELEZIONABILE O OBBLIGATORIA IN CONTRATTO)
   if (shouldPrintTerms) {
     const pageTermsNum = docState.categories.length + 3;
     sheetsHTML += `
