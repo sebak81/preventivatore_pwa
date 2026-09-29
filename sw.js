@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v50'; // Implementazione Scontato con sbarratura obliqua
+const CACHE_NAME = 'prev-app-v53'; // Aggiornamento data odierna su Nuovo preventivo
 const ASSETS = [
   './',
   './index.html',
