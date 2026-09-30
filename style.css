@@ -488,17 +488,17 @@ textarea {
 .strike-diagonal {
   position: relative;
   display: inline-block;
-  padding: 0 4px;
+  padding: 0 3px;
 }
 
 .strike-diagonal::after {
   content: "";
   position: absolute;
-  left: -5%;
+  left: -4%;
   top: 50%;
-  width: 110%;
-  border-top: 2.5px solid #dc2626;
-  transform: rotate(-12deg);
+  width: 108%;
+  border-top: 2px solid #dc2626;
+  transform: rotate(-10deg);
   transform-origin: center;
 }
 
