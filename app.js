@@ -320,13 +320,15 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con Sconto, Revisione & Termini)
+// 5. STATO CENTRALE DEL PREVENTIVO (Con Trasporto & Smaltimento)
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
   revisionNum: 1,
   includeTerms: true,
   discountedTotal: null,
+  transportCost: null,
+  disposalCost: null,
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "15 giorni",
@@ -342,10 +344,6 @@ let docState = {
   finalNotes: ""
 };
 
-// Generazione nome file pulito:
-// Preventivo: [123-45 Cognome Nome]
-// Revisione:  [123-45 Cognome Nome_Rev.X]
-// Contratto:  [123-45 Cognome Nome_CONTRATTO]
 function getSaveFileName() {
   const cleanNum = (docState.number || "000").trim().replace(/[/\\?%*:|"<>]/g, '-');
   const cleanClient = (docState.client?.name || "Cliente").trim().replace(/[/\\?%*:|"<>]/g, '');
@@ -360,7 +358,6 @@ function getSaveFileName() {
   return `${base}.json`;
 }
 
-// Etichetta documento in alto a destra
 function getFormattedDocNumber() {
   const raw = (docState.number || "").trim();
   const num = raw || "BOZZA";
@@ -464,6 +461,19 @@ function setupEventListeners() {
   safeOn('discounted-amount', 'input', (e) => {
     const val = parseFloat(e.target.value);
     docState.discountedTotal = (!isNaN(val) && val > 0) ? val : null;
+  });
+
+  // Eventi Trasporto e Smaltimento
+  safeOn('transport-cost', 'input', (e) => {
+    const val = parseFloat(e.target.value);
+    docState.transportCost = (!isNaN(val) && val > 0) ? val : null;
+    updateCalculations();
+  });
+
+  safeOn('disposal-cost', 'input', (e) => {
+    const val = parseFloat(e.target.value);
+    docState.disposalCost = (!isNaN(val) && val > 0) ? val : null;
+    updateCalculations();
   });
 
   safeOn('doc-number', 'input', (e) => { 
@@ -635,15 +645,13 @@ function initSettingsUI() {
   document.getElementById('set-company-contacts').value = companySettings.contacts || '';
 
   const cityInput = document.getElementById('set-company-city');
-  if (cityInput) cityInput.value = companySettings.city || 'Trevignano';
+  if (cityInput) companySettings.city = cityInput.value.trim() || 'Trevignano';
 
   const addr2Input = document.getElementById('set-company-address2');
-  if (addr2Input) companySettings.address2 = companySettings.address2 || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
-  if (addr2Input) addr2Input.value = companySettings.address2;
+  if (addr2Input) companySettings.address2 = addr2Input.value.trim() || 'via Feltrina, 33 - 31038 Castagnole di Paese (TV)';
 
   const emailInput = document.getElementById('set-company-email');
-  if (emailInput) companySettings.email = companySettings.email || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
-  if (emailInput) emailInput.value = companySettings.email;
+  if (emailInput) companySettings.email = emailInput.value.trim() || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
 
   const termsArea = document.getElementById('set-legal-terms');
   if (termsArea) termsArea.value = legalSettings.terms || DEFAULT_LEGAL.terms;
@@ -959,7 +967,7 @@ function renderSettingsCategoriesList() {
                 <div class="settings-supplier-body">
                   <div class="form-group" style="max-width: 320px; margin-bottom: 12px;">
                     <label>Rinomina Fornitore</label>
-                    <input type="text" value="${escapeHtml(supp.name)}" oninput="updateSupplierName('${escapeHtml(catName)}',${sIdx}, this.value)">
+                    <input type="text" value="${escapeHtml(supp.name)}" oninput="updateSupplierName('${escapeHtml(catName)}', ${sIdx}, this.value)">
                   </div>
                   <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
                     Elenco Modelli di ${escapeHtml(supp.name)}:
@@ -1556,6 +1564,10 @@ function updateCalculations() {
   });
 
   const subtotal = grandFornitura + grandPosa;
+  const transport = (docState.transportCost && docState.transportCost > 0) ? parseFloat(docState.transportCost) : 0;
+  const disposal = (docState.disposalCost && docState.disposalCost > 0) ? parseFloat(docState.disposalCost) : 0;
+  const netTaxable = subtotal + transport + disposal;
+
   let tax = 0;
   let taxLabel = "";
 
@@ -1564,7 +1576,7 @@ function updateCalculations() {
     const quotaPosa = grandPosa;
     const quotaFornitura10 = Math.min(grandFornitura, grandPosa);
     const quotaFornitura22 = Math.max(0, grandFornitura - grandPosa);
-    const calcolata = ((quotaPosa + quotaFornitura10) * 0.10) + (quotaFornitura22 * 0.22);
+    const calcolata = ((quotaPosa + quotaFornitura10) * 0.10) + (quotaFornitura22 * 0.22) + ((transport + disposal) * 0.10);
 
     if (docState.customTaxAmount !== null && docState.customTaxAmount !== undefined) {
       tax = docState.customTaxAmount;
@@ -1577,20 +1589,43 @@ function updateCalculations() {
     }
   } else {
     const rate = parseFloat(docState.taxRate) || 0;
-    tax = subtotal * (rate / 100);
+    tax = netTaxable * (rate / 100);
     if (rate === 22) taxLabel = "Iva ordinaria 22%";
     else if (rate === 10) taxLabel = "Iva agevolata 10%";
     else if (rate === 4) taxLabel = "Iva agevolata 4%";
     else taxLabel = `Iva (${rate}%)`;
   }
 
-  const total = subtotal + tax;
+  const total = netTaxable + tax;
 
   const subEl = document.getElementById('lbl-subtotal');
+  const transpRow = document.getElementById('lbl-transport-row');
+  const transpEl = document.getElementById('lbl-transport');
+  const dispRow = document.getElementById('lbl-disposal-row');
+  const dispEl = document.getElementById('lbl-disposal');
   const taxEl = document.getElementById('lbl-tax');
   const totEl = document.getElementById('lbl-total');
 
   if (subEl) subEl.textContent = `${formatCurrency(subtotal)} (Fornitura: ${formatCurrency(grandFornitura)} + Posa: ${formatCurrency(grandPosa)})`;
+  
+  if (transpRow && transpEl) {
+    if (transport > 0) {
+      transpEl.textContent = formatCurrency(transport);
+      transpRow.style.display = 'block';
+    } else {
+      transpRow.style.display = 'none';
+    }
+  }
+
+  if (dispRow && dispEl) {
+    if (disposal > 0) {
+      dispEl.textContent = formatCurrency(disposal);
+      dispRow.style.display = 'block';
+    } else {
+      dispRow.style.display = 'none';
+    }
+  }
+
   if (taxEl) taxEl.textContent = `${formatCurrency(tax)} (${taxLabel})`;
   if (totEl) totEl.textContent = formatCurrency(total);
 }
@@ -1680,6 +1715,16 @@ function openFromFile(e) {
         discInput.value = (docState.discountedTotal && docState.discountedTotal > 0) ? docState.discountedTotal : '';
       }
 
+      const transpInput = document.getElementById('transport-cost');
+      if (transpInput) {
+        transpInput.value = (docState.transportCost && docState.transportCost > 0) ? docState.transportCost : '';
+      }
+
+      const dispInput = document.getElementById('disposal-cost');
+      if (dispInput) {
+        dispInput.value = (docState.disposalCost && docState.disposalCost > 0) ? docState.disposalCost : '';
+      }
+
       document.getElementById('doc-number').value = docState.number || '';
       document.getElementById('doc-date').value = docState.date || '';
       document.getElementById('doc-validity').value = docState.validity || '15 giorni';
@@ -1746,7 +1791,7 @@ function openFromFile(e) {
 }
 
 // ==========================================================================
-// RESET DOCUMENTO: AZZERAMENTO TOTALE E AGGIORNAMENTO ALLA DATA ODIERNA
+// RESET DOCUMENTO: AZZERAMENTO TOTALE E DATA ODIERNA
 // ==========================================================================
 function resetDocument() {
   if (!confirm("Vuoi iniziare un nuovo preventivo azzerando i dati correnti?")) return;
@@ -1757,6 +1802,8 @@ function resetDocument() {
   docState.revisionNum = 1;
   docState.includeTerms = true;
   docState.discountedTotal = null;
+  docState.transportCost = null;
+  docState.disposalCost = null;
   docState.number = "";
   docState.date = today;
   docState.validity = "15 giorni";
@@ -1785,6 +1832,12 @@ function resetDocument() {
 
   const discInput = document.getElementById('discounted-amount');
   if (discInput) discInput.value = '';
+
+  const transpInput = document.getElementById('transport-cost');
+  if (transpInput) transpInput.value = '';
+
+  const dispInput = document.getElementById('disposal-cost');
+  if (dispInput) dispInput.value = '';
 
   document.getElementById('doc-number').value = "";
   document.getElementById('doc-date').value = today;
@@ -1824,7 +1877,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA
+// 10. GENERAZIONE STAMPA PDF NATIVA (Con Trasporto & Smaltimento)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -1841,6 +1894,15 @@ function prepareAndPrint() {
 
   const subtotal = grandFornitura + grandPosa;
 
+  // Gestione costi Trasporto e Smaltimento
+  const hasTransport = (docState.transportCost !== null && docState.transportCost !== undefined && parseFloat(docState.transportCost) > 0);
+  const transportCost = hasTransport ? parseFloat(docState.transportCost) : 0;
+
+  const hasDisposal = (docState.disposalCost !== null && docState.disposalCost !== undefined && parseFloat(docState.disposalCost) > 0);
+  const disposalCost = hasDisposal ? parseFloat(docState.disposalCost) : 0;
+
+  const netTaxable = subtotal + transportCost + disposalCost;
+
   // Calcolo dettagliato IVA Mista (Beni Significativi)
   const isMista = (docState.taxRate === 'mista');
   const quotaPosa = grandPosa;
@@ -1850,7 +1912,8 @@ function prepareAndPrint() {
   const ivaPosa = quotaPosa * 0.10;
   const ivaForn10 = quotaForn10 * 0.10;
   const ivaForn22 = quotaForn22 * 0.22;
-  const calcolataMista = ivaPosa + ivaForn10 + ivaForn22;
+  const ivaExtra = (transportCost + disposalCost) * 0.10;
+  const calcolataMista = ivaPosa + ivaForn10 + ivaForn22 + ivaExtra;
 
   let tax = 0;
   let taxLabel = "";
@@ -1860,14 +1923,14 @@ function prepareAndPrint() {
     tax = (docState.customTaxAmount !== null && docState.customTaxAmount !== undefined) ? docState.customTaxAmount : calcolataMista;
   } else {
     const rate = parseFloat(docState.taxRate) || 0;
-    tax = subtotal * (rate / 100);
+    tax = netTaxable * (rate / 100);
     if (rate === 22) taxLabel = "Iva ordinaria 22%";
     else if (rate === 10) taxLabel = "Iva agevolata 10%";
     else if (rate === 4) taxLabel = "Iva agevolata 4%";
     else taxLabel = `Iva (${rate}%)`;
   }
 
-  const total = subtotal + tax;
+  const total = netTaxable + tax;
   const isContract = docState.type === "CONTRATTO" || docState.type.includes("CONTRATTO");
   const isRevision = docState.type === "REVISIONE" || docState.type.includes("REVISIONE");
   const formattedDocNum = getFormattedDocNumber();
@@ -2079,7 +2142,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA
+  // 3. PAGINA TOTALI & FIRMA (Con righe condizionali per Trasporto e Smaltimento)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2119,6 +2182,20 @@ function prepareAndPrint() {
         </td>
         <td class="text-right">${formatCurrency(ivaForn22)}</td>
       </tr>
+      ${hasTransport ? `
+      <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
+        <td colspan="3" style="padding-left: 14px;">
+          Trasporto = (${formatCurrency(transportCost)}) &times; 10%
+        </td>
+        <td class="text-right">${formatCurrency(transportCost * 0.10)}</td>
+      </tr>` : ''}
+      ${hasDisposal ? `
+      <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
+        <td colspan="3" style="padding-left: 14px;">
+          Smaltimento = (${formatCurrency(disposalCost)}) &times; 10%
+        </td>
+        <td class="text-right">${formatCurrency(disposalCost * 0.10)}</td>
+      </tr>` : ''}
       <tr style="font-size: 0.88rem; font-weight: 700; background-color: #f1f5f9;">
         <td colspan="3" style="padding-left: 14px;">Totale IVA Mista (10% + 22%)</td>
         <td class="text-right">${formatCurrency(tax)}</td>
@@ -2166,9 +2243,22 @@ function prepareAndPrint() {
               <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
             </tr>
 
+            <!-- Righe opzionali Trasporto e Smaltimento dopo Totale Netto Fornitura & Posa -->
+            ${hasTransport ? `
+            <tr style="font-size: 0.88rem;">
+              <td colspan="3" style="padding-left: 10px;"><strong>Trasporto</strong></td>
+              <td class="text-right">${formatCurrency(transportCost)}</td>
+            </tr>` : ''}
+
+            ${hasDisposal ? `
+            <tr style="font-size: 0.88rem;">
+              <td colspan="3" style="padding-left: 10px;"><strong>Smaltimento</strong></td>
+              <td class="text-right">${formatCurrency(disposalCost)}</td>
+            </tr>` : ''}
+
             ${taxRowsHtml}
 
-            <!-- TOTALE COMPLESSIVO CON CARATTERE ARMONIOSO E BILANCIATO -->
+            <!-- TOTALE COMPLESSIVO -->
             <tr style="background-color: #f1f5f9; font-size: 1.05rem;">
               <td colspan="3" style="padding: 8px 10px; font-weight: 800;">TOTALE COMPLESSIVO (IVA Inclusa)</td>
               <td class="text-right" style="padding: 8px 10px; font-weight: 800; font-size: 1.12rem;">
@@ -2176,7 +2266,7 @@ function prepareAndPrint() {
               </td>
             </tr>
 
-            <!-- RIGA SCONTATO RIQUADRATA CON BORDO MARCATO MA PROPORZIONATA -->
+            <!-- RIGA SCONTATO -->
             ${hasDiscount ? `
             <tr style="background-color: #ffffff; font-size: 1.05rem;">
               <td colspan="3" style="padding: 8px 10px; border: 2px solid #000; font-weight: 800; letter-spacing: 0.5px;">
@@ -2282,7 +2372,7 @@ function prepareAndPrint() {
 
   printRoot.innerHTML = sheetsHTML;
 
-  // IMPOSTA IL NOME DEL FILE PDF IN STAMPA AUTOMATICAMENTE
+  // Nome file PDF automatico pulito
   const originalTitle = document.title;
   const pdfSuggestedName = getSaveFileName().replace(/\.json$/i, '');
   document.title = pdfSuggestedName;
