@@ -178,7 +178,7 @@ const DEFAULT_CATALOG = {
 };
 
 // ==========================================================================
-// 2. PARSER MARKDOWN
+// 2. PARSER MARKDOWN & FUNZIONE AUTO-RESIZE TEXTAREA
 // ==========================================================================
 function parseMarkdown(md) {
   if (!md) return "";
@@ -233,6 +233,13 @@ function parseMarkdown(md) {
   if (inOl) output.push('</ol>');
 
   return output.join('\n');
+}
+
+// Auto-ridimensionamento verticale dinamico della textarea
+function autoResizeTextarea(el) {
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
 }
 
 // ==========================================================================
@@ -320,7 +327,7 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con Trasporto & Smaltimento)
+// 5. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
@@ -463,7 +470,6 @@ function setupEventListeners() {
     docState.discountedTotal = (!isNaN(val) && val > 0) ? val : null;
   });
 
-  // Eventi Trasporto e Smaltimento
   safeOn('transport-cost', 'input', (e) => {
     const val = parseFloat(e.target.value);
     docState.transportCost = (!isNaN(val) && val > 0) ? val : null;
@@ -654,10 +660,10 @@ function initSettingsUI() {
   if (emailInput) companySettings.email = emailInput.value.trim() || 'info@3esseserramenti.it \\ preventivi.3esse@gmail.com';
 
   const termsArea = document.getElementById('set-legal-terms');
-  if (termsArea) termsArea.value = legalSettings.terms || DEFAULT_LEGAL.terms;
+  if (termsArea) legalSettings.terms = termsArea.value;
 
   const privacyArea = document.getElementById('set-legal-privacy');
-  if (privacyArea) privacyArea.value = legalSettings.privacy || DEFAULT_LEGAL.privacy;
+  if (privacyArea) legalSettings.privacy = privacyArea.value;
 
   updateLogoPreviewUI();
   renderSettingsCategoriesList();
@@ -1175,7 +1181,7 @@ function importSettingsJSON(e) {
 }
 
 // ==========================================================================
-// 8. GESTIONE SCHEDE PREVENTIVO: MISURE SDOPPIATE (L / H) & ARTICOLI GENERALI
+// 8. GESTIONE SCHEDE PREVENTIVO: MISURE SDOPPIATE & DESCRIZIONE DINAMICA
 // ==========================================================================
 function addCategoryFromSelector() {
   const sel = document.getElementById('select-category-type');
@@ -1300,6 +1306,9 @@ function renderCategoriesUI() {
 
     container.appendChild(card);
   });
+
+  // Ridimensiona subito tutte le textarea di descrizione in base al contenuto presente
+  document.querySelectorAll('.editor-pos-table textarea').forEach(ta => autoResizeTextarea(ta));
 }
 
 function renderCategoryOptionsBlock(cat) {
@@ -1436,7 +1445,8 @@ function renderPositionsTableHtml(cat) {
           </div>
         </td>
         <td style="width: 30%;">
-          <input type="text" value="${escapeHtml(pos.description)}" placeholder="Descrizione o articolo libero" oninput="updatePosField('${cat.id}', '${pos.id}', 'description', this.value)">
+          <!-- Textarea dinamica che si espande verticalmente da sola -->
+          <textarea rows="1" placeholder="Descrizione o articolo libero" oninput="updatePosField('${cat.id}', '${pos.id}', 'description', this.value); autoResizeTextarea(this);">${escapeHtml(pos.description)}</textarea>
         </td>
         <td style="width: 7%;">
           <input type="number" min="1" step="1" value="${pos.quantity || 1}" style="text-align: center;" oninput="updatePosField('${cat.id}', '${pos.id}', 'quantity', this.value)">
@@ -1877,7 +1887,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Con Trasporto & Smaltimento)
+// 10. GENERAZIONE STAMPA PDF NATIVA
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -2142,7 +2152,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Con righe condizionali per Trasporto e Smaltimento)
+  // 3. PAGINA TOTALI & FIRMA
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2243,7 +2253,7 @@ function prepareAndPrint() {
               <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
             </tr>
 
-            <!-- Righe opzionali Trasporto e Smaltimento dopo Totale Netto Fornitura & Posa -->
+            <!-- Righe opzionali Trasporto e Smaltimento -->
             ${hasTransport ? `
             <tr style="font-size: 0.88rem;">
               <td colspan="3" style="padding-left: 10px;"><strong>Trasporto</strong></td>
@@ -2314,7 +2324,7 @@ function prepareAndPrint() {
     </div>
   `;
 
-  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO (SELEZIONABILE O OBBLIGATORIA IN CONTRATTO)
+  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO
   if (shouldPrintTerms) {
     const pageTermsNum = docState.categories.length + 3;
     sheetsHTML += `
@@ -2372,7 +2382,6 @@ function prepareAndPrint() {
 
   printRoot.innerHTML = sheetsHTML;
 
-  // Nome file PDF automatico pulito
   const originalTitle = document.title;
   const pdfSuggestedName = getSaveFileName().replace(/\.json$/i, '');
   document.title = pdfSuggestedName;
