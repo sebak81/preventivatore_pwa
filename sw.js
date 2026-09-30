@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v56'; // Auto-ridimensionamento dinamico descrizione specifica
+const CACHE_NAME = 'prev-app-v58'; // Aggiunta flag Smaltimento Compreso
 const ASSETS = [
   './',
   './index.html',
