@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v53'; // Aggiornamento data odierna su Nuovo preventivo
+const CACHE_NAME = 'prev-app-v55'; // Aggiunta voci Trasporto e Smaltimento opzionali
 const ASSETS = [
   './',
   './index.html',
