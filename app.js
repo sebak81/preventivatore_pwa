@@ -178,7 +178,7 @@ const DEFAULT_CATALOG = {
 };
 
 // ==========================================================================
-// 2. PARSER MARKDOWN & FUNZIONE AUTO-RESIZE TEXTAREA
+// 2. PARSER MARKDOWN & AUTO-RESIZE TEXTAREA
 // ==========================================================================
 function parseMarkdown(md) {
   if (!md) return "";
@@ -235,7 +235,6 @@ function parseMarkdown(md) {
   return output.join('\n');
 }
 
-// Auto-ridimensionamento verticale dinamico della textarea
 function autoResizeTextarea(el) {
   if (!el) return;
   el.style.height = 'auto';
@@ -327,7 +326,7 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO
+// 5. STATO CENTRALE DEL PREVENTIVO (Con Smaltimento Compreso)
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
@@ -336,6 +335,7 @@ let docState = {
   discountedTotal: null,
   transportCost: null,
   disposalCost: null,
+  disposalIncluded: false,
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "15 giorni",
@@ -479,6 +479,20 @@ function setupEventListeners() {
   safeOn('disposal-cost', 'input', (e) => {
     const val = parseFloat(e.target.value);
     docState.disposalCost = (!isNaN(val) && val > 0) ? val : null;
+    updateCalculations();
+  });
+
+  // Evento Flag Smaltimento Compreso
+  safeOn('disposal-included', 'change', (e) => {
+    docState.disposalIncluded = e.target.checked;
+    const dispInput = document.getElementById('disposal-cost');
+    if (dispInput) {
+      dispInput.disabled = e.target.checked;
+      if (e.target.checked) {
+        dispInput.value = '';
+        docState.disposalCost = null;
+      }
+    }
     updateCalculations();
   });
 
@@ -1445,7 +1459,6 @@ function renderPositionsTableHtml(cat) {
           </div>
         </td>
         <td style="width: 30%;">
-          <!-- Textarea dinamica che si espande verticalmente da sola -->
           <textarea rows="1" placeholder="Descrizione o articolo libero" oninput="updatePosField('${cat.id}', '${pos.id}', 'description', this.value); autoResizeTextarea(this);">${escapeHtml(pos.description)}</textarea>
         </td>
         <td style="width: 7%;">
@@ -1575,7 +1588,7 @@ function updateCalculations() {
 
   const subtotal = grandFornitura + grandPosa;
   const transport = (docState.transportCost && docState.transportCost > 0) ? parseFloat(docState.transportCost) : 0;
-  const disposal = (docState.disposalCost && docState.disposalCost > 0) ? parseFloat(docState.disposalCost) : 0;
+  const disposal = (!docState.disposalIncluded && docState.disposalCost && docState.disposalCost > 0) ? parseFloat(docState.disposalCost) : 0;
   const netTaxable = subtotal + transport + disposal;
 
   let tax = 0;
@@ -1628,7 +1641,10 @@ function updateCalculations() {
   }
 
   if (dispRow && dispEl) {
-    if (disposal > 0) {
+    if (docState.disposalIncluded) {
+      dispEl.textContent = "Compreso";
+      dispRow.style.display = 'block';
+    } else if (disposal > 0) {
       dispEl.textContent = formatCurrency(disposal);
       dispRow.style.display = 'block';
     } else {
@@ -1730,9 +1746,16 @@ function openFromFile(e) {
         transpInput.value = (docState.transportCost && docState.transportCost > 0) ? docState.transportCost : '';
       }
 
+      // Ripristino Smaltimento e Flag Compreso
+      const dispIncEl = document.getElementById('disposal-included');
+      if (dispIncEl) {
+        dispIncEl.checked = !!docState.disposalIncluded;
+      }
+
       const dispInput = document.getElementById('disposal-cost');
       if (dispInput) {
-        dispInput.value = (docState.disposalCost && docState.disposalCost > 0) ? docState.disposalCost : '';
+        dispInput.disabled = !!docState.disposalIncluded;
+        dispInput.value = (!docState.disposalIncluded && docState.disposalCost && docState.disposalCost > 0) ? docState.disposalCost : '';
       }
 
       document.getElementById('doc-number').value = docState.number || '';
@@ -1814,6 +1837,7 @@ function resetDocument() {
   docState.discountedTotal = null;
   docState.transportCost = null;
   docState.disposalCost = null;
+  docState.disposalIncluded = false;
   docState.number = "";
   docState.date = today;
   docState.validity = "15 giorni";
@@ -1846,8 +1870,14 @@ function resetDocument() {
   const transpInput = document.getElementById('transport-cost');
   if (transpInput) transpInput.value = '';
 
+  const dispIncEl = document.getElementById('disposal-included');
+  if (dispIncEl) dispIncEl.checked = false;
+
   const dispInput = document.getElementById('disposal-cost');
-  if (dispInput) dispInput.value = '';
+  if (dispInput) {
+    dispInput.disabled = false;
+    dispInput.value = '';
+  }
 
   document.getElementById('doc-number').value = "";
   document.getElementById('doc-date').value = today;
@@ -1908,7 +1938,7 @@ function prepareAndPrint() {
   const hasTransport = (docState.transportCost !== null && docState.transportCost !== undefined && parseFloat(docState.transportCost) > 0);
   const transportCost = hasTransport ? parseFloat(docState.transportCost) : 0;
 
-  const hasDisposal = (docState.disposalCost !== null && docState.disposalCost !== undefined && parseFloat(docState.disposalCost) > 0);
+  const hasDisposal = !docState.disposalIncluded && (docState.disposalCost !== null && docState.disposalCost !== undefined && parseFloat(docState.disposalCost) > 0);
   const disposalCost = hasDisposal ? parseFloat(docState.disposalCost) : 0;
 
   const netTaxable = subtotal + transportCost + disposalCost;
@@ -2152,7 +2182,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA
+  // 3. PAGINA TOTALI & FIRMA (Con opzione SMALTIMENTO COMPRESO)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2253,18 +2283,23 @@ function prepareAndPrint() {
               <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
             </tr>
 
-            <!-- Righe opzionali Trasporto e Smaltimento -->
+            <!-- Riga opzionale Trasporto -->
             ${hasTransport ? `
             <tr style="font-size: 0.88rem;">
               <td colspan="3" style="padding-left: 10px;"><strong>Trasporto</strong></td>
               <td class="text-right">${formatCurrency(transportCost)}</td>
             </tr>` : ''}
 
-            ${hasDisposal ? `
+            <!-- Riga opzionale Smaltimento / Smaltimento Compreso -->
+            ${docState.disposalIncluded ? `
+            <tr style="font-size: 0.88rem;">
+              <td colspan="3" style="padding-left: 10px;"><strong>SMALTIMENTO COMPRESO</strong></td>
+              <td class="text-right"><strong>Compreso</strong></td>
+            </tr>` : (hasDisposal ? `
             <tr style="font-size: 0.88rem;">
               <td colspan="3" style="padding-left: 10px;"><strong>Smaltimento</strong></td>
               <td class="text-right">${formatCurrency(disposalCost)}</td>
-            </tr>` : ''}
+            </tr>` : '')}
 
             ${taxRowsHtml}
 
@@ -2324,7 +2359,7 @@ function prepareAndPrint() {
     </div>
   `;
 
-  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO
+  // 4. PAGINA CONDIZIONI GENERALI DI CONTRATTO (SELEZIONABILE O OBBLIGATORIA IN CONTRATTO)
   if (shouldPrintTerms) {
     const pageTermsNum = docState.categories.length + 3;
     sheetsHTML += `
@@ -2382,6 +2417,7 @@ function prepareAndPrint() {
 
   printRoot.innerHTML = sheetsHTML;
 
+  // Nome file PDF automatico pulito
   const originalTitle = document.title;
   const pdfSuggestedName = getSaveFileName().replace(/\.json$/i, '');
   document.title = pdfSuggestedName;
