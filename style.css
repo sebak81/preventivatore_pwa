@@ -320,6 +320,17 @@ textarea {
   font-size: 0.85rem;
 }
 
+/* REGOLA AGGIUNTA PER L'AUTO-RIDIMENSIONAMENTO DELLA TEXTAREA */
+.editor-pos-table textarea {
+  min-height: 33px;
+  height: auto;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.35;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+}
+
 /* Box Riepilogo Economico Categoria */
 .cat-summary-box {
   margin-top: 16px;
