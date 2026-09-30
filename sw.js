@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v55'; // Aggiunta voci Trasporto e Smaltimento opzionali
+const CACHE_NAME = 'prev-app-v56'; // Auto-ridimensionamento dinamico descrizione specifica
 const ASSETS = [
   './',
   './index.html',
