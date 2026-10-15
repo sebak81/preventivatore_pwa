@@ -482,7 +482,6 @@ function setupEventListeners() {
     updateCalculations();
   });
 
-  // Evento Flag Smaltimento Compreso
   safeOn('disposal-included', 'change', (e) => {
     docState.disposalIncluded = e.target.checked;
     const dispInput = document.getElementById('disposal-cost');
@@ -1746,7 +1745,6 @@ function openFromFile(e) {
         transpInput.value = (docState.transportCost && docState.transportCost > 0) ? docState.transportCost : '';
       }
 
-      // Ripristino Smaltimento e Flag Compreso
       const dispIncEl = document.getElementById('disposal-included');
       if (dispIncEl) {
         dispIncEl.checked = !!docState.disposalIncluded;
@@ -1917,7 +1915,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA
+// 10. GENERAZIONE STAMPA PDF NATIVA (Con Dati Committente e Firma Spostata)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -2182,7 +2180,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Con opzione SMALTIMENTO COMPRESO)
+  // 3. PAGINA TOTALI & FIRMA (Con Dati Committente e Firma Spostata)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2225,16 +2223,16 @@ function prepareAndPrint() {
       ${hasTransport ? `
       <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
         <td colspan="3" style="padding-left: 14px;">
-          Trasporto = (${formatCurrency(transportCost)}) &times; 10%
+          Trasporto = (\${formatCurrency(transportCost)}) &times; 10%
         </td>
-        <td class="text-right">${formatCurrency(transportCost * 0.10)}</td>
+        <td class="text-right">\${formatCurrency(transportCost * 0.10)}</td>
       </tr>` : ''}
       ${hasDisposal ? `
       <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
         <td colspan="3" style="padding-left: 14px;">
-          Smaltimento = (${formatCurrency(disposalCost)}) &times; 10%
+          Smaltimento = (\${formatCurrency(disposalCost)}) &times; 10%
         </td>
-        <td class="text-right">${formatCurrency(disposalCost * 0.10)}</td>
+        <td class="text-right">\${formatCurrency(disposalCost * 0.10)}</td>
       </tr>` : ''}
       <tr style="font-size: 0.88rem; font-weight: 700; background-color: #f1f5f9;">
         <td colspan="3" style="padding-left: 14px;">Totale IVA Mista (10% + 22%)</td>
@@ -2287,7 +2285,7 @@ function prepareAndPrint() {
             ${hasTransport ? `
             <tr style="font-size: 0.88rem;">
               <td colspan="3" style="padding-left: 10px;"><strong>Trasporto</strong></td>
-              <td class="text-right">${formatCurrency(transportCost)}</td>
+              <td class="text-right">\${formatCurrency(transportCost)}</td>
             </tr>` : ''}
 
             <!-- Riga opzionale Smaltimento / Smaltimento Compreso -->
@@ -2298,7 +2296,7 @@ function prepareAndPrint() {
             </tr>` : (hasDisposal ? `
             <tr style="font-size: 0.88rem;">
               <td colspan="3" style="padding-left: 10px;"><strong>Smaltimento</strong></td>
-              <td class="text-right">${formatCurrency(disposalCost)}</td>
+              <td class="text-right">\${formatCurrency(disposalCost)}</td>
             </tr>` : '')}
 
             ${taxRowsHtml}
@@ -2307,7 +2305,7 @@ function prepareAndPrint() {
             <tr style="background-color: #f1f5f9; font-size: 1.05rem;">
               <td colspan="3" style="padding: 8px 10px; font-weight: 800;">TOTALE COMPLESSIVO (IVA Inclusa)</td>
               <td class="text-right" style="padding: 8px 10px; font-weight: 800; font-size: 1.12rem;">
-                ${hasDiscount ? `<span class="strike-diagonal">${formatCurrency(total)}</span>` : formatCurrency(total)}
+                ${hasDiscount ? `<span class="strike-diagonal">\${formatCurrency(total)}</span>` : formatCurrency(total)}
               </td>
             </tr>
 
@@ -2318,14 +2316,14 @@ function prepareAndPrint() {
                 SCONTATO
               </td>
               <td class="text-right" style="padding: 8px 10px; font-weight: 800; font-size: 1.15rem; border: 2px solid #000;">
-                ${formatCurrency(discountedVal)}
+                \${formatCurrency(discountedVal)}
               </td>
             </tr>
             ` : ''}
           </tbody>
         </table>
 
-        <div class="p-box" style="margin-top: 15px;">
+        <div class="p-box" style="margin-top: 14px;">
           <div class="p-box-title">Condizioni di Fornitura e Pagamento</div>
           <div><strong>Detrazione Fiscale applicabile:</strong> ${bonusPrint}</div>
           <div><strong>Termini di Pagamento:</strong> ${escapeHtml(docState.paymentTerms)}</div>
@@ -2333,10 +2331,34 @@ function prepareAndPrint() {
           ${finalNotesHtml}
         </div>
 
-        <div class="p-signature-area" style="margin-top: 35px;">
-          <div class="p-sign-box" style="width: 320px;">
-            Firma per Accettazione del Committente<br><br><br>
-            ________________________________________
+        <!-- SEZIONE SPAZI DI COMPILAZIONE DATI COMMITTENTE -->
+        <div style="margin-top: 14px; font-size: 0.78rem;">
+          <div style="font-weight: 800; text-transform: uppercase; margin-bottom: 6px; color: #000;">DATI COMMITTENTE:</div>
+          <div style="display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; align-items: flex-end;">
+              <span style="font-weight: 700; white-space: nowrap; margin-right: 6px;">COGNOME E NOME (o RAGIONE SOCIALE)</span>
+              <span style="flex-grow: 1; border-bottom: 1px solid #222; height: 1.1em;"></span>
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+              <span style="font-weight: 700; white-space: nowrap; margin-right: 6px;">INDIRIZZO \\ SEDE LEGALE</span>
+              <span style="flex-grow: 1; border-bottom: 1px solid #222; height: 1.1em;"></span>
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+              <span style="font-weight: 700; white-space: nowrap; margin-right: 6px;">CITTA' E CAP</span>
+              <span style="flex-grow: 1; border-bottom: 1px solid #222; height: 1.1em;"></span>
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+              <span style="font-weight: 700; white-space: nowrap; margin-right: 6px;">CODICE FISCALE (o PARTITA IVA)</span>
+              <span style="flex-grow: 1; border-bottom: 1px solid #222; height: 1.1em;"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FIRMA PER ACCETTAZIONE SPOSTATA SOTTO -->
+        <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+          <div style="width: 290px; text-align: center;">
+            <div style="font-size: 0.82rem; font-weight: 600; margin-bottom: 22px;">Firma per Accettazione del Committente</div>
+            <div style="border-bottom: 1px solid #222; width: 100%;"></div>
           </div>
         </div>
       </div>
@@ -2419,7 +2441,7 @@ function prepareAndPrint() {
 
   // Nome file PDF automatico pulito
   const originalTitle = document.title;
-  const pdfSuggestedName = getSaveFileName().replace(/\.json$/i, '');
+  const pdfSuggestedName = getSaveFileName().replace(/\.json\$/i, '');
   document.title = pdfSuggestedName;
   
   window.print();
