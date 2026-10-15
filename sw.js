@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v60'; // Aggiunta spazi compilazione Dati Committente e firma sotto
+const CACHE_NAME = 'prev-app-v64'; // Descrizione sintetica preventivo centrata e non in grassetto
 const ASSETS = [
   './',
   './index.html',
