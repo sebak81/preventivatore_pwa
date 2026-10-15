@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v58'; // Aggiunta flag Smaltimento Compreso
+const CACHE_NAME = 'prev-app-v60'; // Aggiunta spazi compilazione Dati Committente e firma sotto
 const ASSETS = [
   './',
   './index.html',
