@@ -326,7 +326,7 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con Smaltimento Compreso)
+// 5. STATO CENTRALE DEL PREVENTIVO (Con Descrizione Sintetica)
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
@@ -336,6 +336,7 @@ let docState = {
   transportCost: null,
   disposalCost: null,
   disposalIncluded: false,
+  shortDesc: "",
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "15 giorni",
@@ -351,11 +352,21 @@ let docState = {
   finalNotes: ""
 };
 
+// Generazione nome file:
+// es. 123-26 Rossi Mario _ecobonus.json
+// es. 123-26 Rossi Mario _zanzariere_Rev.1.json
 function getSaveFileName() {
   const cleanNum = (docState.number || "000").trim().replace(/[/\\?%*:|"<>]/g, '-');
   const cleanClient = (docState.client?.name || "Cliente").trim().replace(/[/\\?%*:|"<>]/g, '');
 
   let base = `${cleanNum} ${cleanClient}`.trim();
+
+  // Aggiunge la descrizione sintetica in coda al nome (se presente)
+  if (docState.shortDesc && docState.shortDesc.trim()) {
+    const cleanDesc = docState.shortDesc.trim().replace(/[/\\?%*:|"<>]/g, '');
+    base += ` _${cleanDesc}`;
+  }
+
   if (docState.type === "REVISIONE" || docState.type.includes("REVISIONE")) {
     const rev = docState.revisionNum || 1;
     base += `_Rev.${rev}`;
@@ -365,6 +376,7 @@ function getSaveFileName() {
   return `${base}.json`;
 }
 
+// Etichetta documento in alto a destra
 function getFormattedDocNumber() {
   const raw = (docState.number || "").trim();
   const num = raw || "BOZZA";
@@ -493,6 +505,10 @@ function setupEventListeners() {
       }
     }
     updateCalculations();
+  });
+
+  safeOn('doc-short-desc', 'input', (e) => {
+    docState.shortDesc = e.target.value;
   });
 
   safeOn('doc-number', 'input', (e) => { 
@@ -1320,7 +1336,6 @@ function renderCategoriesUI() {
     container.appendChild(card);
   });
 
-  // Ridimensiona subito tutte le textarea di descrizione in base al contenuto presente
   document.querySelectorAll('.editor-pos-table textarea').forEach(ta => autoResizeTextarea(ta));
 }
 
@@ -1735,6 +1750,11 @@ function openFromFile(e) {
         }
       }
 
+      const shortDescInput = document.getElementById('doc-short-desc');
+      if (shortDescInput) {
+        shortDescInput.value = docState.shortDesc || '';
+      }
+
       const discInput = document.getElementById('discounted-amount');
       if (discInput) {
         discInput.value = (docState.discountedTotal && docState.discountedTotal > 0) ? docState.discountedTotal : '';
@@ -1836,6 +1856,7 @@ function resetDocument() {
   docState.transportCost = null;
   docState.disposalCost = null;
   docState.disposalIncluded = false;
+  docState.shortDesc = "";
   docState.number = "";
   docState.date = today;
   docState.validity = "15 giorni";
@@ -1877,6 +1898,9 @@ function resetDocument() {
     dispInput.value = '';
   }
 
+  const shortDescInput = document.getElementById('doc-short-desc');
+  if (shortDescInput) shortDescInput.value = '';
+
   document.getElementById('doc-number').value = "";
   document.getElementById('doc-date').value = today;
   document.getElementById('doc-validity').value = "15 giorni";
@@ -1915,7 +1939,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Con Dati Committente e Firma Spostata)
+// 10. GENERAZIONE STAMPA PDF NATIVA (Con Dicitura Descrittiva NON in Grassetto)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -2015,6 +2039,12 @@ function prepareAndPrint() {
   if (isRevision) {
     titleSectionHtml += `<div style="font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-top: 8px; text-transform: uppercase;">revisione ${docState.revisionNum || 1} del ${dateFormattedLong}</div>`;
   }
+  
+  // Descrizione sintetica: CENTRATA, MAIUSCOLA e NON IN GRASSETTO (font-weight: normal)
+  if (docState.shortDesc && docState.shortDesc.trim()) {
+    titleSectionHtml += `<div style="font-size: 1.25rem; font-weight: normal; color: #0f172a; margin-top: 8px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(docState.shortDesc)}</div>`;
+  }
+
   if (!isContract && validityText) {
     titleSectionHtml += `<div class="p1-validity-text">${escapeHtml(validityText)}</div>`;
   }
