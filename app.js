@@ -212,11 +212,11 @@ function parseMarkdown(md) {
     if (ulMatch) {
       if (inOl) { output.push('</ol>'); inOl = false; }
       if (!inUl) { output.push('<ul class="md-ul">'); inUl = true; }
-      output.push('<li>' + ulMatch[1] + '</li>');
+      output.push(`<li>${ulMatch[1]}</li>`);
     } else if (olMatch) {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (!inOl) { output.push('<ol class="md-ol">'); inOl = true; }
-      output.push('<li>' + olMatch[1] + '</li>');
+      output.push(`<li>${olMatch[1]}</li>`);
     } else {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (inOl) { output.push('</ol>'); inOl = false; }
@@ -224,7 +224,7 @@ function parseMarkdown(md) {
         if (trimmed.startsWith('<h3') || trimmed.startsWith('<h4')) {
           output.push(trimmed);
         } else {
-          output.push('<p class="md-p">' + trimmed + '</p>');
+          output.push(`<p class="md-p">${trimmed}</p>`);
         }
       }
     }
@@ -988,7 +988,7 @@ function renderSettingsCategoriesList() {
                   </span>
                 </div>
                 <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
+                  <button type="button" class="btn-icon-del" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
                   <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina</button>
                 </div>
               </div>
@@ -1934,7 +1934,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Con Celle Pre-Calcolate in Variabili)
+// 10. GENERAZIONE STAMPA PDF NATIVA (Con Schede Tecniche Alleggerite)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -2035,7 +2035,6 @@ function prepareAndPrint() {
     titleSectionHtml += `<div style="font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-top: 8px; text-transform: uppercase;">revisione ${docState.revisionNum || 1} del ${dateFormattedLong}</div>`;
   }
   
-  // DESCRIZIONE SINTETICA: Centrata, Maiuscola e NON IN GRASSETTO
   if (docState.shortDesc && docState.shortDesc.trim()) {
     titleSectionHtml += `<div style="font-size: 1.2rem; font-weight: normal; color: #0f172a; margin-top: 8px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(docState.shortDesc)}</div>`;
   }
@@ -2080,7 +2079,7 @@ function prepareAndPrint() {
     </div>
   `;
 
-  // 2. PAGINE CATEGORIA (2..N)
+  // 2. PAGINE CATEGORIA (2..N) - GRAFICA ALLEGGERITA
   docState.categories.forEach((cat, idx) => {
     const currentPageNum = idx + 2;
     const catTotals = calculateCategoryTotals(cat);
@@ -2145,14 +2144,10 @@ function prepareAndPrint() {
     sheetsHTML += `
       <div class="sheet">
         <div>
+          <!-- Intestazione alleggerita: solo nome azienda a sinistra, rimosse le scritte a destra e il sottotitolo -->
           <div class="p-header">
             <div class="p-company">
               <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
-              <div style="font-size: 0.8rem;">Allegato Tecnico - Rif. Doc N° ${escapeHtml(formattedDocNum)}</div>
-            </div>
-            <div class="p-doc-details">
-              <div style="font-size: 1.1rem; font-weight: bold;">SCHEDA TECNICA ${idx + 1}</div>
-              <div style="font-size: 0.9rem;">Cliente: ${escapeHtml(docState.client.name)}</div>
             </div>
           </div>
 
@@ -2181,6 +2176,7 @@ function prepareAndPrint() {
             </tbody>
           </table>
 
+          <!-- Riquadro totali di scheda: riga Totale ridimensionata con font più compatto ed elegante -->
           <div style="margin-top: 15px; border: 1px solid #999; padding: 10px 14px; background: #fdfdfd;">
             <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">
               <span>Subtotale Fornitura:</span>
@@ -2190,7 +2186,7 @@ function prepareAndPrint() {
               <span>Posa in Opera:</span>
               <strong>${formatCurrency(catTotals.posa)}</strong>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.92rem; font-weight: 700;">
               <span>Totale ${escapeHtml(cat.name)}:</span>
               <span>${formatCurrency(catTotals.total)}</span>
             </div>
