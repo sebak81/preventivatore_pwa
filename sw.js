@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v66'; // Fix risolutivo placeholder e formattazione testo copertina
+const CACHE_NAME = 'prev-app-v68'; // Alleggerimento intestazioni Schede Tecniche e ridimensionamento totale categoria
 const ASSETS = [
   './',
   './index.html',
