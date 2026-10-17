@@ -212,11 +212,11 @@ function parseMarkdown(md) {
     if (ulMatch) {
       if (inOl) { output.push('</ol>'); inOl = false; }
       if (!inUl) { output.push('<ul class="md-ul">'); inUl = true; }
-      output.push(`<li>${ulMatch[1]}</li>`);
+      output.push('<li>' + ulMatch[1] + '</li>');
     } else if (olMatch) {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (!inOl) { output.push('<ol class="md-ol">'); inOl = true; }
-      output.push(`<li>${olMatch[1]}</li>`);
+      output.push('<li>' + olMatch[1] + '</li>');
     } else {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (inOl) { output.push('</ol>'); inOl = false; }
@@ -224,7 +224,7 @@ function parseMarkdown(md) {
         if (trimmed.startsWith('<h3') || trimmed.startsWith('<h4')) {
           output.push(trimmed);
         } else {
-          output.push(`<p class="md-p">${trimmed}</p>`);
+          output.push('<p class="md-p">' + trimmed + '</p>');
         }
       }
     }
@@ -352,16 +352,12 @@ let docState = {
   finalNotes: ""
 };
 
-// Generazione nome file:
-// es. 123-26 Rossi Mario _ecobonus.json
-// es. 123-26 Rossi Mario _zanzariere_Rev.1.json
 function getSaveFileName() {
   const cleanNum = (docState.number || "000").trim().replace(/[/\\?%*:|"<>]/g, '-');
   const cleanClient = (docState.client?.name || "Cliente").trim().replace(/[/\\?%*:|"<>]/g, '');
 
   let base = `${cleanNum} ${cleanClient}`.trim();
 
-  // Aggiunge la descrizione sintetica in coda al nome (se presente)
   if (docState.shortDesc && docState.shortDesc.trim()) {
     const cleanDesc = docState.shortDesc.trim().replace(/[/\\?%*:|"<>]/g, '');
     base += ` _${cleanDesc}`;
@@ -376,7 +372,6 @@ function getSaveFileName() {
   return `${base}.json`;
 }
 
-// Etichetta documento in alto a destra
 function getFormattedDocNumber() {
   const raw = (docState.number || "").trim();
   const num = raw || "BOZZA";
@@ -1939,7 +1934,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Con Dicitura Descrittiva NON in Grassetto)
+// 10. GENERAZIONE STAMPA PDF NATIVA (Con Celle Pre-Calcolate in Variabili)
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -2040,9 +2035,9 @@ function prepareAndPrint() {
     titleSectionHtml += `<div style="font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-top: 8px; text-transform: uppercase;">revisione ${docState.revisionNum || 1} del ${dateFormattedLong}</div>`;
   }
   
-  // Descrizione sintetica: CENTRATA, MAIUSCOLA e NON IN GRASSETTO (font-weight: normal)
+  // DESCRIZIONE SINTETICA: Centrata, Maiuscola e NON IN GRASSETTO
   if (docState.shortDesc && docState.shortDesc.trim()) {
-    titleSectionHtml += `<div style="font-size: 1.25rem; font-weight: normal; color: #0f172a; margin-top: 8px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(docState.shortDesc)}</div>`;
+    titleSectionHtml += `<div style="font-size: 1.2rem; font-weight: normal; color: #0f172a; margin-top: 8px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(docState.shortDesc)}</div>`;
   }
 
   if (!isContract && validityText) {
@@ -2210,7 +2205,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Con Dati Committente e Firma Spostata)
+  // 3. PAGINA TOTALI & FIRMA (Pre-calcolo sicuro di tutte le righe di riepilogo)
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2227,6 +2222,34 @@ function prepareAndPrint() {
   let finalNotesHtml = docState.finalNotes
     ? `<div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>`
     : '';
+
+  // Righe Trasporto e Smaltimento pre-costruite
+  let transportRowHtml = '';
+  if (hasTransport) {
+    transportRowHtml = `
+      <tr style="font-size: 0.88rem;">
+        <td colspan="3" style="padding-left: 10px;"><strong>Trasporto</strong></td>
+        <td class="text-right">${formatCurrency(transportCost)}</td>
+      </tr>
+    `;
+  }
+
+  let disposalRowHtml = '';
+  if (docState.disposalIncluded) {
+    disposalRowHtml = `
+      <tr style="font-size: 0.88rem;">
+        <td colspan="3" style="padding-left: 10px;"><strong>SMALTIMENTO COMPRESO</strong></td>
+        <td class="text-right"><strong>Compreso</strong></td>
+      </tr>
+    `;
+  } else if (hasDisposal) {
+    disposalRowHtml = `
+      <tr style="font-size: 0.88rem;">
+        <td colspan="3" style="padding-left: 10px;"><strong>Smaltimento</strong></td>
+        <td class="text-right">${formatCurrency(disposalCost)}</td>
+      </tr>
+    `;
+  }
 
   // Righe IVA: calcolo mista dettagliato oppure riga singola ordinaria/agevolata
   let taxRowsHtml = "";
@@ -2278,6 +2301,28 @@ function prepareAndPrint() {
     `;
   }
 
+  // Cella del Totale Complessivo
+  const totalFormattedValue = formatCurrency(total);
+  const totalCellHtml = hasDiscount 
+    ? `<span class="strike-diagonal">${totalFormattedValue}</span>` 
+    : totalFormattedValue;
+
+  // Riga Scontato
+  let discountRowHtml = '';
+  if (hasDiscount) {
+    const discountedFormattedValue = formatCurrency(discountedVal);
+    discountRowHtml = `
+      <tr style="background-color: #ffffff; font-size: 1.05rem;">
+        <td colspan="3" style="padding: 8px 10px; border: 2px solid #000; font-weight: 800; letter-spacing: 0.5px;">
+          SCONTATO
+        </td>
+        <td class="text-right" style="padding: 8px 10px; font-weight: 800; font-size: 1.15rem; border: 2px solid #000;">
+          ${discountedFormattedValue}
+        </td>
+      </tr>
+    `;
+  }
+
   sheetsHTML += `
     <div class="sheet">
       <!-- SEZIONE SUPERIORE -->
@@ -2311,45 +2356,19 @@ function prepareAndPrint() {
               <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
             </tr>
 
-            <!-- Riga opzionale Trasporto -->
-            ${hasTransport ? `
-            <tr style="font-size: 0.88rem;">
-              <td colspan="3" style="padding-left: 10px;"><strong>Trasporto</strong></td>
-              <td class="text-right">\${formatCurrency(transportCost)}</td>
-            </tr>` : ''}
-
-            <!-- Riga opzionale Smaltimento / Smaltimento Compreso -->
-            ${docState.disposalIncluded ? `
-            <tr style="font-size: 0.88rem;">
-              <td colspan="3" style="padding-left: 10px;"><strong>SMALTIMENTO COMPRESO</strong></td>
-              <td class="text-right"><strong>Compreso</strong></td>
-            </tr>` : (hasDisposal ? `
-            <tr style="font-size: 0.88rem;">
-              <td colspan="3" style="padding-left: 10px;"><strong>Smaltimento</strong></td>
-              <td class="text-right">\${formatCurrency(disposalCost)}</td>
-            </tr>` : '')}
-
+            ${transportRowHtml}
+            ${disposalRowHtml}
             ${taxRowsHtml}
 
             <!-- TOTALE COMPLESSIVO -->
             <tr style="background-color: #f1f5f9; font-size: 1.05rem;">
               <td colspan="3" style="padding: 8px 10px; font-weight: 800;">TOTALE COMPLESSIVO (IVA Inclusa)</td>
               <td class="text-right" style="padding: 8px 10px; font-weight: 800; font-size: 1.12rem;">
-                ${hasDiscount ? `<span class="strike-diagonal">\${formatCurrency(total)}</span>` : formatCurrency(total)}
+                ${totalCellHtml}
               </td>
             </tr>
 
-            <!-- RIGA SCONTATO -->
-            ${hasDiscount ? `
-            <tr style="background-color: #ffffff; font-size: 1.05rem;">
-              <td colspan="3" style="padding: 8px 10px; border: 2px solid #000; font-weight: 800; letter-spacing: 0.5px;">
-                SCONTATO
-              </td>
-              <td class="text-right" style="padding: 8px 10px; font-weight: 800; font-size: 1.15rem; border: 2px solid #000;">
-                \${formatCurrency(discountedVal)}
-              </td>
-            </tr>
-            ` : ''}
+            ${discountRowHtml}
           </tbody>
         </table>
 
@@ -2384,7 +2403,7 @@ function prepareAndPrint() {
           </div>
         </div>
 
-        <!-- FIRMA PER ACCETTAZIONE SPOSTATA SOTTO -->
+        <!-- FIRMA PER ACCETTAZIONE -->
         <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
           <div style="width: 290px; text-align: center;">
             <div style="font-size: 0.82rem; font-weight: 600; margin-bottom: 22px;">Firma per Accettazione del Committente</div>
