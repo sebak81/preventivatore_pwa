@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v64'; // Descrizione sintetica preventivo centrata e non in grassetto
+const CACHE_NAME = 'prev-app-v66'; // Fix risolutivo placeholder e formattazione testo copertina
 const ASSETS = [
   './',
   './index.html',
