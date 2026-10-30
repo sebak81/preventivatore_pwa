@@ -24,14 +24,14 @@ const DEFAULT_CATALOG = {
         id: "supp_port_qfort",
         name: "QFORT",
         models: [
-          { id: "mod_baby_stars", name: "Baby Stars", specs: "Alluminio/PVC coibentato, serratura automatica 5 punti", glass: "Vetro blindato antisfondamento", desc: "Portoncino d'ingresso ad elevata sicurezza con pannello coibentato ad alto isolamento termico ed acustico." }
+          { id: "mod_baby_stars", name: "Baby Stars", specs: "Alluminio/PVC coibentato, serratura automatica 5 punti", glass: "Vetro blindato antisfondamento", maniglie: "", desc: "Portoncino d'ingresso ad elevata sicurezza con pannello coibentato ad alto isolamento termico ed acustico." }
         ]
       },
       {
         id: "supp_port_blindati",
         name: "Blindati Artigianali",
         models: [
-          { id: "mod_classe3", name: "Porta Blindata Classe 3", specs: "Doppia lamiera zincata, cilindro europeo alta sicurezza", glass: "-", desc: "Porta blindata d'ingresso certificata classe antieffrazione 3 con defender e lama parafreddo a pavimento." }
+          { id: "mod_classe3", name: "Porta Blindata Classe 3", specs: "Doppia lamiera zincata, cilindro europeo alta sicurezza", glass: "-", maniglie: "", desc: "Porta blindata d'ingresso certificata classe antieffrazione 3 con defender e lama parafreddo a pavimento." }
         ]
       }
     ]
@@ -42,26 +42,26 @@ const DEFAULT_CATALOG = {
         id: "supp_ser_qfort",
         name: "QFORT",
         models: [
-          { id: "mod_4_stars", name: "4 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni di battuta", glass: "24 mm B.E. Warm Edge", desc: "Profilo in PVC classe A da 70 mm a 5 camere con rinforzi in acciaio zincato. Sistema a 2 guarnizioni di battuta in EPDM." },
-          { id: "mod_5_stars", name: "5 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm o 30 mm B.E. Warm Edge", desc: "Design squadrato ed essenziale. Profilo in PVC da 70 mm a 5 camere, ferramenta perimetrale con scontri antieffrazione." },
-          { id: "mod_7_stars", name: "7 Stars (85mm - 7 camere)", specs: "85 mm - 7 camere - 3 guarnizioni (giunto aperto)", glass: "Triplo vetro 44 mm selettivo B.E. Warm Edge", desc: "Top di gamma a taglio termico passivo. Profilo da 85 mm a 7 camere e 3 guarnizioni per case a bassissimo consumo energetico." },
-          { id: "mod_stars_epiq", name: "Stars Epiq (82mm - 6 camere)", specs: "82 mm - 6 camere - 3 guarnizioni", glass: "Triplo vetro alte prestazioni", desc: "Sistema innovativo con estetica moderna e complanare o semi-complanare per grandi aperture." }
+          { id: "mod_4_stars", name: "4 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni di battuta", glass: "24 mm B.E. Warm Edge", maniglie: "", desc: "Profilo in PVC classe A da 70 mm a 5 camere con rinforzi in acciaio zincato. Sistema a 2 guarnizioni di battuta in EPDM." },
+          { id: "mod_5_stars", name: "5 Stars (70mm - 5 camere)", specs: "70 mm - 5 camere - 2 guarnizioni", glass: "24 mm o 30 mm B.E. Warm Edge", maniglie: "", desc: "Design squadrato ed essenziale. Profilo in PVC da 70 mm a 5 camere, ferramenta perimetrale con scontri antieffrazione." },
+          { id: "mod_7_stars", name: "7 Stars (85mm - 7 camere)", specs: "85 mm - 7 camere - 3 guarnizioni (giunto aperto)", glass: "Triplo vetro 44 mm selettivo B.E. Warm Edge", maniglie: "", desc: "Top di gamma a taglio termico passivo. Profilo da 85 mm a 7 camere e 3 guarnizioni per case a bassissimo consumo energetico." },
+          { id: "mod_stars_epiq", name: "Stars Epiq (82mm - 6 camere)", specs: "82 mm - 6 camere - 3 guarnizioni", glass: "Triplo vetro alte prestazioni", maniglie: "", desc: "Sistema innovativo con estetica moderna e complanare o semi-complanare per grandi aperture." }
         ]
       },
       {
         id: "supp_ser_cosmet",
         name: "Cosmet",
         models: [
-          { id: "mod_cosmet_sintesi", name: "Sintesi 76 (76mm - 5 camere)", specs: "76 mm - 5 camere - 2 guarnizioni", glass: "Vetrocamera 28 mm B.E. con gas Argon", desc: "Serramento in PVC Cosmet Serie Sintesi. Spessore 76 mm, ottimo bilanciamento tra leggerezza visiva ed isolamento termo-acustico." },
-          { id: "mod_cosmet_diamante", name: "Diamante 84 (84mm - 6 camere)", specs: "84 mm - 6 camere - 3 guarnizioni di tenuta", glass: "Triplo vetro 48 mm selettivo acustico", desc: "Sistema top level Cosmet Diamante. Elevatissimo isolamento termico con guarnizione centrale vulcanizzata e profili rinforzati." },
-          { id: "mod_cosmet_kristal", name: "Kristal (Tutto Vetro complanare)", specs: "Profilo a scomparsa con anta a tutto vetro", glass: "Vetro strutturale temperato/stratificato", desc: "Soluzione minimale Cosmet con anta a scomparsa per la massima luminosità naturale e design contemporaneo." }
+          { id: "mod_cosmet_sintesi", name: "Sintesi 76 (76mm - 5 camere)", specs: "76 mm - 5 camere - 2 guarnizioni", glass: "Vetrocamera 28 mm B.E. con gas Argon", maniglie: "", desc: "Serramento in PVC Cosmet Serie Sintesi. Spessore 76 mm, ottimo bilanciamento tra leggerezza visiva ed isolamento termo-acustico." },
+          { id: "mod_cosmet_diamante", name: "Diamante 84 (84mm - 6 camere)", specs: "84 mm - 6 camere - 3 guarnizioni di tenuta", glass: "Triplo vetro 48 mm selettivo acustico", maniglie: "", desc: "Sistema top level Cosmet Diamante. Elevatissimo isolamento termico con guarnizione centrale vulcanizzata e profili rinforzati." },
+          { id: "mod_cosmet_kristal", name: "Kristal (Tutto Vetro complanare)", specs: "Profilo a scomparsa con anta a tutto vetro", glass: "Vetro strutturale temperato/stratificato", maniglie: "", desc: "Soluzione minimale Cosmet con anta a scomparsa per la massima luminosità naturale e design contemporaneo." }
         ]
       },
       {
         id: "supp_ser_alluminio",
         name: "Alluminio Taglio Termico",
         models: [
-          { id: "mod_all_75", name: "Serie 75 TT", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", desc: "Profili estrusi in lega primaria a taglio termico. Massima indeformabilità, resistenza agli agenti atmosferici e minima manutenzione." }
+          { id: "mod_all_75", name: "Serie 75 TT", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", maniglie: "", desc: "Profili estrusi in lega primaria a taglio termico. Massima indeformabilità, resistenza agli agenti atmosferici e minima manutenzione." }
         ]
       }
     ]
@@ -125,8 +125,8 @@ const DEFAULT_CATALOG = {
         id: "supp_porte_int",
         name: "Porte Interne Design",
         models: [
-          { id: "mod_battente_cieca", name: "Battente Tamburata Microtek", specs: "Telaio e coprifili con guarnizione in gomma, cerniere a scomparsa", glass: "-", desc: "Porta interna moderna ad anta liscia con serratura magnetica e finiture antigraffio." },
-          { id: "mod_scorrevole_scomp", name: "Scorrevole a Scomparsa", specs: "Anta coordinata, carrelli ammortizzati tipo scrigno", glass: "-", desc: "Soluzione salvaspazio a scomparsa nel controtelaio murario con chiusura rallentata." }
+          { id: "mod_battente_cieca", name: "Battente Tamburata Microtek", specs: "Telaio e coprifili con guarnizione in gomma, cerniere a scomparsa", glass: "-", maniglie: "", desc: "Porta interna moderna ad anta liscia con serratura magnetica e finiture antigraffio." },
+          { id: "mod_scorrevole_scomp", name: "Scorrevole a Scomparsa", specs: "Anta coordinata, carrelli ammortizzati tipo scrigno", glass: "-", maniglie: "", desc: "Soluzione salvaspazio a scomparsa nel controtelaio murario con chiusura rallentata." }
         ]
       }
     ]
@@ -176,6 +176,13 @@ const DEFAULT_CATALOG = {
     ]
   }
 };
+
+// Funzione di utilità per verificare se una macro-categoria supporta il campo Maniglie
+function categoryHasHandles(categoryName) {
+  if (!categoryName) return false;
+  const normalized = categoryName.trim().toLowerCase();
+  return normalized === 'portoncini' || normalized === 'serramenti' || normalized === 'porte interne';
+}
 
 // ==========================================================================
 // 2. PARSER MARKDOWN & AUTO-RESIZE TEXTAREA
@@ -326,7 +333,7 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con Descrizione Sintetica)
+// 5. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
@@ -890,13 +897,22 @@ function handleAddMacroCategory() {
     return;
   }
 
+  const supportsManiglie = categoryHasHandles(rawName);
+
   catalogSettings[rawName] = {
     suppliers: [
       {
         id: 'supp_' + Date.now(),
         name: "Fornitore Standard",
         models: [
-          { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: `Fornitura di ${rawName} realizzata a regola d'arte.` }
+          { 
+            id: 'mod_' + Date.now(), 
+            name: "Modello Base", 
+            specs: "", 
+            glass: "", 
+            ...(supportsManiglie ? { maniglie: "" } : {}),
+            desc: `Fornitura di ${rawName} realizzata a regola d'arte.` 
+          }
         ]
       }
     ]
@@ -929,6 +945,7 @@ function renderSettingsCategoriesList() {
     const catData = catalogSettings[catName];
     const suppliers = catData.suppliers || [];
     const isCatOpen = !!openSettingsCategories[catName];
+    const supportsManiglie = categoryHasHandles(catName);
 
     const accordionItem = document.createElement('div');
     accordionItem.className = `settings-cat-accordion ${isCatOpen ? 'is-open' : ''}`;
@@ -968,6 +985,12 @@ function renderSettingsCategoriesList() {
                     <label>Vetraggio / Accessori Consigliati</label>
                     <input type="text" value="${escapeHtml(mod.glass || '')}" placeholder="es. Triplo vetro 44 mm selettivo B.E." oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'glass', this.value)">
                   </div>
+                  ${supportsManiglie ? `
+                  <div class="form-group">
+                    <label>Maniglie</label>
+                    <input type="text" value="${escapeHtml(mod.maniglie || '')}" placeholder="es. Maniglia Hoppe Toulon cromo satinato" oninput="updateModelField('${escapeHtml(catName)}', ${sIdx}, ${mIdx}, 'maniglie', this.value)">
+                  </div>
+                  ` : ''}
                 </div>
                 <div class="form-group full" style="margin-top: 8px;">
                   <label>Descrizione Generale Precompilata (compare nel preventivo)</label>
@@ -988,7 +1011,7 @@ function renderSettingsCategoriesList() {
                   </span>
                 </div>
                 <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
-                  <button type="button" class="btn-icon-del" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="addModelToSupplier('${escapeHtml(catName)}', ${sIdx})">+ Aggiungi Modello</button>
                   <button type="button" class="btn btn-danger btn-sm" onclick="deleteSupplier('${escapeHtml(catName)}', ${sIdx})">Elimina</button>
                 </div>
               </div>
@@ -1053,11 +1076,20 @@ window.addSupplierToCategory = function(catName) {
   const suppName = prompt("Inserisci il nome del nuovo fornitore:");
   if (!suppName || !suppName.trim()) return;
 
+  const supportsManiglie = categoryHasHandles(catName);
+
   const newSupp = {
     id: 'supp_' + Date.now(),
     name: suppName.trim(),
     models: [
-      { id: 'mod_' + Date.now(), name: "Modello Base", specs: "", glass: "", desc: `Fornitura di ${catName} secondo specifiche di capitolato.` }
+      { 
+        id: 'mod_' + Date.now(), 
+        name: "Modello Base", 
+        specs: "", 
+        glass: "", 
+        ...(supportsManiglie ? { maniglie: "" } : {}),
+        desc: `Fornitura di ${catName} secondo specifiche di capitolato.` 
+      }
     ]
   };
   catalogSettings[catName].suppliers.push(newSupp);
@@ -1085,11 +1117,15 @@ window.addModelToSupplier = function(catName, sIdx) {
   const supp = catalogSettings[catName].suppliers[sIdx];
   if (!supp) return;
   if (!supp.models) supp.models = [];
+  
+  const supportsManiglie = categoryHasHandles(catName);
+
   supp.models.push({
     id: 'mod_' + Date.now(),
     name: "Nuovo Modello",
     specs: "",
     glass: "",
+    ...(supportsManiglie ? { maniglie: "" } : {}),
     desc: ""
   });
   openSettingsSuppliers[`${catName}_${sIdx}`] = true;
@@ -1224,6 +1260,7 @@ function addCategoryFromSelector() {
     specs: firstModel.specs || "",
     color: "",
     glass: firstModel.glass || "",
+    maniglie: firstModel.maniglie || "",
     description: firstModel.desc || "",
     positions: [
       { id: 'pos_' + Date.now(), name: "Pos. 1", width: "", height: "", description: "", quantity: 1, unitPrice: 0 }
@@ -1349,6 +1386,8 @@ function renderCategoryOptionsBlock(cat) {
     `<option value="${escapeHtml(m.name)}" ${m.name === cat.modelName ? 'selected' : ''}>${escapeHtml(m.name)}</option>`
   ).join('');
 
+  const supportsManiglie = categoryHasHandles(cat.name);
+
   return `
     <div style="background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: 6px;">
       <div class="form-grid">
@@ -1379,6 +1418,12 @@ function renderCategoryOptionsBlock(cat) {
           <label>Vetraggio / Accessori</label>
           <input type="text" value="${escapeHtml(cat.glass)}" placeholder="Tipologia vetro o accessori" oninput="updateCatField('${cat.id}', 'glass', this.value)">
         </div>
+        ${supportsManiglie ? `
+        <div class="form-group">
+          <label>Maniglie</label>
+          <input type="text" value="${escapeHtml(cat.maniglie || '')}" placeholder="es. Hoppe Toulon cromo satinato" oninput="updateCatField('${cat.id}', 'maniglie', this.value)">
+        </div>
+        ` : ''}
       </div>
 
       <div class="form-group full" style="margin-top: 10px;">
@@ -1401,11 +1446,13 @@ window.onCatSupplierChange = function(catId, suppName) {
       cat.modelName = supp.models[0].name;
       cat.specs = supp.models[0].specs || "";
       cat.glass = supp.models[0].glass || "";
+      cat.maniglie = supp.models[0].maniglie || "";
       cat.description = supp.models[0].desc || "";
     } else {
       cat.modelName = "";
       cat.specs = "";
       cat.glass = "";
+      cat.maniglie = "";
       cat.description = "";
     }
   }
@@ -1426,6 +1473,7 @@ window.onCatModelChange = function(catId, modelName) {
       if (mod) {
         cat.specs = mod.specs || "";
         cat.glass = mod.glass || "";
+        cat.maniglie = mod.maniglie || "";
         cat.description = mod.desc || "";
       }
     }
@@ -1934,7 +1982,7 @@ function resetDocument() {
 }
 
 // ==========================================================================
-// 10. GENERAZIONE STAMPA PDF NATIVA (Con Schede Tecniche Alleggerite)
+// 10. GENERAZIONE STAMPA PDF NATIVA
 // ==========================================================================
 function prepareAndPrint() {
   const printRoot = document.getElementById('print-root');
@@ -2035,6 +2083,7 @@ function prepareAndPrint() {
     titleSectionHtml += `<div style="font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-top: 8px; text-transform: uppercase;">revisione ${docState.revisionNum || 1} del ${dateFormattedLong}</div>`;
   }
   
+  // Descrizione sintetica: Centrata, Maiuscola e NON IN GRASSETTO
   if (docState.shortDesc && docState.shortDesc.trim()) {
     titleSectionHtml += `<div style="font-size: 1.2rem; font-weight: normal; color: #0f172a; margin-top: 8px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(docState.shortDesc)}</div>`;
   }
@@ -2079,7 +2128,7 @@ function prepareAndPrint() {
     </div>
   `;
 
-  // 2. PAGINE CATEGORIA (2..N) - GRAFICA ALLEGGERITA
+  // 2. PAGINE CATEGORIA (2..N) - GRAFICA ALLEGGERITA CON SUPPORTO MANIGLIE
   docState.categories.forEach((cat, idx) => {
     const currentPageNum = idx + 2;
     const catTotals = calculateCategoryTotals(cat);
@@ -2129,11 +2178,12 @@ function prepareAndPrint() {
     }).join('');
 
     let specsBoxHtml = '';
-    if (cat.specs || cat.color || cat.glass) {
+    if (cat.specs || cat.color || cat.glass || cat.maniglie) {
       let lines = '';
       if (cat.specs) lines += `<div><strong>Caratteristiche Sistema:</strong> ${escapeHtml(cat.specs)}</div>`;
       if (cat.color) lines += `<div><strong>Finitura / Colore:</strong> ${escapeHtml(cat.color)}</div>`;
       if (cat.glass) lines += `<div><strong>Vetraggio / Accessori:</strong> ${escapeHtml(cat.glass)}</div>`;
+      if (cat.maniglie) lines += `<div><strong>Maniglie:</strong> ${escapeHtml(cat.maniglie)}</div>`;
       specsBoxHtml = `<div class="p-box" style="margin-bottom: 12px; padding: 8px 12px; background: #fafafa;"><div style="font-size: 0.85rem; line-height: 1.5;">${lines}</div></div>`;
     }
 
@@ -2144,7 +2194,7 @@ function prepareAndPrint() {
     sheetsHTML += `
       <div class="sheet">
         <div>
-          <!-- Intestazione alleggerita: solo nome azienda a sinistra, rimosse le scritte a destra e il sottotitolo -->
+          <!-- Intestazione alleggerita -->
           <div class="p-header">
             <div class="p-company">
               <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
@@ -2176,7 +2226,6 @@ function prepareAndPrint() {
             </tbody>
           </table>
 
-          <!-- Riquadro totali di scheda: riga Totale ridimensionata con font più compatto ed elegante -->
           <div style="margin-top: 15px; border: 1px solid #999; padding: 10px 14px; background: #fdfdfd;">
             <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">
               <span>Subtotale Fornitura:</span>
@@ -2272,16 +2321,16 @@ function prepareAndPrint() {
       ${hasTransport ? `
       <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
         <td colspan="3" style="padding-left: 14px;">
-          Trasporto = (\${formatCurrency(transportCost)}) &times; 10%
+          Trasporto = (${formatCurrency(transportCost)}) &times; 10%
         </td>
-        <td class="text-right">\${formatCurrency(transportCost * 0.10)}</td>
+        <td class="text-right">${formatCurrency(transportCost * 0.10)}</td>
       </tr>` : ''}
       ${hasDisposal ? `
       <tr style="font-size: 0.83rem; background-color: #fafafa; color: #1e293b;">
         <td colspan="3" style="padding-left: 14px;">
-          Smaltimento = (\${formatCurrency(disposalCost)}) &times; 10%
+          Smaltimento = (${formatCurrency(disposalCost)}) &times; 10%
         </td>
-        <td class="text-right">\${formatCurrency(disposalCost * 0.10)}</td>
+        <td class="text-right">${formatCurrency(disposalCost * 0.10)}</td>
       </tr>` : ''}
       <tr style="font-size: 0.88rem; font-weight: 700; background-color: #f1f5f9;">
         <td colspan="3" style="padding-left: 14px;">Totale IVA Mista (10% + 22%)</td>
@@ -2297,13 +2346,11 @@ function prepareAndPrint() {
     `;
   }
 
-  // Cella del Totale Complessivo
   const totalFormattedValue = formatCurrency(total);
   const totalCellHtml = hasDiscount 
     ? `<span class="strike-diagonal">${totalFormattedValue}</span>` 
     : totalFormattedValue;
 
-  // Riga Scontato
   let discountRowHtml = '';
   if (hasDiscount) {
     const discountedFormattedValue = formatCurrency(discountedVal);
@@ -2484,9 +2531,8 @@ function prepareAndPrint() {
 
   printRoot.innerHTML = sheetsHTML;
 
-  // Nome file PDF automatico pulito
   const originalTitle = document.title;
-  const pdfSuggestedName = getSaveFileName().replace(/\.json\$/i, '');
+  const pdfSuggestedName = getSaveFileName().replace(/\.json$/i, '');
   document.title = pdfSuggestedName;
   
   window.print();
