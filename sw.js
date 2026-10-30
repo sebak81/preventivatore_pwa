@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v68'; // Alleggerimento intestazioni Schede Tecniche e ridimensionamento totale categoria
+const CACHE_NAME = 'prev-app-v70'; // Aggiunta campo Maniglie retrocompatibile per Portoncini, Serramenti e Porte interne
 const ASSETS = [
   './',
   './index.html',
