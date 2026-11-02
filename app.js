@@ -61,7 +61,7 @@ const DEFAULT_CATALOG = {
         id: "supp_ser_alluminio",
         name: "Alluminio Taglio Termico",
         models: [
-          { id: "mod_all_75", name: "Serie 75 TT", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", maniglie: "", desc: "Profili estrusi in lega primaria a taglio termico. Massima indeformabilità, resistenza agli agenti atmosferici e minima manutenzione." }
+          { id: "mod_all_75", name: "Serie 75 TT", specs: "75 mm taglio termico poliammide", glass: "33.1/16/33.1 B.E.", desc: "Profili estrusi in lega primaria a taglio termico. Massima indeformabilità, resistenza agli agenti atmosferici e minima manutenzione." }
         ]
       }
     ]
@@ -177,7 +177,6 @@ const DEFAULT_CATALOG = {
   }
 };
 
-// Funzione di utilità per verificare se una macro-categoria supporta il campo Maniglie
 function categoryHasHandles(categoryName) {
   if (!categoryName) return false;
   const normalized = categoryName.trim().toLowerCase();
@@ -219,7 +218,7 @@ function parseMarkdown(md) {
     if (ulMatch) {
       if (inOl) { output.push('</ol>'); inOl = false; }
       if (!inUl) { output.push('<ul class="md-ul">'); inUl = true; }
-      output.push(`<li>${ulMatch[1]}</li>`);
+      output.push('<li>' + ulMatch[1] + '</li>');
     } else if (olMatch) {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (!inOl) { output.push('<ol class="md-ol">'); inOl = true; }
@@ -231,7 +230,7 @@ function parseMarkdown(md) {
         if (trimmed.startsWith('<h3') || trimmed.startsWith('<h4')) {
           output.push(trimmed);
         } else {
-          output.push(`<p class="md-p">${trimmed}</p>`);
+          output.push('<p class="md-p">' + trimmed + '</p>');
         }
       }
     }
@@ -333,7 +332,7 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO
+// 5. STATO CENTRALE DEL PREVENTIVO (Con Descrizione Sintetica)
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
@@ -2128,7 +2127,7 @@ function prepareAndPrint() {
     </div>
   `;
 
-  // 2. PAGINE CATEGORIA (2..N) - GRAFICA ALLEGGERITA CON SUPPORTO MANIGLIE
+  // 2. PAGINE CATEGORIA (2..N) - GRAFICA ALLEGGERITA CON SUPPORTO MANIGLIE E RIGHE VUOTE
   docState.categories.forEach((cat, idx) => {
     const currentPageNum = idx + 2;
     const catTotals = calculateCategoryTotals(cat);
@@ -2140,7 +2139,20 @@ function prepareAndPrint() {
       const hVal = (p.height || "").trim();
       const oldMeasures = (p.measures || "").trim();
       const hasMeasures = wVal.length > 0 || hVal.length > 0 || oldMeasures.length > 0;
+      const descVal = (p.description || "").trim();
+      const hasDesc = descVal.length > 0;
+      const hasPrice = (parseFloat(p.unitPrice) || 0) > 0;
 
+      // 1. RIGA TOTALMENTE VUOTA (SPAZIATORE INTENZIONALE INSERITO DALL'UTENTE)
+      if (!hasName && !hasMeasures && !hasDesc && !hasPrice) {
+        return `
+          <tr style="height: 22px;">
+            <td colspan="6" style="border: 1px solid #aaa; padding: 4px;">&nbsp;</td>
+          </tr>
+        `;
+      }
+
+      // 2. RIGA SENZA NOME E SENZA MISURE MA CON DESCRIZIONE O PREZZO (es. Nota di lavorazione o articolo a corpo)
       if (!hasName && !hasMeasures) {
         return `
           <tr>
