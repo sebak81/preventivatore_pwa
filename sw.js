@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v70'; // Aggiunta campo Maniglie retrocompatibile per Portoncini, Serramenti e Porte interne
+const CACHE_NAME = 'prev-app-v72'; // Supporto righe vuote spaziatrici nelle schede tecniche
 const ASSETS = [
   './',
   './index.html',
