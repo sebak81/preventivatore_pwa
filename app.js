@@ -222,7 +222,7 @@ function parseMarkdown(md) {
     } else if (olMatch) {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (!inOl) { output.push('<ol class="md-ol">'); inOl = true; }
-      output.push(`<li>${olMatch[1]}</li>`);
+      output.push('<li>' + olMatch[1] + '</li>');
     } else {
       if (inUl) { output.push('</ul>'); inUl = false; }
       if (inOl) { output.push('</ol>'); inOl = false; }
@@ -346,7 +346,7 @@ let docState = {
   number: "",
   date: new Date().toISOString().split('T')[0],
   validity: "15 giorni",
-  client: { name: "", residence: "", taxId: "", phone: "", email: "" },
+  client: { name: "", address: "", city: "", residence: "", taxId: "", phone: "", email: "" },
   sameSite: true,
   siteAddress: "",
   categories: [],
@@ -357,6 +357,52 @@ let docState = {
   deliveryTerms: "Circa 6-8 settimane lavorative dall'avvenuto rilievo misure definitive.",
   finalNotes: ""
 };
+
+function getFullClientResidence(client) {
+  if (!client) return "";
+  const addr = (client.address || "").trim();
+  const city = (client.city || "").trim();
+  if (addr && city) return `${addr} - ${city}`;
+  if (addr) return addr;
+  if (city) return city;
+  return (client.residence || "").trim();
+}
+
+function parseLegacyResidence(res) {
+  const clean = (res || "").trim();
+  if (!clean) return { address: "", city: "" };
+
+  // 1. Separatore trattino " - "
+  const lastDash = clean.lastIndexOf(" - ");
+  if (lastDash !== -1) {
+    return {
+      address: clean.slice(0, lastDash).trim(),
+      city: clean.slice(lastDash + 3).trim()
+    };
+  }
+
+  // 2. CAP italiano a 5 cifre
+  const capMatch = clean.match(/(?:^|[\s,\-])(\d{5}\b.*)/);
+  if (capMatch) {
+    const start = capMatch.index;
+    return {
+      address: clean.slice(0, start).replace(/[\s,\-]+$/, ""),
+      city: capMatch[1].replace(/^[\s,\-]+/, "")
+    };
+  }
+
+  // 3. Virgola seguita da nome città (non dal numero civico)
+  const commaCityMatch = clean.match(/,\s*(?=[a-zA-ZÀ-ÿ]{2,})/);
+  if (commaCityMatch) {
+    const idx = commaCityMatch.index;
+    return {
+      address: clean.slice(0, idx).trim(),
+      city: clean.slice(idx + 1).trim()
+    };
+  }
+
+  return { address: clean, city: "" };
+}
 
 function getSaveFileName() {
   const cleanNum = (docState.number || "000").trim().replace(/[/\\?%*:|"<>]/g, '-');
@@ -408,27 +454,6 @@ function formatLongItalianDate(isoDate) {
   } catch (e) {
     return isoDate;
   }
-}
-
-function splitClientResidence(res) {
-  const clean = (res || "").trim();
-  if (!clean) return { address: "", cityCap: "" };
-  const capMatch = clean.match(/(?:^|[\s,\-])(\d{5}\b.*)/);
-  if (capMatch) {
-    const start = capMatch.index;
-    return {
-      address: clean.slice(0, start).replace(/[\s,\-]+$/, ""),
-      cityCap: capMatch[1].replace(/^[\s,\-]+/, "")
-    };
-  }
-  const lastComma = clean.lastIndexOf(",");
-  if (lastComma !== -1) {
-    return {
-      address: clean.slice(0, lastComma).replace(/[\s,\-]+$/, ""),
-      cityCap: clean.slice(lastComma + 1).replace(/^[\s,\-]+/, "")
-    };
-  }
-  return { address: clean, cityCap: "" };
 }
 
 // ==========================================================================
@@ -542,7 +567,14 @@ function setupEventListeners() {
   safeOn('doc-validity', 'input', (e) => { docState.validity = e.target.value; });
 
   safeOn('client-name', 'input', (e) => { docState.client.name = e.target.value; });
-  safeOn('client-residence', 'input', (e) => { docState.client.residence = e.target.value; });
+  safeOn('client-address', 'input', (e) => { 
+    docState.client.address = e.target.value; 
+    docState.client.residence = getFullClientResidence(docState.client);
+  });
+  safeOn('client-city', 'input', (e) => { 
+    docState.client.city = e.target.value; 
+    docState.client.residence = getFullClientResidence(docState.client);
+  });
   safeOn('client-taxid', 'input', (e) => { docState.client.taxId = e.target.value; });
   safeOn('client-phone', 'input', (e) => { docState.client.phone = e.target.value; });
   safeOn('client-email', 'input', (e) => { docState.client.email = e.target.value; });
@@ -1748,6 +1780,7 @@ function escapeHtml(str) {
 // 9. SALVATAGGIO CON NOMENCLATURA PERSONALIZZATA (.json)
 // ==========================================================================
 async function saveToFile() {
+  docState.client.residence = getFullClientResidence(docState.client);
   const jsonStr = JSON.stringify(docState, null, 2);
   const fileName = getSaveFileName();
 
@@ -1843,8 +1876,20 @@ function openFromFile(e) {
       document.getElementById('doc-date').value = docState.date || '';
       document.getElementById('doc-validity').value = docState.validity || '15 giorni';
 
+      // Gestione retrocompatibile Indirizzo + Città
+      if (!docState.client) docState.client = {};
+      if ('address' in docState.client || 'city' in docState.client) {
+        docState.client.address = docState.client.address || '';
+        docState.client.city = docState.client.city || '';
+      } else {
+        const parsedRes = parseLegacyResidence(docState.client.residence || '');
+        docState.client.address = parsedRes.address;
+        docState.client.city = parsedRes.city;
+      }
+
       document.getElementById('client-name').value = docState.client?.name || '';
-      document.getElementById('client-residence').value = docState.client?.residence || '';
+      document.getElementById('client-address').value = docState.client?.address || '';
+      document.getElementById('client-city').value = docState.client?.city || '';
       document.getElementById('client-taxid').value = docState.client?.taxId || '';
       document.getElementById('client-phone').value = docState.client?.phone || '';
       document.getElementById('client-email').value = docState.client?.email || '';
@@ -1923,7 +1968,7 @@ function resetDocument() {
   docState.number = "";
   docState.date = today;
   docState.validity = "15 giorni";
-  docState.client = { name: "", residence: "", taxId: "", phone: "", email: "" };
+  docState.client = { name: "", address: "", city: "", residence: "", taxId: "", phone: "", email: "" };
   docState.categories = [];
   docState.siteAddress = "";
   docState.sameSite = true;
@@ -1969,7 +2014,8 @@ function resetDocument() {
   document.getElementById('doc-validity').value = "15 giorni";
 
   document.getElementById('client-name').value = "";
-  document.getElementById('client-residence').value = "";
+  document.getElementById('client-address').value = "";
+  document.getElementById('client-city').value = "";
   document.getElementById('client-taxid').value = "";
   document.getElementById('client-phone').value = "";
   document.getElementById('client-email').value = "";
@@ -2090,6 +2136,8 @@ function prepareAndPrint() {
     ? `<img src="${companySettings.logo}" class="p-page1-logo-full" alt="Logo">`
     : `<div class="p1-company-fallback">${escapeHtml(companySettings.name || '3 ESSE SERRAMENTI')}</div>`;
 
+  const clientFullResidence = getFullClientResidence(docState.client);
+
   const clientPhoneHtml = docState.client.phone
     ? `<div class="p1-client-line">tel: ${escapeHtml(docState.client.phone)}</div>`
     : '';
@@ -2131,7 +2179,7 @@ function prepareAndPrint() {
 
       <div class="p1-middle-section">
         <div class="p1-client-name">${escapeHtml(docState.client.name) || 'CLIENTE'}</div>
-        <div class="p1-client-address">${escapeHtml(docState.client.residence) || ''}</div>
+        <div class="p1-client-address">${escapeHtml(clientFullResidence)}</div>
         ${clientPhoneHtml}
         <div class="p1-client-line">e mail: ${escapeHtml(docState.client.email || '')}</div>
         ${siteAddressHtml}
@@ -2396,11 +2444,10 @@ function prepareAndPrint() {
     `;
   }
 
-  // Precompilazione Dati Committente dall'intestazione preventivo
+  // Precompilazione Dati Committente dai campi dedicati
   const clientNameVal = escapeHtml(docState.client?.name || '');
-  const resParts = splitClientResidence(docState.client?.residence || '');
-  const clientAddrVal = escapeHtml(resParts.address);
-  const clientCityCapVal = escapeHtml(resParts.cityCap);
+  const clientAddrVal = escapeHtml(docState.client?.address || '');
+  const clientCityCapVal = escapeHtml(docState.client?.city || '');
   const clientTaxIdVal = escapeHtml(docState.client?.taxId || '');
 
   sheetsHTML += `
