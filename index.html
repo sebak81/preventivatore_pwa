@@ -62,6 +62,12 @@
           <label>Validità Offerta</label>
           <input type="text" id="doc-validity" value="15 giorni">
         </div>
+
+        <!-- Descrizione sintetica preventivo -->
+        <div class="form-group full">
+          <label>Descrizione sintetica preventivo</label>
+          <input type="text" id="doc-short-desc" placeholder="es. Ecobonus, Zanzariere, Porte Interne">
+        </div>
       </div>
     </section>
 
@@ -75,9 +81,13 @@
           <label>Cognome e Nome / Ragione Sociale</label>
           <input type="text" id="client-name" placeholder="Rossi Mario">
         </div>
-        <div class="form-group full">
-          <label>Indirizzo Residenza (Via, Civico, CAP, Città, Prov)</label>
-          <input type="text" id="client-residence" placeholder="via Roma 10, 00100 Roma (RM)">
+        <div class="form-group">
+          <label>Indirizzo (Via e Civico)</label>
+          <input type="text" id="client-address" placeholder="via Carlo Cattaneo, 34">
+        </div>
+        <div class="form-group">
+          <label>CAP, Città e Provincia</label>
+          <input type="text" id="client-city" placeholder="30030 Martellago (VE)">
         </div>
         <div class="form-group">
           <label>Codice Fiscale / P.IVA</label>
@@ -154,7 +164,7 @@
           <input type="number" step="0.01" min="0" id="transport-cost" placeholder="0.00">
         </div>
 
-        <!-- Opzione Smaltimento con Flag Compreso affiancato a destra -->
+        <!-- Opzione Smaltimento con Flag Compreso -->
         <div class="form-group">
           <label>Smaltimento (€)</label>
           <div style="display: flex; gap: 8px; align-items: center;">
