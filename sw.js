@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v72'; // Supporto righe vuote spaziatrici nelle schede tecniche
+const CACHE_NAME = 'prev-app-v74'; // Precompilazione Dati Committente nel Quadro Economico Complessivo
 const ASSETS = [
   './',
   './index.html',
