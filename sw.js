@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prev-app-v74'; // Precompilazione Dati Committente nel Quadro Economico Complessivo
+const CACHE_NAME = 'prev-app-v76'; // Separazione campi Indirizzo e Città nel form Committente
 const ASSETS = [
   './',
   './index.html',
