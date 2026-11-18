@@ -332,7 +332,7 @@ async function fetchRemoteLegalTerms() {
 }
 
 // ==========================================================================
-// 5. STATO CENTRALE DEL PREVENTIVO (Con Descrizione Sintetica)
+// 5. STATO CENTRALE DEL PREVENTIVO
 // ==========================================================================
 let docState = {
   type: "PREVENTIVO",
@@ -408,6 +408,27 @@ function formatLongItalianDate(isoDate) {
   } catch (e) {
     return isoDate;
   }
+}
+
+function splitClientResidence(res) {
+  const clean = (res || "").trim();
+  if (!clean) return { address: "", cityCap: "" };
+  const capMatch = clean.match(/(?:^|[\s,\-])(\d{5}\b.*)/);
+  if (capMatch) {
+    const start = capMatch.index;
+    return {
+      address: clean.slice(0, start).replace(/[\s,\-]+$/, ""),
+      cityCap: capMatch[1].replace(/^[\s,\-]+/, "")
+    };
+  }
+  const lastComma = clean.lastIndexOf(",");
+  if (lastComma !== -1) {
+    return {
+      address: clean.slice(0, lastComma).replace(/[\s,\-]+$/, ""),
+      cityCap: clean.slice(lastComma + 1).replace(/^[\s,\-]+/, "")
+    };
+  }
+  return { address: clean, cityCap: "" };
 }
 
 // ==========================================================================
@@ -2152,7 +2173,7 @@ function prepareAndPrint() {
         `;
       }
 
-      // 2. RIGA SENZA NOME E SENZA MISURE MA CON DESCRIZIONE O PREZZO (es. Nota di lavorazione o articolo a corpo)
+      // 2. RIGA SENZA NOME E SENZA MISURE MA CON DESCRIZIONE O PREZZO
       if (!hasName && !hasMeasures) {
         return `
           <tr>
@@ -2206,7 +2227,6 @@ function prepareAndPrint() {
     sheetsHTML += `
       <div class="sheet">
         <div>
-          <!-- Intestazione alleggerita -->
           <div class="p-header">
             <div class="p-company">
               <div class="p-company-title">${escapeHtml(companySettings.name)}</div>
@@ -2262,7 +2282,7 @@ function prepareAndPrint() {
     `;
   });
 
-  // 3. PAGINA TOTALI & FIRMA (Pre-calcolo sicuro di tutte le righe di riepilogo)
+  // 3. PAGINA TOTALI & FIRMA
   const pageTotalsNum = docState.categories.length + 2;
   let catSummaryRows = docState.categories.map((c) => {
     const t = calculateCategoryTotals(c);
@@ -2280,7 +2300,6 @@ function prepareAndPrint() {
     ? `<div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>Note:</strong> ${escapeHtml(docState.finalNotes)}</div>`
     : '';
 
-  // Righe Trasporto e Smaltimento pre-costruite
   let transportRowHtml = '';
   if (hasTransport) {
     transportRowHtml = `
@@ -2308,7 +2327,6 @@ function prepareAndPrint() {
     `;
   }
 
-  // Righe IVA: calcolo mista dettagliato oppure riga singola ordinaria/agevolata
   let taxRowsHtml = "";
   if (isMista) {
     taxRowsHtml = `
@@ -2378,6 +2396,13 @@ function prepareAndPrint() {
     `;
   }
 
+  // Precompilazione Dati Committente dall'intestazione preventivo
+  const clientNameVal = escapeHtml(docState.client?.name || '');
+  const resParts = splitClientResidence(docState.client?.residence || '');
+  const clientAddrVal = escapeHtml(resParts.address);
+  const clientCityCapVal = escapeHtml(resParts.cityCap);
+  const clientTaxIdVal = escapeHtml(docState.client?.taxId || '');
+
   sheetsHTML += `
     <div class="sheet">
       <!-- SEZIONE SUPERIORE -->
@@ -2435,25 +2460,25 @@ function prepareAndPrint() {
           ${finalNotesHtml}
         </div>
 
-        <!-- SEZIONE SPAZI DI COMPILAZIONE DATI COMMITTENTE -->
+        <!-- SEZIONE DATI COMMITTENTE PRECOMPILATI -->
         <div style="margin-top: 14px; font-size: 0.78rem;">
           <div style="font-weight: 800; text-transform: uppercase; margin-bottom: 6px; color: #000;">DATI COMMITTENTE:</div>
           <div style="display: flex; flex-direction: column; gap: 7px;">
             <div style="display: flex; align-items: flex-end;">
-              <span style="font-weight: 700; white-space: nowrap; margin-right: 6px;">COGNOME E NOME (o RAGIONE SOCIALE)</span>
-              <span style="flex-grow: 1; border-bottom: 1px solid #222; height: 1.1em;"></span>
+              <span style="font-weight: 700; white-space: nowrap; margin-right: 8px;">COGNOME E NOME (o RAGIONE SOCIALE)</span>
+              <span style="flex-grow: 1; border-bottom: 1px solid #222; min-height: 1.15em; padding-left: 6px; font-weight: 600; color: #0f172a;">${clientNameVal}</span>
             </div>
             <div style="display: flex; align-items: flex-end;">
-              <span style="font-weight: 700; white-space: nowrap; margin-right: 6px;">INDIRIZZO \\ SEDE LEGALE</span>
-              <span style="flex-grow: 1; border-bottom: 1px solid #222; height: 1.1em;"></span>
+              <span style="font-weight: 700; white-space: nowrap; margin-right: 8px;">INDIRIZZO \\ SEDE LEGALE</span>
+              <span style="flex-grow: 1; border-bottom: 1px solid #222; min-height: 1.15em; padding-left: 6px; font-weight: 600; color: #0f172a;">${clientAddrVal}</span>
             </div>
             <div style="display: flex; align-items: flex-end;">
-              <span style="font-weight: 700; white-space: nowrap; margin-right: 6px;">CITTA' E CAP</span>
-              <span style="flex-grow: 1; border-bottom: 1px solid #222; height: 1.1em;"></span>
+              <span style="font-weight: 700; white-space: nowrap; margin-right: 8px;">CITTA' E CAP</span>
+              <span style="flex-grow: 1; border-bottom: 1px solid #222; min-height: 1.15em; padding-left: 6px; font-weight: 600; color: #0f172a;">${clientCityCapVal}</span>
             </div>
             <div style="display: flex; align-items: flex-end;">
-              <span style="font-weight: 700; white-space: nowrap; margin-right: 6px;">CODICE FISCALE (o PARTITA IVA)</span>
-              <span style="flex-grow: 1; border-bottom: 1px solid #222; height: 1.1em;"></span>
+              <span style="font-weight: 700; white-space: nowrap; margin-right: 8px;">CODICE FISCALE (o PARTITA IVA)</span>
+              <span style="flex-grow: 1; border-bottom: 1px solid #222; min-height: 1.15em; padding-left: 6px; font-weight: 600; color: #0f172a;">${clientTaxIdVal}</span>
             </div>
           </div>
         </div>
